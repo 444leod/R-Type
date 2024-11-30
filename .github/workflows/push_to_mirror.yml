@@ -10,7 +10,7 @@ jobs:
   build:
     name: Test compilations
     runs-on: self-hosted
-    container: epitechcontent/epitest-docker:latest
+    container: ximaz/epitest-docker-aarch64
 
     steps:
       - name: Checkout repository
