@@ -25,7 +25,7 @@ jobs:
 
   push_to_mirror:
     name: Push to mirror
-    needs: [build, test, check_coding_style]
+    needs: [build]
     if: ${{ github.ref_name == 'main' && github.event_name == 'push' }}
     runs-on: self-hosted
 
