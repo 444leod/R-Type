@@ -12,6 +12,7 @@
 #include <map>
 #include <vector>
 #include <cassert>
+#include <algorithm>
 #include "Family.hpp"
 #include "SparseSet.hpp"
 #include "View.hpp"
@@ -40,6 +41,14 @@ public:
 
         _entities.emplace_back(entity);
         return entity;
+    }
+
+    void remove(std::size_t entity)
+    {
+        for (auto const &[id, sparse] : _sparse_sets)
+            if (sparse->contains(entity))
+                sparse->erase(entity);
+        _entities.erase(std::find(_entities.begin(), _entities.end(), entity));
     }
 
     template <typename T>
