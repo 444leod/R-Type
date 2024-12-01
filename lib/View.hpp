@@ -70,7 +70,7 @@ public:
         {
             if (!_sparse_sets.contains(component))
             {
-                std::cerr << "Component " << component << " is not in the registry" << std::endl;
+                // std::cerr << "Component " << component << " is not in the registry" << std::endl;
                 return {};
             }
         }
@@ -136,7 +136,7 @@ private:
         return true;
     }
 
-    template <typename T, Others...>
+    template <typename T, typename... Remaining>
     bool _updateComponentsTuple(std::size_t entity, std::tuple<Component, Others...> &tuple)
     {
         const auto id = Family::type<T>();
@@ -148,9 +148,9 @@ private:
         if (!sparse->contains(entity))
             return false;
         std::get<T>(tuple) = sparse->get(entity);
-        if constexpr (sizeof...(Others) > 0)
+        if constexpr (sizeof...(Remaining) > 0)
         {
-            return _updateComponentTuple<Others...>(entity, tuple);
+            return _updateComponentTuple<Remaining...>(entity, tuple);
         }
         return true;
     }
