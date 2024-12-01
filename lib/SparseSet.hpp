@@ -27,17 +27,17 @@ class SparseSet final : public ISparseSet
 {
 public:
     SparseSet() = default;
-    ~SparseSet() = default;
+    ~SparseSet() override = default;
 
     void set(std::size_t entity, const T& component) { this->_map[entity] = component; }
     void erase(std::size_t entity) override { this->_map.erase(entity); }
 
-    bool contains(std::size_t entity) const { return this->_map.find(entity) != this->_map.end(); }
+    [[nodiscard]] bool contains(std::size_t entity) const { return this->_map.find(entity) != this->_map.end(); }
 
     T &get(std::size_t entity) { return this->_map.at(entity); }
     const T &get(std::size_t entity) const { return this->_map.at(entity); }
 
-    std::vector<std::size_t> getEntities() const
+    [[nodiscard]] std::vector<std::size_t> getEntities() const
     {
         std::vector<std::size_t> entities;
         for (const auto &[entity, _] : _map)
