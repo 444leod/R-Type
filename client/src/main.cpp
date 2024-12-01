@@ -5,11 +5,16 @@
 ** main
 */
 
+#include "EventDispatcher.hpp"
 #include "Foo.hpp"
 
 int main(void)
 {
-    std::cout << "Client said:" << std::endl;
-    Foo::say();
+    Foo *foo = new Foo();
+    EventDispatcher dispatcher;
+    dispatcher.link<foo_message>(foo);
+    dispatcher.broadcast<foo_message>({ .message = "Hello world!" });
+    dispatcher.unlink<foo_message>(foo);
+    dispatcher.broadcast<foo_message>({ .message = "If this shows up we're cooked..." });
     return 0;
 }
