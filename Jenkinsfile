@@ -31,7 +31,10 @@ pipeline {
                         stage('Build Docker Image') {
                             steps {
                                 script {
-                                    sh 'docker build -t rtype-documentation:latest -f documentation/docusaurus/Dockerfile .'
+                                    sh '''
+                                        cd documentation/docusaurus
+                                        docker build -t rtype-documentation:latest .
+                                    '''
                                 }
                             }
                         }
