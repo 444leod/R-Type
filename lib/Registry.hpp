@@ -18,9 +18,9 @@
 #include "SparseSet.hpp"
 #include "View.hpp"
 
-inline entity_id get_new_entity_id()
+inline Entity get_new_entity_id()
 {
-    static entity_id value = 0;
+    static Entity value = 0;
     return value++;
 }
 
@@ -44,7 +44,7 @@ public:
         return entity;
     }
 
-    void remove(entity_id entity)
+    void remove(Entity entity)
     {
         for (auto const &[id, sparse] : _sparse_sets)
             if (sparse->contains(entity))
@@ -52,8 +52,15 @@ public:
         _entities.erase(std::find(_entities.begin(), _entities.end(), entity));
     }
 
+    void clear()
+    {
+        for (auto const &[id, sparse] : _sparse_sets)
+            sparse->clear();
+        _entities.clear();
+    }
+
     template <typename T>
-    void addComponent(entity_id entity, const T &component)
+    void addComponent(Entity entity, const T &component)
     {
         const auto id = Family::type<T>();
         SparseSet<T> *set = nullptr;
@@ -76,8 +83,8 @@ public:
     }
 
 private:
-    std::vector<entity_id> _entities = {};
-    std::map<entity_id, ISparseSet *> _sparse_sets = {};
+    std::vector<Entity> _entities = {};
+    std::map<std::size_t, ISparseSet *> _sparse_sets = {};
 };
 
 #endif //REGISTRY_HPP

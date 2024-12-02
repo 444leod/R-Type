@@ -10,18 +10,17 @@
 
 #include <cstddef>
 #include <type_traits>
-#include "Entity.hpp"
 
 class Family {
-    static entity_id identifier() noexcept {
-        static entity_id value = 0;
+    static std::size_t identifier() noexcept {
+        static std::size_t value = 0;
         return value++;
     }
 
 public:
     template<typename>
-    static entity_id type() noexcept {
-        static const entity_id value = identifier();
+    static std::size_t type() noexcept {
+        static const std::size_t value = identifier();
         return value;
     }
 };
@@ -51,16 +50,16 @@ public:
 #   define GENERATOR_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #endif
 
-constexpr entity_id hash(const char* str) {
-    entity_id hash = 0;
+constexpr std::size_t hash(const char* str) {
+    std::size_t hash = 0;
     while (*str) {
         hash = hash * 101 + static_cast<unsigned char>(*str++);
     }
     return hash;
 }
 struct GENERATOR_API generator {
-    static entity_id next() {
-        static entity_id value{};
+    static std::size_t next() {
+        static std::size_t value{};
         return value++;
     }
 };
@@ -68,13 +67,13 @@ struct GENERATOR_API generator {
 template<typename Type>
 struct GENERATOR_API final_type {
 #if defined GENERATOR_PRETTY_FUNCTION
-    static constexpr entity_id id() {
+    static constexpr std::size_t id() {
         constexpr auto value = hash(GENERATOR_PRETTY_FUNCTION);
         return value;
     }
 #else
-    static entity_id id() {
-        static const entity_id value = generator::next();
+    static std::size_t id() {
+        static const std::size_t value = generator::next();
         return value;
     }
 #endif
@@ -83,7 +82,7 @@ struct GENERATOR_API final_type {
 template<typename T>
 struct GENERATOR_API type {
     using Type = std::decay_t<T>;
-    static constexpr entity_id id() {
+    static constexpr std::size_t id() {
         return final_type<Type>::id();
     }
 };

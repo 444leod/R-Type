@@ -19,8 +19,9 @@ class ISparseSet {
 public:
     virtual ~ISparseSet() = default;
 
-    virtual bool contains(entity_id entity) const = 0;
-    virtual void erase(entity_id entity) = 0;
+    virtual bool contains(Entity entity) const = 0;
+    virtual void erase(Entity entity) = 0;
+    virtual void clear() = 0;
     friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
 };
 
@@ -31,17 +32,19 @@ public:
     SparseSet() = default;
     ~SparseSet() override = default;
 
-    void set(entity_id entity, const T& component) { this->_map[entity] = component; }
-    void erase(entity_id entity) override { this->_map.erase(entity); }
+    void set(Entity entity, const T& component) { this->_map[entity] = component; }
+    void erase(Entity entity) override { this->_map.erase(entity); }
 
-    [[nodiscard]] bool contains(entity_id entity) const { return this->_map.contains(entity); }
+    [[nodiscard]] bool contains(Entity entity) const { return this->_map.contains(entity); }
 
-    T &get(entity_id entity) { return this->_map.at(entity); }
-    const T &get(entity_id entity) const { return this->_map.at(entity); }
+    T &get(Entity entity) { return this->_map.at(entity); }
+    const T &get(Entity entity) const { return this->_map.at(entity); }
 
-    [[nodiscard]] std::vector<entity_id> getEntities() const
+    void clear() override { this->_map.clear(); }
+
+    [[nodiscard]] std::vector<Entity> getEntities() const
     {
-        std::vector<entity_id> entities;
+        std::vector<Entity> entities;
         for (const auto &[entity, _] : _map)
             entities.push_back(entity);
         return entities;
@@ -62,7 +65,7 @@ public:
     }
 
 private:
-    std::map<entity_id, T> _map = {};
+    std::map<Entity, T> _map = {};
 };
 
 #endif //SPARSESET_HPP

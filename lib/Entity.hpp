@@ -10,7 +10,6 @@
 
 #include <cstddef>
 
-using entity_id = std::size_t;
-
+using Entity = std::size_t;
 
 #endif //ENTITY_HPP
