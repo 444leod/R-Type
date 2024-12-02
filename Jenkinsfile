@@ -8,6 +8,9 @@ pipeline {
     }
     stages {
         stage('Build, Publish, Deploy Docusaurus') {
+            when {
+                branch 'main'
+            }
             stages {
                 stage('Check Changes') {
                     steps {
@@ -61,12 +64,12 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-        stage('Docker logout') {
-            steps {
-                script {
-                    sh 'docker logout'
+                stage('Docker logout') {
+                    steps {
+                        script {
+                            sh 'docker logout'
+                        }
+                    }
                 }
             }
         }
