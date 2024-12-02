@@ -13,13 +13,14 @@
 #include <vector>
 #include <cassert>
 #include <algorithm>
+#include "Entity.hpp"
 #include "Family.hpp"
 #include "SparseSet.hpp"
 #include "View.hpp"
 
-inline std::size_t get_new_entity_id()
+inline entity_id get_new_entity_id()
 {
-    static std::size_t value = 0;
+    static entity_id value = 0;
     return value++;
 }
 
@@ -43,7 +44,7 @@ public:
         return entity;
     }
 
-    void remove(std::size_t entity)
+    void remove(entity_id entity)
     {
         for (auto const &[id, sparse] : _sparse_sets)
             if (sparse->contains(entity))
@@ -52,7 +53,7 @@ public:
     }
 
     template <typename T>
-    void addComponent(std::size_t entity, const T &component)
+    void addComponent(entity_id entity, const T &component)
     {
         const auto id = Family::type<T>();
         SparseSet<T> *set = nullptr;
@@ -75,8 +76,8 @@ public:
     }
 
 private:
-    std::vector<std::size_t> _entities = {};
-    std::map<std::size_t, ISparseSet *> _sparse_sets = {};
+    std::vector<entity_id> _entities = {};
+    std::map<entity_id, ISparseSet *> _sparse_sets = {};
 };
 
 #endif //REGISTRY_HPP

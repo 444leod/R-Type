@@ -13,10 +13,11 @@
 #include <vector>
 #include <tuple>
 #include <memory>
+#include "Entity.hpp"
 #include "Family.hpp"
 #include "SparseSet.hpp"
 
-inline std::ostream &operator<<(std::ostream &os, const std::vector<std::size_t> &vec)
+inline std::ostream &operator<<(std::ostream &os, const std::vector<entity_id> &vec)
 {
     os << "Entities: ";
     for (const auto &id : vec)
@@ -30,7 +31,7 @@ template <typename Component, typename... Others>
 class View
 {
 public:
-    View(const std::map<std::size_t, ISparseSet *> &sparse_sets) : _identifiers{Family::type<Component>(), Family::type<Others>()...}, _sparse_sets{sparse_sets} {
+    View(const std::map<entity_id, ISparseSet *> &sparse_sets) : _identifiers{Family::type<Component>(), Family::type<Others>()...}, _sparse_sets{sparse_sets} {
         // for (const auto &component : _identifiers)
         // {
         //     if (!_sparse_sets.contains(component))
@@ -61,10 +62,10 @@ public:
     }
     ~View() = default;
 
-    std::vector<std::pair<std::size_t, std::tuple<Component, Others...>>> get()
+    std::vector<std::pair<entity_id, std::tuple<Component, Others...>>> get()
     {
         std::vector<std::tuple<Component, Others...>> components;
-        std::vector<std::size_t> entities;
+        std::vector<entity_id> entities;
 
         for (const auto &component : _identifiers)
         {
@@ -99,8 +100,8 @@ public:
             }
         }
 
-        std::vector<std::pair<std::size_t, std::tuple<Component, Others...>>> result;
-        for (std::size_t i = 0; i < components.size(); i++)
+        std::vector<std::pair<entity_id, std::tuple<Component, Others...>>> result;
+        for (entity_id i = 0; i < components.size(); i++)
         {
             result.push_back(std::make_pair(entities[i], components[i]));
         }
@@ -109,7 +110,7 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const View &view)
     {
-        std::vector<std::size_t> identifiers = view._identifiers;
+        std::vector<entity_id> identifiers = view._identifiers;
         if (identifiers.empty())
             return os;
         os << identifiers[0];
@@ -120,11 +121,11 @@ public:
     }
 
 private:
-    std::vector<std::size_t> _identifiers;
-    std::map<std::size_t, ISparseSet *> _sparse_sets;
+    std::vector<entity_id> _identifiers;
+    std::map<entity_id, ISparseSet *> _sparse_sets;
 
     template <typename T>
-    bool _updateComponentTuple(std::size_t entity, std::tuple<Component, Others...> &tuple)
+    bool _updateComponentTuple(entity_id entity, std::tuple<Component, Others...> &tuple)
     {
         const auto id = Family::type<T>();
         auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
@@ -133,7 +134,7 @@ private:
     }
 
     template <typename T, typename... Remaining>
-    bool _updateComponentsTuple(std::size_t entity, std::tuple<Component, Others...> &tuple)
+    bool _updateComponentsTuple(entity_id entity, std::tuple<Component, Others...> &tuple)
     {
         const auto id = Family::type<T>();
         auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
@@ -148,7 +149,7 @@ private:
     }
 
     // template <typename T>
-    // bool _entityContainComponents(const std::size_t entity)
+    // bool _entityContainComponents(const entity_id entity)
     // {
     //     const auto id = Family::type<T>();
     //     if (!_sparse_sets.contains(id))
@@ -162,7 +163,7 @@ private:
     // }
     //
     // template <typename T, Others...>
-    // bool _entityContainComponents(const std::size_t entity)
+    // bool _entityContainComponents(const entity_id entity)
     // {
     //     const auto id = Family::type<T>();
     //     if (!_sparse_sets.contains(id))
