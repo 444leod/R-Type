@@ -78,11 +78,9 @@ public:
         const auto first = _identifiers[0];
         const auto sparse = dynamic_cast<SparseSet<Component> *>(_sparse_sets.at(first));
 
-        auto entitiesList = sparse->getEntities();
         for (const auto &entity : sparse->getEntities())
         {
             std::tuple<Component, Others...> tuple;
-            Component &res = sparse->get(entity);
             std::get<Component>(tuple) = sparse->get(entity);
             if constexpr (sizeof...(Others) > 0)
             {
@@ -140,10 +138,6 @@ private:
     bool _updateComponentsTuple(std::size_t entity, std::tuple<Component, Others...> &tuple)
     {
         const auto id = Family::type<T>();
-        if (!_sparse_sets.contains(id))
-        {
-            return false;
-        }
         auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
         if (!sparse->contains(entity))
             return false;
@@ -154,34 +148,6 @@ private:
         }
         return true;
     }
-
-    // template <typename T>
-    // bool _entityContainComponents(const std::size_t entity)
-    // {
-    //     const auto id = Family::type<T>();
-    //     if (!_sparse_sets.contains(id))
-    //     {
-    //         return false;
-    //     }
-    //     auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
-    //     if (!sparse->contains(entity))
-    //         return false;
-    //     return true;
-    // }
-    //
-    // template <typename T, Others...>
-    // bool _entityContainComponents(const std::size_t entity)
-    // {
-    //     const auto id = Family::type<T>();
-    //     if (!_sparse_sets.contains(id))
-    //     {
-    //         return false;
-    //     }
-    //     auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
-    //     if (!sparse->contains(entity))
-    //         return false;
-    //     return _entityContainComponents<Others...>(entity);
-    // }
 };
 
 #endif //VIEW_HPP
