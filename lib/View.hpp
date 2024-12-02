@@ -127,30 +127,22 @@ private:
     bool _updateComponentTuple(std::size_t entity, std::tuple<Component, Others...> &tuple)
     {
         const auto id = Family::type<T>();
-        if (!_sparse_sets.contains(id))
-        {
-            return false;
-        }
         auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
         std::get<T>(tuple) = sparse->get(entity);
         return true;
     }
 
-    template <typename T, Others...>
+    template <typename T, typename... Remaining>
     bool _updateComponentsTuple(std::size_t entity, std::tuple<Component, Others...> &tuple)
     {
         const auto id = Family::type<T>();
-        if (!_sparse_sets.contains(id))
-        {
-            return false;
-        }
         auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
         if (!sparse->contains(entity))
             return false;
         std::get<T>(tuple) = sparse->get(entity);
-        if constexpr (sizeof...(Others) > 0)
+        if constexpr (sizeof...(Remaining) > 0)
         {
-            return _updateComponentTuple<Others...>(entity, tuple);
+            return _updateComponentTuple<Remaining...>(entity, tuple);
         }
         return true;
     }
