@@ -42,5 +42,4 @@ int main() {
 
 ## Et encore une photo
 
-  
 ![Une photo](https://www.epitech.eu/wp-content/themes/epitech-refonte/assets/images/hero-home-epitech-hero-boy.webp)
