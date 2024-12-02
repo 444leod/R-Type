@@ -4,6 +4,7 @@ pipeline {
     agent any
     environment {
         GITHUB_GHCR_PAT = credentials('github_pat_packages')
+        TOKEN_TA_NOTIFIER = credentials('my_ta_notifier_api')
     }
     stages {
         stage('Build, Publish, Deploy Docusaurus') {
@@ -47,6 +48,16 @@ pipeline {
                                     sh 'docker push ghcr.io/epitechpromo2027/rtype-documentation:latest'
                                 }
                             }
+                        }
+                    }
+                }
+                stage('Notify Server - Deploy docs') {
+                    when {
+                        expression { (!!changes) == true }
+                    }
+                    steps {
+                        script {
+                            sh 'curl --fail-with-body --header "Authorization: Bearer $TOKEN_TA_NOTIFIER" "https://mytanotifier.a1ex.fr/api/build-rtype-docs'
                         }
                     }
                 }
