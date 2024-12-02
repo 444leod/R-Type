@@ -18,6 +18,7 @@ class ISparseSet {
 public:
     virtual ~ISparseSet() = default;
 
+    virtual bool contains(std::size_t entity) const = 0;
     virtual void erase(std::size_t entity) = 0;
     friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
 };
