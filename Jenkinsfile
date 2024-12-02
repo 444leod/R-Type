@@ -1,9 +1,9 @@
+def changes
 pipeline {
     agent any
     environment {
         GITHUB_GHCR_PAT = credentials('github_pat_packages')
     }
-    def changes
     stages {
         stage('Build, Publish, Deploy Docusaurus') {
             stages {
