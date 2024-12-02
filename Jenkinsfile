@@ -52,11 +52,6 @@ pipeline {
                 }
             }
         }
-        stage('Other') {
-            steps {
-                echo "OK"
-            }
-        }
     }
     post {
         always {
