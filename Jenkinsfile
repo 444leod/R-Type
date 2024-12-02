@@ -57,9 +57,16 @@ pipeline {
                     }
                     steps {
                         script {
-                            sh 'curl --fail-with-body --header "Authorization: Bearer $TOKEN_TA_NOTIFIER" "https://mytanotifier.a1ex.fr/api/build-rtype-docs'
+                            sh 'curl --fail-with-body --header "Authorization: Bearer $TOKEN_TA_NOTIFIER" https://mytanotifier.a1ex.fr/api/build-rtype-docs'
                         }
                     }
+                }
+            }
+        }
+        stage('Docker logout') {
+            steps {
+                script {
+                    sh 'docker logout'
                 }
             }
         }
