@@ -9,7 +9,7 @@ pipeline {
     }
     stages {
         stage('Build, Publish, Deploy Docusaurus') {
-            steps {
+            stages {
                 stage('Check Changes') {
                     steps {
                         script {
@@ -18,7 +18,7 @@ pipeline {
                                 returnStdout: true
                             ).trim()
                             if (!changes) {
-                                echo "No changes detected in documentation, ignoring pipeline."
+                                echo "No changes detected in /documentation/docusaurus, ignoring Docker build."
                             } else {
                                 echo "Changes detected in /documentation/docusaurus :"
                                 echo changes
@@ -27,27 +27,34 @@ pipeline {
                         }
                     }
                 }
-                stage('Docker') {
+                stage('Docker Build and Publish') {
                     when {
                         expression { env.DOCS_CHANGED == 'true' }
                     }
-                    steps {
-                        stage('Build docker') {
+                    stages {
+                        stage('Build Docker Image') {
                             steps {
                                 script {
                                     sh 'docker build -t rtype-documentation:latest -f documentation/docusaurus/Dockerfile .'
                                 }
                             }
                         }
-                        stage('Push') {
+                        stage('Push Docker Image') {
                             steps {
-                                sh 'echo $GITHUB_GHCR_PAT | docker login ghcr.io -u a9ex --password-stdin'
-                                sh 'docker tag rtype-documentation:latest ghcr.io/epitechpromo2027/rtype-documentationi:latest'
-                                sh 'docker push ghcr.io/epitechpromo2027/rtype-documentation:latest'
+                                script {
+                                    sh 'echo $GITHUB_GHCR_PAT | docker login ghcr.io -u a9ex --password-stdin'
+                                    sh 'docker tag rtype-documentation:latest ghcr.io/epitechpromo2027/rtype-documentation:latest'
+                                    sh 'docker push ghcr.io/epitechpromo2027/rtype-documentation:latest'
+                                }
                             }
                         }
                     }
                 }
+            }
+        }
+        stage('Other') {
+            steps {
+                echo "OK"
             }
         }
     }
