@@ -35,8 +35,6 @@ pipeline {
                                 script {
                                     sh '''
                                         cd documentation/docusaurus
-                                        ls
-                                        ls docs
                                         docker build -t rtype-documentation:latest .
                                     '''
                                 }
