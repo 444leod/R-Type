@@ -12,8 +12,8 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include "Entity.hpp"
 #include "Family.hpp"
+#include "Entity.hpp"
 
 class ISparseSet {
 public:
@@ -35,7 +35,7 @@ public:
     void set(Entity entity, const T& component) { this->_map[entity] = component; }
     void erase(Entity entity) override { this->_map.erase(entity); }
 
-    [[nodiscard]] bool contains(Entity entity) const { return this->_map.contains(entity); }
+    [[nodiscard]] bool contains(Entity entity) const override { return this->_map.contains(entity); }
 
     T &get(Entity entity) { return this->_map.at(entity); }
     const T &get(Entity entity) const { return this->_map.at(entity); }
@@ -58,7 +58,7 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const SparseSet &sparse)
     {
-        os << "\tSparse for component " << Family::type<T>() << ": " << std::endl;
+        os << "\tSparse for component " << type<T>::id() << ": " << std::endl;
         for (const auto &[id, ptr] : sparse._map)
             os << "\t\t" << id << ": " << *ptr << std::endl;
         return os;

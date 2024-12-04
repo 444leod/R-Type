@@ -13,8 +13,8 @@
 #include <vector>
 #include <cassert>
 #include <algorithm>
-#include "Entity.hpp"
 #include "Family.hpp"
+#include "Entity.hpp"
 #include "SparseSet.hpp"
 #include "View.hpp"
 
@@ -44,7 +44,7 @@ public:
         return entity;
     }
 
-    void remove(Entity entity)
+    void remove(const Entity entity)
     {
         for (auto const &[id, sparse] : _sparse_sets)
             if (sparse->contains(entity))
@@ -62,7 +62,7 @@ public:
     template <typename T>
     void addComponent(Entity entity, const T &component)
     {
-        const auto id = Family::type<T>();
+        const auto id = type<T>::id();
         SparseSet<T> *set = nullptr;
 
         if (!this->_sparse_sets.contains(id))

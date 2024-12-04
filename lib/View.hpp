@@ -12,7 +12,6 @@
 #include <map>
 #include <vector>
 #include <tuple>
-#include <memory>
 #include "Entity.hpp"
 #include "Family.hpp"
 #include "SparseSet.hpp"
@@ -31,7 +30,7 @@ template <typename Component, typename... Others>
 class View
 {
 public:
-    View(const std::map<std::size_t, ISparseSet *> &sparse_sets) : _identifiers{Family::type<Component>(), Family::type<Others>()...}, _sparse_sets{sparse_sets} {
+    View(const std::map<std::size_t, ISparseSet *> &sparse_sets) : _identifiers{type<Component>::id(), type<Others>::id()...}, _sparse_sets{sparse_sets} {
         // for (const auto &component : _identifiers)
         // {
         //     if (!_sparse_sets.contains(component))
@@ -127,7 +126,7 @@ private:
     template <typename T>
     bool _updateComponentTuple(Entity entity, std::tuple<Component, Others...> &tuple)
     {
-        const auto id = Family::type<T>();
+        const auto id = type<T>::id();
         auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
         std::get<T>(tuple) = sparse->get(entity);
         return true;
@@ -136,7 +135,7 @@ private:
     template <typename T, typename... Remaining>
     bool _updateComponentsTuple(Entity entity, std::tuple<Component, Others...> &tuple)
     {
-        const auto id = Family::type<T>();
+        const auto id = type<T>::id();
         auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
         if (!sparse->contains(entity))
             return false;
@@ -151,7 +150,7 @@ private:
     // template <typename T>
     // bool _entityContainComponents(const Entity entity)
     // {
-    //     const auto id = Family::type<T>();
+    //     const auto id = type<T>::id();
     //     if (!_sparse_sets.contains(id))
     //     {
     //         return false;
@@ -165,7 +164,7 @@ private:
     // template <typename T, Others...>
     // bool _entityContainComponents(const Entity entity)
     // {
-    //     const auto id = Family::type<T>();
+    //     const auto id = type<T>::id();
     //     if (!_sparse_sets.contains(id))
     //     {
     //         return false;
