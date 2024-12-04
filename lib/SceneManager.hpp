@@ -75,7 +75,12 @@ public:
         }
     }
 
-    void stop() noexcept { this->_running = false; }
+    void stop() noexcept
+    {
+        this->_running = false;
+        if (this->_current != nullptr)
+            this->_current->onExit();
+    }
 
 private:
     void _updateSceneState()
