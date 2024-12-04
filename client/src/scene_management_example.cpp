@@ -5,11 +5,12 @@
 ** scene_management_example.cpp
 */
 
+#include <iostream>
 #include "SceneManager.hpp"
 
-class FirstScene final : public IScene {
+class FirstScene final : public AScene {
 public:
-    FirstScene(std::string& scene, bool& running) : IScene(scene, running) {}
+    FirstScene(SceneManager& m, const std::string& n) : AScene(m, n) {}
 
     void initialize() override
     {
@@ -18,35 +19,36 @@ public:
     void update(double deltaTime) override
     {
         const auto now = std::chrono::high_resolution_clock::now();
+        const auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - _start).count();
 
-        if (const auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - _start).count();duration >= 5) {
-            _sceneReference = "SecondScene";
+        if (duration >= 5) {
+            this->_manager.load("SecondScene");
         }
     }
 
-    void render(sf::RenderWindow &window) override
-    {
-    }
+    void render(sf::RenderWindow &window) override {}
 
-    void onEvent(sf::Event &event) override
-    {
-    }
+    void onEvent(sf::Event &event) override {}
 
-    void onEnter(const std::string& lastScene) override
+    void onEnter() override
     {
-        _start = std::chrono::high_resolution_clock::now();
+        std::cout << "Entered " << this->name() << std::endl;
+        this->_start = std::chrono::high_resolution_clock::now();
     }
+    void onEnter(const AScene& lastScene) override { this->onEnter(); }
 
-    void onExit(const std::string& nextScene) override
+    void onExit() override
     {
+        std::cout << "Exiting from " << this->name() << "..." << std::endl;
     }
+    void onExit(const AScene& nextScene) override { this->onExit(); }
 private:
     std::chrono::time_point<std::chrono::system_clock> _start = std::chrono::high_resolution_clock::now();
 };
 
-class SecondScene final : public IScene {
+class SecondScene final : public AScene {
 public:
-    SecondScene(std::string& scene, bool& running) : IScene(scene, running) {}
+    SecondScene(SceneManager& m, const std::string& n) : AScene(m, n) {}
 
     void initialize() override
     {
@@ -57,7 +59,7 @@ public:
         const auto now = std::chrono::high_resolution_clock::now();
 
         if (const auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - _start).count();duration >= 5) {
-            _sceneReference = "FirstScene";
+            this->_manager.load("FirstScene");
         }
     }
 
@@ -69,14 +71,18 @@ public:
     {
     }
 
-    void onEnter(const std::string& lastScene) override
+    void onEnter() override
     {
-        _start = std::chrono::high_resolution_clock::now();
+        std::cout << "Entered " << this->name() << std::endl;
+        this->_start = std::chrono::high_resolution_clock::now();
     }
+    void onEnter(const AScene& lastScene) override { this->onEnter(); }
 
-    void onExit(const std::string& nextScene) override
+    void onExit() override
     {
+        std::cout << "Exiting from " << this->name() << "..." << std::endl;
     }
+    void onExit(const AScene& nextScene) override { this->onExit(); }
 
 private:
     std::chrono::time_point<std::chrono::system_clock> _start = std::chrono::high_resolution_clock::now();
@@ -89,6 +95,7 @@ int main(void)
     sceneManager.registerScene<FirstScene>("FirstScene");
     sceneManager.registerScene<SecondScene>("SecondScene");
 
-    sceneManager.run("FirstScene");
+    sceneManager.load("FirstScene");
+    sceneManager.run();
     return 0;
 }
