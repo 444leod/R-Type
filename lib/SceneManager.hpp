@@ -18,24 +18,54 @@
 #include "AScene.hpp"
 
 namespace scene {
+    /**
+     * @brief Concept to ensure the type is derived from AScene.
+     */
     template<typename T>
     concept SceneType = std::is_base_of_v<AScene, T>;
 }
 
+/**
+ * @class SceneManager
+ * @brief Manages the scenes in the application.
+ */
 class SceneManager final : public ISceneManager {
 public:
+    /**
+     * @class Exception
+     * @brief Custom exception class for SceneManager.
+     */
     class Exception final : public std::exception {
-        public:
-            explicit Exception(std::string message) : _message(std::move(message)) {}
-            ~Exception() override = default;
-            [[nodiscard]] const char *what() const noexcept override { return _message.c_str(); }
-        private:
-            std::string _message;
+    public:
+        /**
+         * @brief Constructor with a message.
+         * @param message The exception message.
+         */
+        explicit Exception(std::string message) : _message(std::move(message)) {}
+
+        /**
+         * @brief Default destructor.
+         */
+        ~Exception() override = default;
+
+        /**
+         * @brief Returns the exception message.
+         * @return The exception message.
+         */
+        [[nodiscard]] const char *what() const noexcept override { return _message.c_str(); }
+    private:
+        std::string _message; ///< The exception message.
     };
 
     SceneManager() = default;
     ~SceneManager() override = default;
 
+    /**
+     * @brief Registers a scene with a given name.
+     * @tparam T The type of the scene.
+     * @param name The name of the scene.
+     * @throws Exception if the scene name is empty.
+     */
     template <scene::SceneType T>
     void registerScene(const std::string &name)
     {
@@ -46,27 +76,37 @@ public:
         this->_scenes[name] = scene;
     }
 
+    /**
+     * @brief Resets the scene manager.
+     */
     void reset()
     {
         this->_current = nullptr;
         this->_loadingName = "";
     }
 
-    void load(const std::string& name)
+    /**
+     * @brief Loads a scene by name.
+     * @param name The name of the scene to load.
+     */
+    void load(const std::string& name) override
     {
         if (!this->_running)
             return;
         if (this->_scenes.contains(name))
             this->_loadingName = name;
-        // could just throw in case the scene doesn't exist
     }
 
+    /**
+     * @brief Runs the scene manager.
+     * @throws Exception if no scenes are currently loaded.
+     */
     void run()
     {
         auto before = std::chrono::high_resolution_clock::now();
 
-        if (this->_loadingName == "")
-            throw Exception("No scenes curretly loaded.");
+        if (this->_loadingName.empty())
+            throw Exception("No scenes currently loaded.");
         while (_running) {
             auto now = std::chrono::high_resolution_clock::now();
             const double deltaTime = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - before).count() / 1000.0;
@@ -78,6 +118,9 @@ public:
         }
     }
 
+    /**
+     * @brief Stops the scene manager.
+     */
     void stop() noexcept override
     {
         this->_running = false;
@@ -86,6 +129,9 @@ public:
     }
 
 private:
+    /**
+     * @brief Updates the state of the current scene.
+     */
     void _updateSceneState()
     {
         if (_loadingName.empty())
@@ -104,6 +150,9 @@ private:
         this->_loadingName = "";
     }
 
+    /**
+     * @brief Polls events from the window.
+     */
     void _pollEvents()
     {
         sf::Event event{};
@@ -114,6 +163,9 @@ private:
         }
     }
 
+    /**
+     * @brief Renders the current scene.
+     */
     void _render()
     {
         this->_window.clear();
