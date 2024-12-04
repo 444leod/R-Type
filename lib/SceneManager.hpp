@@ -14,6 +14,7 @@
 #include <SFML/Graphics.hpp>
 #include <utility>
 #include <exception>
+#include "ISceneManager.hpp"
 #include "AScene.hpp"
 
 namespace scene {
@@ -21,7 +22,7 @@ namespace scene {
     concept SceneType = std::is_base_of_v<AScene, T>;
 }
 
-class SceneManager final {
+class SceneManager final : public ISceneManager {
 public:
     class Exception final : public std::exception {
         public:
@@ -33,7 +34,7 @@ public:
     };
 
     SceneManager() = default;
-    virtual ~SceneManager() = default;
+    ~SceneManager() override = default;
 
     template <scene::SceneType T>
     void registerScene(const std::string &name)
@@ -53,6 +54,8 @@ public:
 
     void load(const std::string& name)
     {
+        if (!this->_running)
+            return;
         if (this->_scenes.contains(name))
             this->_loadingName = name;
         // could just throw in case the scene doesn't exist
@@ -75,12 +78,12 @@ public:
         }
     }
 
-    void stop() noexcept { this->_running = false; }
+    void stop() noexcept override{ this->_running = false; }
 
 private:
     void _updateSceneState()
     {
-        if (_loadingName == "")
+        if (_loadingName.empty())
             return;
 
         /// Exit the current scene if there was one

@@ -11,13 +11,13 @@
 class SceneManager;
 
 #include <SFML/Graphics.hpp>
-#include "SceneManager.hpp"
+#include "ISceneManager.hpp"
 
 class AScene {
 public:
-    AScene(SceneManager& manager, const std::string& name):
+    AScene(ISceneManager& manager, const std::string& name):
         _manager(manager), _name(name) {}
-    ~AScene() = default;
+    virtual~AScene() = default;
 
     /// @brief Called once at the start of the program
     virtual void initialize() = 0;
@@ -53,7 +53,7 @@ public:
     virtual void onExit(const AScene& nextScene) = 0;
 
 protected:
-    SceneManager& _manager;
+    ISceneManager& _manager;
 
 private:
     const std::string& _name = "";
