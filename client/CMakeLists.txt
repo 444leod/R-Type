@@ -1,11 +1,18 @@
+project(r-type_client VERSION 0.0.1)
+
 set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
 set(SRC_FILES
     main.cpp
 )
 
+find_package(SFML REQUIRED COMPONENTS graphics window system)
+
 list(TRANSFORM SRC_FILES PREPEND "src/")
-add_executable(r-type_client ${SRC_FILES})
-target_include_directories(r-type_client PUBLIC ${LIB_DIR})
-set_target_properties(r-type_client PROPERTIES
+
+add_executable(${PROJECT_NAME} ${SRC_FILES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
 )

@@ -55,3 +55,6 @@ CMakeUserPresets.json
 # Bins
 r-type_client
 r-type_server
+
+# Rtype conan venv
+rtype
