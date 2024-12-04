@@ -26,8 +26,7 @@ public:
     void link(IEventHandler *handler)
     {
         const std::size_t type = Family::type<T>();
-        auto find = this->_links.find(type);
-        if (find == this->_links.end())
+        if (!this->_links.contains(type))
             this->_links[type] = {};
         this->_links[type].push_back(handler);
     }
@@ -39,9 +38,8 @@ public:
     void unlink(IEventHandler *handler)
     {
         const std::size_t type = Family::type<T>();
-        auto find = this->_links.find(type);
-        if (find != this->_links.end())
-            this->_links.erase(find);
+        if (this->_links.contains(type))
+            this->_links.erase(type);
     }
 
     /// @brief Call all the even listeners
