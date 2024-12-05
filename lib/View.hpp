@@ -33,8 +33,8 @@ class View
 
         EntityComponents operator*() {
             size_t entity = *_entityIdsIterator;
-            return {entity, std::tie(dynamic_cast<SparseSet<Component>&>(*_sparse_sets.at(type<Component>::id())).get(entity),
-                                     dynamic_cast<SparseSet<Others>&>(*_sparse_sets.at(type<Others>::id())).get(entity)...)};
+            return {entity, std::tie(dynamic_cast<SparseSet<Component>&>(*_sparse_sets.at(type<Component>::id())).at(entity),
+                                     dynamic_cast<SparseSet<Others>&>(*_sparse_sets.at(type<Others>::id())).at(entity)...)};
         }
 
         Iterator& operator++() {
@@ -82,8 +82,8 @@ public:
     template <typename Func>
     void each(Func&& func) {
         for (auto entity : _entities) {
-            std::tuple<Component&, Others&...> tuple = std::tie(dynamic_cast<SparseSet<Component>&>(*_sparse_sets.at(type<Component>::id())).get(entity),
-                                     dynamic_cast<SparseSet<Others>&>(*_sparse_sets.at(type<Others>::id())).get(entity)...);
+            std::tuple<Component&, Others&...> tuple = std::tie(dynamic_cast<SparseSet<Component>&>(*_sparse_sets.at(type<Component>::id())).at(entity),
+                                     dynamic_cast<SparseSet<Others>&>(*_sparse_sets.at(type<Others>::id())).at(entity)...);
             if constexpr (std::is_invocable_v<Func, Entity, Component&, Others&...>) {
                 func(entity, std::get<Component&>(tuple), std::get<Others&>(tuple)...);
             } else {
@@ -132,7 +132,7 @@ private:
         const auto first = _type_ids[0];
         const auto sparse = dynamic_cast<SparseSet<Component> *>(_sparse_sets.at(first));
 
-        auto entitiesList = sparse->getEntities();
+        auto entitiesList = sparse->entities();
 
         if constexpr (sizeof...(Others) > 0)
         {

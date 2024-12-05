@@ -12,15 +12,29 @@
 #include <stdexcept>
 #include "Entity.hpp"
 
+class ISparseSet
+{
+public:
+    virtual ~ISparseSet() = default;
+
+    virtual bool contains(const Entity& entity) const noexcept = 0;
+    virtual void remove(const Entity& entity) = 0;
+    virtual void clear() = 0;
+    virtual const std::vector<Entity>& entities() const noexcept = 0;
+    virtual std::size_t size() const noexcept = 0;
+    virtual std::size_t capacity() const noexcept = 0;
+};
+
 /// @brief Class representation of a Sparse Set
 /// @tparam T The type of data to be held
 template<typename T>
-class SparseSet
+class SparseSet : public ISparseSet
 {
 public:
     SparseSet() = default;
     ~SparseSet() = default;
 
+public:
     /// @brief Check if the entity is contained in the set
     /// @param entity The entity to check for
     /// @return `true` if the entity is in the set. `false` otherwise
@@ -60,8 +74,11 @@ public:
     /// @param entity The entity to remove from the set
     void remove(const Entity& entity)
     {
+        if (!this->contains(entity))
+            return;
+
         T& last_c = this->_components.back();
-        std::size_t last_e = this->_dense.back();
+        Entity last_e = this->_dense.back();
         // Swap the Entity and Component to the end
         this->_swap(this->_dense.back(), this->_dense[this->_sparse[entity]]);
         this->_swap(this->_components.back(), this->_components[this->_sparse[entity]]);
@@ -72,6 +89,18 @@ public:
         this->_components.pop_back();
     }
 
+    /// @brief Clears the entire set
+    void clear() noexcept
+    {
+        this->_sparse.clear();
+        this->_sparse.push_back(0);
+        this->_dense.clear();
+        this->_components.clear();
+    }
+
+    /// @brief Returns the list of entities contained in the set
+    /// @return A reference to an std::vector of entities
+    const std::vector<Entity>& entities() const noexcept { return this->_dense; }
     /// @brief Gets the amount of components registered
     /// @return std::size_t
     std::size_t size() const noexcept { return this->_dense.size(); }
@@ -80,15 +109,13 @@ public:
     std::size_t capacity() const noexcept { return this->_sparse.capacity(); }
 
 private:
-
     /// @brief Adds an entity in the Sparse if it can, resize otherwise
     /// @param entity The entity to add to
     /// @param value The value to set to the entity id
     void _add_in_sparse(const Entity& entity, std::size_t value)
     {
-        const std::size_t cap = this->_sparse.capacity();
-        if (cap <= entity)
-            this->_sparse.resize(cap * 2);
+        while (this->_sparse.capacity() <= entity)
+            this->_sparse.resize(this->_sparse.capacity() * 2);
         this->_sparse[entity] = value;
     }
 
@@ -104,7 +131,8 @@ private:
         b = tmp;
     }
 
+private:
     std::vector<std::size_t> _sparse = { 0 };
-    std::vector<std::size_t> _dense = {};
+    std::vector<Entity> _dense = {};
     std::vector<T> _components = {};
 };
