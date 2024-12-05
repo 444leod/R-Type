@@ -67,7 +67,7 @@ pipeline {
                 stage('Docker logout') {
                     steps {
                         script {
-                            sh 'docker logout'
+                            sh 'docker logout ghcr.io'
                         }
                     }
                 }
@@ -76,6 +76,7 @@ pipeline {
     }
     post {
         always {
+            cleanWs(deleteDirs: true, disableDeferredWipeout: true)
             echo "Pipeline OK"
         }
         failure {
