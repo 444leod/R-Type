@@ -15,6 +15,14 @@
 #include "Family.hpp"
 #include "Entity.hpp"
 
+class ISparseSetObserver {
+public:
+    virtual ~ISparseSetObserver() = default;
+
+    virtual void onEntitySet(const Entity& entity) = 0;
+    virtual void onEntityErased(const Entity& entity) = 0;
+};
+
 class ISparseSet {
 public:
     virtual ~ISparseSet() = default;
@@ -32,8 +40,16 @@ public:
     SparseSet() = default;
     ~SparseSet() override = default;
 
-    void set(Entity entity, const T& component) { this->_map[entity] = component; }
-    void erase(Entity entity) override { this->_map.erase(entity); }
+    void set(Entity entity, const T& component) {
+        this->_map[entity] = component;
+        for (auto observer : _observers)
+            observer->onEntitySet(entity);
+    }
+    void erase(Entity entity) override {
+        this->_map.erase(entity);
+        for (auto observer : _observers)
+            observer->onEntityErased(entity);
+    }
 
     [[nodiscard]] bool contains(Entity entity) const override { return this->_map.contains(entity); }
 
@@ -56,6 +72,9 @@ public:
             std::cout << id << ": " << ptr << std::endl;
     }
 
+    void addObserver(ISparseSetObserver *observer) { _observers.push_back(observer); }
+    void removeObserver(ISparseSetObserver *observer) { std::erase(_observers, observer); }
+
     friend std::ostream &operator<<(std::ostream &os, const SparseSet &sparse)
     {
         os << "\tSparse for component " << type<T>::id() << ": " << std::endl;
@@ -66,6 +85,7 @@ public:
 
 private:
     std::map<Entity, T> _map = {};
+    std::vector<ISparseSetObserver *> _observers = {};
 };
 
 #endif //SPARSESET_HPP

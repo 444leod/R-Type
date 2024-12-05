@@ -17,7 +17,7 @@
 #include "SparseSet.hpp"
 
 template <typename Component, typename... Others>
-class View
+class View final : public ISparseSetObserver
 {
     using ComponentsTuple = std::tuple<Component, Others...>;
 
@@ -64,8 +64,21 @@ class View
 public:
     View(const std::map<std::size_t, ISparseSet *> &sparse_sets) : _type_ids{type<Component>::id(), type<Others>::id()...}, _sparse_sets{sparse_sets} {
         _queryEntities();
+        for (auto id : _type_ids)
+            dynamic_cast<SparseSet<Component> *>(_sparse_sets.at(id))->addObserver(this);
     }
-    ~View() = default;
+    ~View() override {
+        for (auto id : _type_ids)
+            dynamic_cast<SparseSet<Component> *>(_sparse_sets.at(id))->removeObserver(this);
+    }
+
+    void onEntityErased(const Entity& entity) override {
+        erase_if(_entities, [entity](const Entity& e) { return e == entity; });
+    }
+
+    void onEntitySet(const Entity &entity) override {
+        this->refresh(); // not optimized at all, to change
+    }
 
     void refresh() {
         _queryEntities();
