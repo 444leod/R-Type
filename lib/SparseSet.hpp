@@ -1,71 +1,110 @@
 /*
 ** EPITECH PROJECT, 2024
-** rtype
+** R-Type
 ** File description:
-** SparseSet.hpp
+** SparseSet
 */
 
-#ifndef SPARSESET_HPP
-#define SPARSESET_HPP
+#pragma once
 
-#include <iostream>
-#include <map>
-#include <memory>
 #include <vector>
-#include "Family.hpp"
+#include <cstdint>
+#include <stdexcept>
 #include "Entity.hpp"
 
-class ISparseSet {
-public:
-    virtual ~ISparseSet() = default;
-
-    virtual bool contains(Entity entity) const = 0;
-    virtual void erase(Entity entity) = 0;
-    virtual void clear() = 0;
-    friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
-};
-
-template <typename T>
-class SparseSet final : public ISparseSet
+/// @brief Class representation of a Sparse Set
+/// @tparam T The type of data to be held
+template<typename T>
+class SparseSet
 {
 public:
     SparseSet() = default;
-    ~SparseSet() override = default;
+    ~SparseSet() = default;
 
-    void set(Entity entity, const T& component) { this->_map[entity] = component; }
-    void erase(Entity entity) override { this->_map.erase(entity); }
-
-    [[nodiscard]] bool contains(Entity entity) const override { return this->_map.contains(entity); }
-
-    T &get(Entity entity) { return this->_map.at(entity); }
-    const T &get(Entity entity) const { return this->_map.at(entity); }
-
-    void clear() override { this->_map.clear(); }
-
-    [[nodiscard]] std::vector<Entity> getEntities() const
+    /// @brief Check if the entity is contained in the set
+    /// @param entity The entity to check for
+    /// @return `true` if the entity is in the set. `false` otherwise
+    bool contains(const Entity& entity) const noexcept
     {
-        std::vector<Entity> entities;
-        for (const auto &[entity, _] : _map)
-            entities.push_back(entity);
-        return entities;
+        return entity < this->_sparse.size()
+            && this->_sparse[entity] < this->_dense.size()
+            && entity == this->_dense[this->_sparse[entity]];
     }
 
-    void display()
+    /// @brief Gets the component linked to an entity
+    /// @param entity The entity to get the component of
+    /// @return A reference to an entiy
+    T& at(const Entity& entity)
     {
-        for (const auto &[id, ptr] : _map)
-            std::cout << id << ": " << ptr << std::endl;
+        if (!this->contains(entity))
+            throw std::out_of_range("Entity not present in the set.");
+        return this->_components[this->_sparse[entity]];
     }
 
-    friend std::ostream &operator<<(std::ostream &os, const SparseSet &sparse)
+    /// @brief Sets the component of a entity
+    /// @param entity The entity to set the component to
+    /// @param component The component
+    void set(const Entity& entity, T component)
     {
-        os << "\tSparse for component " << type<T>::id() << ": " << std::endl;
-        for (const auto &[id, ptr] : sparse._map)
-            os << "\t\t" << id << ": " << *ptr << std::endl;
-        return os;
+        if (this->contains(entity)) {
+            this->_components[this->_sparse[entity]] = component;
+        } else {
+            const std::size_t size = this->_dense.size();
+            this->_dense.push_back(entity);
+            this->_components.push_back(component);
+            this->_add_in_sparse(entity, size);
+        }
     }
+
+    /// @brief Remove an entity from a set
+    /// @param entity The entity to remove from the set
+    void remove(const Entity& entity)
+    {
+        T& last_c = this->_components.back();
+        std::size_t last_e = this->_dense.back();
+        // Swap the Entity and Component to the end
+        this->_swap(this->_dense.back(), this->_dense[this->_sparse[entity]]);
+        this->_swap(this->_components.back(), this->_components[this->_sparse[entity]]);
+        // Swap their IDs in the sparse
+        this->_swap(this->_sparse[last_e], this->_sparse[entity]);
+        // Delete in dense lists
+        this->_dense.pop_back();
+        this->_components.pop_back();
+    }
+
+    /// @brief Gets the amount of components registered
+    /// @return std::size_t
+    std::size_t size() const noexcept { return this->_dense.size(); }
+    /// @brief Gets the capacity of the set
+    /// @return std::size_t
+    std::size_t capacity() const noexcept { return this->_sparse.capacity(); }
 
 private:
-    std::map<Entity, T> _map = {};
-};
 
-#endif //SPARSESET_HPP
+    /// @brief Adds an entity in the Sparse if it can, resize otherwise
+    /// @param entity The entity to add to
+    /// @param value The value to set to the entity id
+    void _add_in_sparse(const Entity& entity, std::size_t value)
+    {
+        const std::size_t cap = this->_sparse.capacity();
+        if (cap <= entity)
+            this->_sparse.resize(cap * 2);
+        this->_sparse[entity] = value;
+    }
+
+    /// @brief Swaps two values
+    /// @tparam U The type of the values passed as parameter
+    /// @param a The first value to swap
+    /// @param b The second value to swap
+    template<typename U>
+    void _swap(U& a, U& b)
+    {
+        U tmp = a;
+        a = b;
+        b = tmp;
+    }
+
+    std::vector<std::size_t> _sparse = { 0 };
+    std::vector<std::size_t> _dense = {};
+    std::vector<T> _components = {};
+};
