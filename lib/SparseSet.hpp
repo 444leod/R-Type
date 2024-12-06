@@ -30,6 +30,8 @@ public:
     virtual bool contains(Entity entity) const = 0;
     virtual void erase(Entity entity) = 0;
     virtual void clear() = 0;
+    virtual void addObserver(ISparseSetObserver *observer) = 0;
+    virtual void removeObserver(ISparseSetObserver *observer) = 0;
     friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
 };
 
@@ -72,8 +74,8 @@ public:
             std::cout << id << ": " << ptr << std::endl;
     }
 
-    void addObserver(ISparseSetObserver *observer) { _observers.push_back(observer); }
-    void removeObserver(ISparseSetObserver *observer) { std::erase(_observers, observer); }
+    void addObserver(ISparseSetObserver *observer) override { _observers.push_back(observer); }
+    void removeObserver(ISparseSetObserver *observer) override { std::erase(_observers, observer); }
 
     friend std::ostream &operator<<(std::ostream &os, const SparseSet &sparse)
     {
