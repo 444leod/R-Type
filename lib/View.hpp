@@ -16,135 +16,271 @@
 #include "Family.hpp"
 #include "SparseSet.hpp"
 
-/// @brief Class representation of a view / a query from a register
-/// @tparam Component The first component of the query - necessary
-/// @tparam ...Others Other components to query - not necessary
+/**
+ * @brief Trait to check if T is in the list of types.
+ */
+template <typename T, typename... Types>
+struct is_part_of : std::false_type {};
+
+/**
+ * @brief Recursive case: T is part of the list if it matches the first type or any of the remaining types.
+ */
+template <typename T, typename First, typename... Rest>
+struct is_part_of<T, First, Rest...>
+    : std::conditional_t<std::is_same_v<T, First>, std::true_type, is_part_of<T, Rest...>> {};
+
+/**
+ * @brief Helper variable template to simplify usage.
+ */
+template <typename T, typename... Types>
+inline constexpr bool is_part_of_v = is_part_of<T, Types...>::value;
+
+/**
+ * @brief Define the part_of concept using the is_part_of struct.
+ */
+template <typename T, typename... Types>
+concept part_of = is_part_of_v<T, Types...>;
+
+/**
+ * @brief View class to iterate over entities with specific components.
+ *
+ * @tparam Component The main component type.
+ * @tparam Others Other component types.
+ */
 template <typename Component, typename... Others>
 class View final : public ISparseSetObserver
 {
 public:
     using ComponentsTuple = std::tuple<Component, Others...>;
 
-    /// @brief An forward iterator used to traverse through a view
+    /**
+     * @brief Iterator class to iterate over entities and their components.
+     */
     class Iterator {
     public:
-        /// @brief View Iterator constructor
-        /// @param entityIdsIterator An iterator to go through the entities
-        /// @param sparse_sets A reference of the sparse set map from the view
-        Iterator(std::vector<size_t>::iterator entityIdsIterator, std::map<std::size_t, ISparseSet *> &sparse_sets)
+        /**
+         * @brief Constructor to initialize the iterator.
+         *
+         * @param entityIdsIterator Iterator to the entity IDs.
+         * @param sparse_sets Reference to the map of sparse sets.
+         */
+        Iterator(const std::vector<size_t>::iterator entityIdsIterator, std::map<std::size_t, ISparseSet *>& sparse_sets)
             : _entityIdsIterator{entityIdsIterator}, _sparse_sets{sparse_sets} {}
 
-        struct EntityComponents {
-            Entity entity;
-            ComponentsTuple components;
-        };
-
-        /// @brief The dereferencing operator of the iterator
-        /// @return Returns an entity - components pair
-        EntityComponents operator*() {
-            size_t entity = *_entityIdsIterator;
-            return {entity, std::tie(dynamic_cast<SparseSet<Component>&>(*_sparse_sets.at(type<Component>::id())).at(entity),
-                                     dynamic_cast<SparseSet<Others>&>(*_sparse_sets.at(type<Others>::id())).at(entity)...)};
+        /**
+         * @brief Dereference operator to get the entity and its components.
+         *
+         * @return A tuple containing the entity and its components.
+         */
+        std::tuple<const Entity&, Component&, Others&...> operator*() {
+            const Entity& entity = *_entityIdsIterator;
+            return std::tie(
+                entity,
+                this->get<Component>(entity),
+                this->get<Others>(entity)...
+            );
         }
 
-        /// @brief Forward iterating operator
-        /// @return A reference to this iterator
+        /**
+         * @brief Pre-increment operator.
+         *
+         * @return Reference to the incremented iterator.
+         */
         Iterator& operator++() {
             ++_entityIdsIterator;
             return *this;
         }
 
-        /// @brief Forward iterating operator
-        /// @param ? ???
-        /// @return A reference to this iterator
+        /**
+         * @brief Post-increment operator.
+         *
+         * @return Copy of the iterator before incrementing.
+         */
         Iterator operator++(int) {
             Iterator temp = *this;
             ++(*this);
             return temp;
         }
 
-        /// @brief Check if two iterators point to the same place
-        /// @param other The other iterator to compare with
-        /// @return `true` if they point to the same thing, `false` otherwise
+        /**
+         * @brief Equality comparison operator.
+         *
+         * @param other The other iterator to compare with.
+         *
+         * @return True if the iterators are equal, false otherwise.
+         */
         bool operator==(const Iterator& other) const {
             return _entityIdsIterator == other._entityIdsIterator;
         }
 
-        /// @brief Check if two iterators point to different places
-        /// @param other The other iterator to compare with
-        /// @return `true` if they point to different things, `false` otherwise
+        /**
+         * @brief Inequality comparison operator.
+         *
+         * @param other The other iterator to compare with.
+         *
+         * @return True if the iterators are not equal, false otherwise.
+         */
         bool operator!=(const Iterator& other) const {
             return _entityIdsIterator != other._entityIdsIterator;
         }
 
     private:
+        /**
+         * @brief Helper function to get a component of an entity.
+         *
+         * @tparam T The component type.
+         * @param entity The entity to get the component from.
+         *
+         * @return Reference to the component.
+         */
+        template <typename T>
+        [[nodiscard]] T& get(const Entity& entity) {
+            return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).at(entity);
+        }
+
         std::vector<size_t>::iterator _entityIdsIterator;
-        std::map<std::size_t, ISparseSet *> &_sparse_sets;
+        std::map<std::size_t, ISparseSet *>& _sparse_sets;
     };
 
 public:
-    /// @brief Create a view from a list of sparse sets
-    /// @param sparse_sets The sparse sets to include in the view
-    View(const std::map<std::size_t, ISparseSet *> &sparse_sets) : _type_ids{type<Component>::id(), type<Others>::id()...}, _sparse_sets{sparse_sets} {
+    /**
+     * @brief Constructor to initialize the view with the sparse sets.
+     *
+     * @param sparse_sets Reference to the map of sparse sets.
+     */
+    explicit View(const std::map<std::size_t, ISparseSet *>& sparse_sets) : _type_ids{type<Component>::id(), type<Others>::id()...}, _sparse_sets{sparse_sets} {
         this->refresh();
-        for (auto id : _type_ids)
-            dynamic_cast<SparseSet<Component> *>(this->_sparse_sets.at(id))->addObserver(this);
-    }
-    ~View() override {
-        for (auto id : _type_ids)
-            dynamic_cast<SparseSet<Component> *>(this->_sparse_sets.at(id))->removeObserver(this);
+        for (auto id : this->_type_ids)
+            if (this->_sparse_sets.contains(id))
+                this->_sparse_sets.at(id)->addObserver(this);
     }
 
-    /// @brief Called from the `ISparseSetObserver` when a sparse set let go of an entity
-    /// @param entity The entity to be removed
+    /**
+     * @brief Destructor to remove the view as an observer from the sparse sets.
+     */
+    ~View() override {
+        for (auto id : this->_type_ids)
+            if (this->_sparse_sets.contains(id))
+                this->_sparse_sets.at(id)->removeObserver(this);
+    }
+
+    /**
+     * @brief Callback function when an entity is erased.
+     *
+     * @param entity The entity that was erased.
+     */
     void onEntityErased(const Entity& entity) override {
         std::erase_if(_entities, [entity](const Entity& e) { return e == entity; });
     }
 
-    /// @brief Called from the `ISparseSetObserver` when an entity was added in a sparse set
-    /// @param entity The entity that was added
-    void onEntitySet(const Entity &entity) override {
+    /**
+     * @brief Callback function when an entity is set.
+     *
+     * @param entity The entity that was set.
+     */
+    void onEntitySet(const Entity& entity) override {
         for (auto [_, set] : this->_sparse_sets)
             if (!set->contains(entity))
                 return;
         this->_entities.push_back(entity);
     }
 
-    /// @brief Refreshes the list of entity
+    /**
+     * @brief Refresh the view by querying the entities again.
+     */
     void refresh() {
         this->_queryEntities();
     }
 
-    /// @brief Get an iterator to the first element of the view
-    /// @return A new View::Iterator
+    /**
+     * @brief Return an iterator to the beginning.
+     *
+     * @return Iterator to the beginning.
+     */
     Iterator begin() {
         return Iterator(_entities.begin(), _sparse_sets);
     }
 
-    /// @brief Get an iteraotr to the last + 1 element of the view
-    /// @return A new View::Iterator
+    /**
+     * @brief Return an iterator to the end.
+     *
+     * @return Iterator to the end.
+     */
     Iterator end() {
         return Iterator(_entities.end(), _sparse_sets);
     }
 
-    /// @brief Apply a function to each of the elements in a view (similat to a `foreach`)
-    /// @tparam Func Type description of the function applied
-    /// @param func The function to be applied
+    /**
+     * @brief Return the number of entities in the view.
+     *
+     * @return Number of entities.
+     */
+    [[nodiscard]] std::size_t size() const {
+        return _entities.size();
+    }
+
+    /**
+     * @brief Iterate over each entity and its components, applying the given function.
+     *
+     * @tparam Func The type of the function to apply.
+     * @param func The function to apply to each entity and its components.
+     */
     template <typename Func>
     void each(Func&& func) {
         for (auto entity : _entities) {
-            std::tuple<Component&, Others&...> tuple = std::tie(dynamic_cast<SparseSet<Component>&>(*_sparse_sets.at(type<Component>::id())).at(entity),
-                                     dynamic_cast<SparseSet<Others>&>(*_sparse_sets.at(type<Others>::id())).at(entity)...);
             if constexpr (std::is_invocable_v<Func, Entity, Component&, Others&...>) {
-                func(entity, std::get<Component&>(tuple), std::get<Others&>(tuple)...);
+                func(entity, this->get<Component>(entity), this->get<Others>(entity)...);
             } else {
-                func(std::get<Component&>(tuple), std::get<Others&>(tuple)...);
+                func(this->get<Component>(entity), this->get<Others>(entity)...);
             }
         }
     }
 
-    friend std::ostream &operator<<(std::ostream &os, const View &view)
-    {
+    /**
+     * @brief Get a component of an entity.
+     *
+     * @tparam T The component type (must be part of the view).
+     * @param entity The entity to get the component from.
+     *
+     * @return Reference to the component.
+     */
+    template <typename T>
+    requires part_of<T, Component, Others...>
+    [[nodiscard]] T& get(const Entity& entity) {
+        return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).at(entity);
+    }
+
+    /**
+     * @brief Return a vector of tuples containing each entity and its components.
+     *
+     * @return Vector of tuples with entities and their components.
+     */
+    std::vector<std::tuple<Entity, Component&, Others&...>> each() {
+        std::vector<std::tuple<Entity, Component&, Others&...>> result;
+        for (auto tuple : *this) {
+            result.push_back(tuple);
+        }
+        return result;
+    }
+
+    /**
+     * @brief Return a vector of entities in the view.
+     *
+     * @return Vector of entities.
+     */
+    [[nodiscard]] std::vector<Entity> entities() const noexcept {
+        return _entities;
+    }
+
+    /**
+     * @brief Output stream operator to print the view.
+     *
+     * @param os The output stream.
+     * @param view The view to print.
+     *
+     * @return Reference to the output stream.
+     */
+    friend std::ostream &operator<<(std::ostream &os, const View &view) {
         std::vector<Entity> identifiers = view._type_ids;
         if (identifiers.empty())
             return os;
@@ -171,12 +307,12 @@ private:
     std::vector<Entity> _entities;
 
 private:
-    /// @brief Query the list of entities that are shared by all sparse set
+    /**
+     * @brief Query the entities that have the required components.
+     */
     void _queryEntities() {
-        for (const auto &component : _type_ids)
-        {
-            if (!_sparse_sets.contains(component))
-            {
+        for (const auto &component : _type_ids) {
+            if (!_sparse_sets.contains(component)) {
                 std::cerr << "Component " << component << " is not in the registry" << std::endl;
                 return;
             }
@@ -187,12 +323,9 @@ private:
 
         auto entitiesList = sparse->entities();
 
-        if constexpr (sizeof...(Others) > 0)
-        {
-            for (const auto &entity : entitiesList)
-            {
-                if (!_entityContainComponents<Others...>(entity))
-                {
+        if constexpr (sizeof...(Others) > 0) {
+            for (const auto &entity : entitiesList) {
+                if (!_entityContainComponents<Others...>(entity)) {
                     entitiesList.erase(std::remove(entitiesList.begin(), entitiesList.end(), entity), entitiesList.end());
                 }
             }
@@ -201,24 +334,26 @@ private:
         _entities = entitiesList;
     }
 
-    /// @brief Check if an entity has a list of component
-    /// @tparam T The first (necessary) component
-    /// @tparam ...Remaining The others components (could be empty)
-    /// @param entity The entity to check for
-    /// @return `true` if the entity has all the components needed, `false` otherwise
+    /**
+     * @brief Check if an entity contains the required components.
+     *
+     * @tparam T The first component type.
+     * @tparam Remaining The remaining component types.
+     * @param entity The entity to check.
+     *
+     * @return True if the entity contains all required components, false otherwise.
+     */
     template <typename T, typename... Remaining>
-    bool _entityContainComponents(const Entity entity)
-    {
+    bool _entityContainComponents(const Entity entity) {
         const auto id = type<T>::id();
-        if (!_sparse_sets.contains(id))
-        {
+        if (!_sparse_sets.contains(id)) {
             return false;
         }
         auto sparse = dynamic_cast<SparseSet<T> *>(_sparse_sets.at(id));
         if (!sparse->contains(entity))
             return false;
         if constexpr (sizeof...(Remaining) > 0)
-            return _entityContainComponents<Others...>(entity);
+            return _entityContainComponents<Remaining...>(entity);
         return true;
     }
 };

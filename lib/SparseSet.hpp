@@ -5,7 +5,8 @@
 ** SparseSet
 */
 
-#pragma once
+#ifndef SPARSESET_HPP
+#define SPARSESET_HPP
 
 #include <vector>
 #include <cstdint>
@@ -24,28 +25,31 @@ class ISparseSet {
 public:
     virtual ~ISparseSet() = default;
 
-    virtual bool contains(const Entity& entity) const noexcept = 0;
+    [[nodiscard]] virtual bool contains(const Entity& entity) const noexcept = 0;
     virtual void remove(const Entity& entity) = 0;
     virtual void clear() = 0;
-    virtual const std::vector<Entity>& entities() const noexcept = 0;
-    virtual std::size_t size() const noexcept = 0;
-    virtual std::size_t capacity() const noexcept = 0;
+    [[nodiscard]] virtual const std::vector<Entity>& entities() const noexcept = 0;
+    [[nodiscard]] virtual std::size_t size() const noexcept = 0;
+    [[nodiscard]] virtual std::size_t capacity() const noexcept = 0;
+    virtual void addObserver(ISparseSetObserver *observer) noexcept = 0;
+    virtual void removeObserver(ISparseSetObserver *observer) noexcept = 0;
+    friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
 };
 
 /// @brief Class representation of a Sparse Set
 /// @tparam T The type of data to be held
 template<typename T>
-class SparseSet : public ISparseSet
+class SparseSet final : public ISparseSet
 {
 public:
     SparseSet() = default;
-    ~SparseSet() = default;
+    ~SparseSet() override = default;
 
 public:
     /// @brief Check if the entity is contained in the set
     /// @param entity The entity to check for
     /// @return `true` if the entity is in the set. `false` otherwise
-    bool contains(const Entity& entity) const noexcept
+    [[nodiscard]] bool contains(const Entity& entity) const noexcept override
     {
         return entity < this->_sparse.size()
             && this->_sparse[entity] < this->_dense.size()
@@ -82,7 +86,7 @@ public:
 
     /// @brief Remove an entity from a set
     /// @param entity The entity to remove from the set
-    void remove(const Entity& entity)
+    void remove(const Entity& entity) override
     {
         if (!this->contains(entity))
             return;
@@ -103,7 +107,7 @@ public:
     }
 
     /// @brief Clears the entire set
-    void clear() noexcept
+    void clear() noexcept override
     {
         this->_sparse.clear();
         this->_sparse.push_back(0);
@@ -113,20 +117,20 @@ public:
 
     /// @brief Add an observer to this set
     /// @param observer The observer to be added
-    void addObserver(ISparseSetObserver *observer) noexcept { this->_observers.push_back(observer); }
+    void addObserver(ISparseSetObserver *observer) noexcept override { this->_observers.push_back(observer); }
     /// @brief Remove an observer from this set
     /// @param observer The observer to be removed
-    void removeObserver(ISparseSetObserver *observer) noexcept { std::erase(this->_observers, observer); }
+    void removeObserver(ISparseSetObserver *observer) noexcept override { std::erase(this->_observers, observer); }
 
     /// @brief Returns the list of entities contained in the set
     /// @return A reference to an std::vector of entities
-    const std::vector<Entity>& entities() const noexcept { return this->_dense; }
+    [[nodiscard]] const std::vector<Entity>& entities() const noexcept override { return this->_dense; }
     /// @brief Gets the amount of components registered
     /// @return std::size_t
-    std::size_t size() const noexcept { return this->_dense.size(); }
+    [[nodiscard]] std::size_t size() const noexcept override { return this->_dense.size(); }
     /// @brief Gets the capacity of the set
     /// @return std::size_t
-    std::size_t capacity() const noexcept { return this->_sparse.capacity(); }
+    [[nodiscard]] std::size_t capacity() const noexcept override { return this->_sparse.capacity(); }
 
 private:
     /// @brief Adds an entity in the Sparse if it can, resize otherwise
@@ -157,3 +161,5 @@ private:
     std::vector<T> _components = {};
     std::vector<ISparseSetObserver *> _observers = {};
 };
+
+#endif //SPARSESET_HPP
