@@ -12,8 +12,15 @@
 #include <stdexcept>
 #include "Entity.hpp"
 
-class ISparseSet
-{
+class ISparseSetObserver {
+public:
+    virtual ~ISparseSetObserver() = default;
+
+    virtual void onEntitySet(const Entity& entity) = 0;
+    virtual void onEntityErased(const Entity& entity) = 0;
+};
+
+class ISparseSet {
 public:
     virtual ~ISparseSet() = default;
 
@@ -68,6 +75,9 @@ public:
             this->_components.push_back(component);
             this->_add_in_sparse(entity, size);
         }
+
+        for (auto observer : this->_observers)
+            observer->onEntitySet(entity);
     }
 
     /// @brief Remove an entity from a set
@@ -87,6 +97,9 @@ public:
         // Delete in dense lists
         this->_dense.pop_back();
         this->_components.pop_back();
+
+        for (auto observer : this->_observers)
+            observer->onEntityErased(entity);
     }
 
     /// @brief Clears the entire set
@@ -97,6 +110,13 @@ public:
         this->_dense.clear();
         this->_components.clear();
     }
+
+    /// @brief Add an observer to this set
+    /// @param observer The observer to be added
+    void addObserver(ISparseSetObserver *observer) noexcept { this->_observers.push_back(observer); }
+    /// @brief Remove an observer from this set
+    /// @param observer The observer to be removed
+    void removeObserver(ISparseSetObserver *observer) noexcept { std::erase(this->_observers, observer); }
 
     /// @brief Returns the list of entities contained in the set
     /// @return A reference to an std::vector of entities
@@ -135,4 +155,5 @@ private:
     std::vector<std::size_t> _sparse = { 0 };
     std::vector<Entity> _dense = {};
     std::vector<T> _components = {};
+    std::vector<ISparseSetObserver *> _observers = {};
 };
