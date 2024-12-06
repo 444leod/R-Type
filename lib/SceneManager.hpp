@@ -11,7 +11,11 @@
 #include <memory>
 #include <map>
 #include <chrono>
+
+#ifndef __RTYPE_NO_DISPLAY__
 #include <SFML/Graphics.hpp>
+#endif
+
 #include <utility>
 #include <exception>
 #include "ISceneManager.hpp"
@@ -112,9 +116,16 @@ public:
             const double deltaTime = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - before).count() / 1000.0;
             before = now;
             this->_updateSceneState();
+
+            #ifndef __RTYPE_NO_DISPLAY__
             this->_pollEvents();
+            #endif
+
             this->_current->update(deltaTime);
+
+            #ifndef __RTYPE_NO_DISPLAY__
             this->_render();
+           #endif
         }
     }
 
@@ -150,6 +161,8 @@ private:
         this->_loadingName = "";
     }
 
+    #ifndef __RTYPE_NO_DISPLAY__
+
     /**
      * @brief Polls events from the window.
      */
@@ -157,8 +170,11 @@ private:
     {
         sf::Event event{};
         while (this->_window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
                 this->_window.close();
+                this->stop();
+                return;
+            }
             this->_current->onEvent(event);
         }
     }
@@ -173,6 +189,8 @@ private:
         this->_window.display();
     }
 
+    #endif
+
 private:
     bool _running = true;
 
@@ -180,7 +198,9 @@ private:
     std::shared_ptr<AScene> _current = nullptr;
     std::string _loadingName;
 
-    sf::RenderWindow _window;
+    #ifndef __RTYPE_NO_DISPLAY__
+    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(800, 600), "R-Type");
+    #endif
 };
 
 #endif //SCENEMANAGER_HPP
