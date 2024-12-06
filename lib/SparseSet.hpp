@@ -59,7 +59,7 @@ public:
     /// @brief Gets the component linked to an entity
     /// @param entity The entity to get the component of
     /// @return A reference to an entiy
-    T& at(const Entity& entity)
+    [[nodiscard]] T& at(const Entity& entity)
     {
         if (!this->contains(entity))
             throw std::out_of_range("Entity not present in the set.");
