@@ -15,15 +15,15 @@ struct foo_message : public IEvent
     const std::string& message;
 };
 
-class Foo : public EventHandler<foo_message>
+class Foo final : public EventHandler<foo_message>
 {
 public:
-    void say() noexcept
+    static void say() noexcept
     {
         std::cout << "Hello world!" << std::endl;
     }
 
-    virtual void receive(const foo_message& event) override {
+    void receive(const foo_message& event) override {
         std::cout << "Message: " << event.message << std::endl;
     }
 
