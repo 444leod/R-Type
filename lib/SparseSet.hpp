@@ -13,12 +13,25 @@
 #include <memory>
 #include <vector>
 #include "Family.hpp"
+#include "Entity.hpp"
+
+class ISparseSetObserver {
+public:
+    virtual ~ISparseSetObserver() = default;
+
+    virtual void onEntitySet(const Entity& entity) = 0;
+    virtual void onEntityErased(const Entity& entity) = 0;
+};
 
 class ISparseSet {
 public:
     virtual ~ISparseSet() = default;
 
-    virtual void erase(std::size_t entity) = 0;
+    virtual bool contains(Entity entity) const = 0;
+    virtual void erase(Entity entity) = 0;
+    virtual void clear() = 0;
+    virtual void addObserver(ISparseSetObserver *observer) = 0;
+    virtual void removeObserver(ISparseSetObserver *observer) = 0;
     friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
 };
 
@@ -27,19 +40,29 @@ class SparseSet final : public ISparseSet
 {
 public:
     SparseSet() = default;
-    ~SparseSet() = default;
+    ~SparseSet() override = default;
 
-    void set(std::size_t entity, const T& component) { this->_map[entity] = component; }
-    void erase(std::size_t entity) override { this->_map.erase(entity); }
+    void set(Entity entity, const T& component) {
+        this->_map[entity] = component;
+        for (auto observer : _observers)
+            observer->onEntitySet(entity);
+    }
+    void erase(Entity entity) override {
+        this->_map.erase(entity);
+        for (auto observer : _observers)
+            observer->onEntityErased(entity);
+    }
 
-    bool contains(std::size_t entity) const { return this->_map.find(entity) != this->_map.end(); }
+    [[nodiscard]] bool contains(Entity entity) const override { return this->_map.contains(entity); }
 
-    T &get(std::size_t entity) { return this->_map.at(entity); }
-    const T &get(std::size_t entity) const { return this->_map.at(entity); }
+    T &get(Entity entity) { return this->_map.at(entity); }
+    const T &get(Entity entity) const { return this->_map.at(entity); }
 
-    std::vector<std::size_t> getEntities() const
+    void clear() override { this->_map.clear(); }
+
+    [[nodiscard]] std::vector<Entity> getEntities() const
     {
-        std::vector<std::size_t> entities;
+        std::vector<Entity> entities;
         for (const auto &[entity, _] : _map)
             entities.push_back(entity);
         return entities;
@@ -51,16 +74,20 @@ public:
             std::cout << id << ": " << ptr << std::endl;
     }
 
+    void addObserver(ISparseSetObserver *observer) override { _observers.push_back(observer); }
+    void removeObserver(ISparseSetObserver *observer) override { std::erase(_observers, observer); }
+
     friend std::ostream &operator<<(std::ostream &os, const SparseSet &sparse)
     {
-        os << "\tSparse for component " << Family::type<T>() << ": " << std::endl;
+        os << "\tSparse for component " << type<T>::id() << ": " << std::endl;
         for (const auto &[id, ptr] : sparse._map)
             os << "\t\t" << id << ": " << *ptr << std::endl;
         return os;
     }
 
 private:
-    std::map<std::size_t, T> _map = {};
+    std::map<Entity, T> _map = {};
+    std::vector<ISparseSetObserver *> _observers = {};
 };
 
 #endif //SPARSESET_HPP
