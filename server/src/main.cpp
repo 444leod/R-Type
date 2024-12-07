@@ -10,6 +10,6 @@
 int main(void)
 {
     std::cout << "Server said:" << std::endl;
-    Foo::say();
+    Foo().say();
     return 0;
 }
