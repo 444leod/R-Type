@@ -54,7 +54,7 @@ public:
 
         /**
          * @brief Returns the exception message.
-         * @return The exception message.
+         * @return const char * The exception message.
          */
         [[nodiscard]] const char *what() const noexcept override { return _message.c_str(); }
     private:
