@@ -16,6 +16,10 @@ conan:
 	chmod +x ./scripts/install_conan.sh
 	./scripts/install_conan.sh
 
+conan_ci:
+	chmod +x ./scripts/install_conan_ci.sh
+	./scripts/install_conan_ci.sh
+
 deps:
 	conan install . --output-folder=$(BUILD_DIR) --build=missing
 
