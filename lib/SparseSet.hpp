@@ -110,7 +110,6 @@ public:
     void clear() noexcept override
     {
         this->_sparse.clear();
-        this->_sparse.push_back(0);
         this->_dense.clear();
         this->_components.clear();
     }
@@ -138,9 +137,26 @@ private:
     /// @param value The value to set to the entity id
     void _add_in_sparse(const Entity& entity, std::size_t value)
     {
-        while (this->_sparse.capacity() <= entity)
-            this->_sparse.resize(this->_sparse.capacity() * 2);
+        if (this->_sparse.capacity() <= entity) {
+            this->_sparse.resize(this->_compute_resize(entity));
+        }
         this->_sparse[entity] = value;
+    }
+
+    /// @brief O1 method to compute the necessary size a vector should have (2^n)
+    /// @param k The minimum size
+    static std::size_t _compute_resize(std::size_t k)
+    {
+        if (k == 0)
+            return 1;
+        k |= k >> 1;
+        k |= k >> 2;
+        k |= k >> 3;
+        k |= k >> 4;
+        k |= k >> 8;
+        k |= k >> 16;
+        k |= k >> 32;
+        return k + 1;
     }
 
     /// @brief Swaps two values
@@ -156,7 +172,7 @@ private:
     }
 
 private:
-    std::vector<std::size_t> _sparse = { 0 };
+    std::vector<std::size_t> _sparse = { };
     std::vector<Entity> _dense = {};
     std::vector<T> _components = {};
     std::vector<ISparseSetObserver *> _observers = {};
