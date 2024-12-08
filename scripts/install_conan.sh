@@ -7,8 +7,8 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
-read -p "Enter the venv name you want to create: (default rtype)" venv_name
-venv_name=${venv_name:-"rtype"}
+read -p "Enter the venv name you want to create: (default rtype_venv)" venv_name
+venv_name=${venv_name:-"rtype_venv"}
 
 echo -e "\nCreating virtual environment $venv_name\n"
 python3 -m venv $venv_name

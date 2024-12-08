@@ -5,14 +5,13 @@ set(SRC_FILES
     main.cpp
 )
 
-find_package(SFML REQUIRED COMPONENTS graphics window system)
-
 list(TRANSFORM SRC_FILES PREPEND "src/")
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR})
+target_link_libraries(${PROJECT_NAME} PRIVATE asio::asio sfml::sfml)
+target_include_directories(${PROJECT_NAME} PRIVATE ${LIB_DIR})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
