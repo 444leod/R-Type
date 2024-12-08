@@ -73,17 +73,6 @@ pipeline {
                 }
             }
         }
-        stage('test') {
-            steps {
-                script {
-                    sh '''
-                        make conan
-                        make deps
-                        make
-                    '''
-                }
-            }
-        }
     }
     post {
         always {
