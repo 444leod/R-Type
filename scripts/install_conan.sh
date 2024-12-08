@@ -2,10 +2,10 @@
 
 echo -e "Welcome to the AER-Type Conan installation script\n\n"
 
-if ! command -v python3 &> /dev/null; then
-    echo -e "Python3 is not installed :( Please install it and try again.\n"
-    exit 1
-fi
+# if ! command -v python3 &> /dev/null; then
+#     echo -e "Python3 is not installed :( Please install it and try again.\n"
+#     exit 1
+# fi
 
 read -p "Enter the venv name you want to create: (default rtype_venv)" venv_name
 venv_name=${venv_name:-"rtype_venv"}
