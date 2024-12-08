@@ -83,7 +83,6 @@ int main(void)
     std::vector<sf::Keyboard::Key> pressed_keys;
 
     sf::Clock clock;
-    const sf::Time frameTime = sf::seconds(1.f / 60.f);
 
     while (running) {
         float dt = clock.restart().asSeconds();
