@@ -36,8 +36,10 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
 };
 
-/// @brief Class representation of a Sparse Set
-/// @tparam T The type of data to be held
+/**
+ * @brief Class representation of a Sparse Set
+ * @tparam T The type of data to be held
+ */
 template<typename T>
 class SparseSet final : public ISparseSet
 {
@@ -46,9 +48,11 @@ public:
     ~SparseSet() override = default;
 
 public:
-    /// @brief Check if the entity is contained in the set
-    /// @param entity The entity to check for
-    /// @return `true` if the entity is in the set. `false` otherwise
+    /**
+     * @brief Check if the entity is contained in the set
+     * @param entity The entity to check for
+     * @return `true` if the entity is in the set. `false` otherwise
+     */
     [[nodiscard]] bool contains(const Entity& entity) const noexcept override
     {
         return entity < this->_sparse.size()
@@ -56,9 +60,11 @@ public:
             && entity == this->_dense[this->_sparse[entity]];
     }
 
-    /// @brief Gets the component linked to an entity
-    /// @param entity The entity to get the component of
-    /// @return A reference to an entiy
+    /**
+     * @brief Gets the component linked to an entity
+     * @param entity The entity to get the component of
+     * @return A reference to an entiy
+     */
     [[nodiscard]] T& at(const Entity& entity)
     {
         if (!this->contains(entity))
@@ -66,9 +72,11 @@ public:
         return this->_components[this->_sparse[entity]];
     }
 
-    /// @brief Sets the component of a entity
-    /// @param entity The entity to set the component to
-    /// @param component The component
+    /**
+     * @brief Sets the component of a entity
+     * @param entity The entity to set the component to
+     * @param component The component
+     */
     void set(const Entity& entity, T component)
     {
         if (this->contains(entity)) {
@@ -84,8 +92,10 @@ public:
             observer->onEntitySet(entity);
     }
 
-    /// @brief Remove an entity from a set
-    /// @param entity The entity to remove from the set
+    /**
+     * @brief Remove an entity from a set
+     * @param entity The entity to remove from the set
+     */
     void remove(const Entity& entity) override
     {
         if (!this->contains(entity))
@@ -106,7 +116,9 @@ public:
             observer->onEntityErased(entity);
     }
 
-    /// @brief Clears the entire set
+    /**
+     * @brief Clears the entire set
+     */
     void clear() noexcept override
     {
         this->_sparse.clear();
@@ -114,27 +126,39 @@ public:
         this->_components.clear();
     }
 
-    /// @brief Add an observer to this set
-    /// @param observer The observer to be added
+    /**
+     * @brief Add an observer to this set
+     * @param observer The observer to be added
+     */
     void addObserver(ISparseSetObserver *observer) noexcept override { this->_observers.push_back(observer); }
-    /// @brief Remove an observer from this set
-    /// @param observer The observer to be removed
+    /**
+     * @brief Remove an observer from this set
+     * @param observer The observer to be removed
+     */
     void removeObserver(ISparseSetObserver *observer) noexcept override { std::erase(this->_observers, observer); }
 
-    /// @brief Returns the list of entities contained in the set
-    /// @return A reference to an std::vector of entities
+    /**
+     * @brief Returns the list of entities contained in the set
+     * @return A reference to an std::vector of entities
+     */
     [[nodiscard]] const std::vector<Entity>& entities() const noexcept override { return this->_dense; }
-    /// @brief Gets the amount of components registered
-    /// @return std::size_t
+    /**
+     * @brief Gets the amount of components registered
+     * @return std::size_t
+     */
     [[nodiscard]] std::size_t size() const noexcept override { return this->_dense.size(); }
-    /// @brief Gets the capacity of the set
-    /// @return std::size_t
+    /**
+     * @brief Gets the capacity of the set
+     * @return std::size_t
+     */
     [[nodiscard]] std::size_t capacity() const noexcept override { return this->_sparse.capacity(); }
 
 private:
-    /// @brief Adds an entity in the Sparse if it can, resize otherwise
-    /// @param entity The entity to add to
-    /// @param value The value to set to the entity id
+    /**
+     * @brief Adds an entity in the Sparse if it can, resize otherwise
+     * @param entity The entity to add to
+     * @param value The value to set to the entity id
+     */
     void _add_in_sparse(const Entity& entity, std::size_t value)
     {
         if (this->_sparse.capacity() <= entity) {
@@ -143,8 +167,10 @@ private:
         this->_sparse[entity] = value;
     }
 
-    /// @brief O1 method to compute the necessary size a vector should have (2^n)
-    /// @param k The minimum size
+    /**
+     * @brief O1 method to compute the necessary size a vector should have (2^n)
+     * @param k The minimum size
+     */
     static std::size_t _compute_resize(std::size_t k)
     {
         if (k == 0)
@@ -159,10 +185,12 @@ private:
         return k + 1;
     }
 
-    /// @brief Swaps two values
-    /// @tparam U The type of the values passed as parameter
-    /// @param a The first value to swap
-    /// @param b The second value to swap
+    /**
+     * @brief Swaps two values
+     * @tparam U The type of the values passed as parameter
+     * @param a The first value to swap
+     * @param b The second value to swap
+     */
     template<typename U>
     void _swap(U& a, U& b)
     {
