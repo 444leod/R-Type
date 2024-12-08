@@ -73,6 +73,22 @@ pipeline {
                 }
             }
         }
+        stage('Test') {
+            agent {
+                docker {
+                    image 'ghcr.io/zowks/epitech-devcontainer@sha256:002acbce96b7289d4038617c6da75079fc7c007c082999f6a69536e439817d62'
+                }
+            }
+            steps {
+                script {
+                    sh '''
+                        make conan
+                        make deps
+                        make
+                    '''
+                }
+            }
+        }
     }
     post {
         always {
