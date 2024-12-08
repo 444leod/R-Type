@@ -171,7 +171,7 @@ private:
      * @brief O1 method to compute the necessary size a vector should have (2^n)
      * @param k The minimum size
      */
-    static std::size_t _compute_resize(std::size_t k)
+    [[nodiscard]] static std::size_t _compute_resize(std::size_t k)
     {
         if (k == 0)
             return 1;
@@ -192,7 +192,7 @@ private:
      * @param b The second value to swap
      */
     template<typename U>
-    void _swap(U& a, U& b)
+    static void _swap(U& a, U& b)
     {
         U tmp = a;
         a = b;
