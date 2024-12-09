@@ -77,6 +77,7 @@ pipeline {
             agent {
                 docker {
                     image 'conanio/gcc7'
+                    args '-u root'
                 }
             }
             steps {
