@@ -84,6 +84,7 @@ pipeline {
                 script {
                     sh '''#!/bin/bash
                         make conan
+                        source rtype_venv/bin/activate
                         make deps
                         make
                     '''
