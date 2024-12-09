@@ -83,7 +83,7 @@ pipeline {
             steps {
                 script {
                     sh '''#!/bin/bash
-                        make conan_ci
+                        make conan
                         make deps
                         make
                     '''
