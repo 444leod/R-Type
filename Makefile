@@ -22,8 +22,7 @@ conan_ci:
 
 deps:
 	conan profile detect --force
-	groups
-	sudo conan install . --output-folder=$(BUILD_DIR) --build=missing -c tools.system.package_manager:mode=install
+	conan install . --output-folder=$(BUILD_DIR) --build=missing -c tools.system.package_manager:mode=install
 
 configure:
 	cmake -S . -B $(BUILD_DIR) -DCMAKE_TOOLCHAIN_FILE=$(BUILD_DIR)/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
