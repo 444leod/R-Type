@@ -21,6 +21,7 @@ conan_ci:
 	./scripts/install_conan_ci.sh
 
 deps:
+	conan profile detect --force
 	conan install . --output-folder=$(BUILD_DIR) --build=missing
 
 configure:
