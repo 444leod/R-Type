@@ -35,6 +35,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+where conan
 source ~/.profile
 
 echo -e "Conan installed successfully!\n"
