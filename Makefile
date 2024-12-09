@@ -20,6 +20,7 @@ conan_ci:
 	conan profile detect --force
 
 deps:
+	conan profile detect --force
 	conan install . --output-folder=$(BUILD_DIR) --build=missing -c tools.system.package_manager:mode=install
 
 configure:
