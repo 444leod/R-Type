@@ -18,10 +18,17 @@
 
 #include <utility>
 #include <exception>
+#include <thread>
 #include "ISceneManager.hpp"
 #include "AScene.hpp"
 
+#include <iostream>
+
 namespace scene {
+
+    constexpr int TARGET_FPS = 60;
+    const std::chrono::milliseconds FRAME_DURATION(1000 / TARGET_FPS);
+
     /**
      * @brief Concept to ensure the type is derived from AScene.
      */
@@ -61,7 +68,9 @@ public:
         std::string _message; ///< The exception message.
     };
 
-    SceneManager() = default;
+    SceneManager() {
+        _window.setKeyRepeatEnabled(false);
+    }
     ~SceneManager() override = default;
 
     /**
@@ -125,6 +134,9 @@ public:
 
             #ifndef __RTYPE_NO_DISPLAY__
             this->_render();
+            const double elapsed = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(std::chrono::high_resolution_clock::now() - now).count() / 1000.0;
+            if (elapsed < scene::FRAME_DURATION.count())
+                std::this_thread::sleep_for(scene::FRAME_DURATION - std::chrono::milliseconds(static_cast<int>(elapsed)));
            #endif
         }
     }
@@ -199,7 +211,7 @@ private:
     std::string _loadingName;
 
     #ifndef __RTYPE_NO_DISPLAY__
-    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(800, 600), "R-Type");
+    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(1920, 1080), "R-Type");
     #endif
 };
 

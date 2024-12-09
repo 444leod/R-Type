@@ -1,6 +1,9 @@
 set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
 set(SRC_FILES
     main.cpp
+    scenes/Game/Game.cpp
+    scenes/Game/Events/PlayerMovement.cpp
+    scenes/Game/Events/PlayerMovement.hpp
 )
 
 list(TRANSFORM SRC_FILES PREPEND "src/")
