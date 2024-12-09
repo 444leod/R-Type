@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo -e "Welcome to the AER-Type Conan installation script\n\n"
 
