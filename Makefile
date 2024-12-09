@@ -22,6 +22,7 @@ conan_ci:
 
 deps:
 	conan profile detect --force
+	groups
 	sudo conan install . --output-folder=$(BUILD_DIR) --build=missing -c tools.system.package_manager:mode=install
 
 configure:
