@@ -17,8 +17,7 @@ conan:
 	./scripts/install_conan.sh
 
 conan_ci:
-	chmod +x ./scripts/install_conan_ci.sh
-	./scripts/install_conan_ci.sh
+	conan profile detect --force
 
 deps:
 	conan install . --output-folder=$(BUILD_DIR) --build=missing -c tools.system.package_manager:mode=install
