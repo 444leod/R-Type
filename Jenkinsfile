@@ -88,6 +88,7 @@ pipeline {
                         make deps
                         make
                     '''
+                    archiveArtifacts artifacts: 'build/r-type*', fingerprint: true
                 }
             }
         }
