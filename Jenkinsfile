@@ -88,6 +88,7 @@ pipeline {
                                 make conan_ci
                                 source rtype_venv/bin/activate
                                 make deps
+                                make
                             '''
                         }
                     }
@@ -102,8 +103,7 @@ pipeline {
                     steps {
                         script {
                             sh '''#!/bin/bash
-                                source rtype_venv/bin/activate
-                                make
+                                echo test
                             '''
                         }
                     }
