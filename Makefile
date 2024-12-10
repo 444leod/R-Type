@@ -17,7 +17,8 @@ conan:
 	./scripts/install_conan.sh
 
 conan_ci:
-	conan profile detect --force
+	chmod +x ./scripts/install_conan_ci.sh
+	./scripts/install_conan_ci.sh
 
 deps:
 	conan profile detect --force

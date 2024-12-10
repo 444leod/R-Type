@@ -8,8 +8,8 @@ list(TRANSFORM SRC_FILES PREPEND "src/")
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE asio::asio)
-
 target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR})
-set_target_properties(r-type_server PROPERTIES
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
 )

@@ -73,22 +73,38 @@ pipeline {
                 }
             }
         }
-        stage('Test') {
+        stage('Build binaries') {
             agent {
                 docker {
                     image 'ghcr.io/a9ex/epitech-devcontainer@sha256:3222291beff662c9570eff60887c0d8e0cf02e4e26f8f4f58f91cd7120095fa4'
                     args '-u root'
                 }
             }
-            steps {
-                script {
-                    sh '''#!/bin/bash
-                        make conan
-                        source rtype_venv/bin/activate
-                        make deps
-                        make
-                    '''
-                    archiveArtifacts artifacts: 'build/r-type*', fingerprint: true
+            stages {
+                stage('Install deps') {
+                    steps {
+                        script {
+                            sh '''
+                                make conan_ci
+                                source rtype_venv/bin/activate
+                                make deps
+                            '''
+                        }
+                    }
+                }
+                stage('Build binaries') {
+                    steps {
+                        script {
+                            sh '''
+                                make
+                            '''
+                        }
+                    }
+                }
+                stage('Archive artifacts') {
+                    steps {
+                        archiveArtifacts artifacts: 'build/r-type*', fingerprint: true
+                    }
                 }
             }
         }
