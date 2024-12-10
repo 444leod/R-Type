@@ -101,7 +101,8 @@ pipeline {
                     }
                     steps {
                         script {
-                            sh '''
+                            sh '''#!/bin/bash
+                                source rtype_venv/bin/activate
                                 make
                             '''
                         }
