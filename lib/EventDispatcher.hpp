@@ -25,10 +25,10 @@ public:
     template<typename T>
     void link(IEventHandler *handler)
     {
-        const std::size_t type = Family::type<T>();
-        if (!this->_links.contains(type))
-            this->_links[type] = {};
-        this->_links[type].push_back(handler);
+        const std::size_t type_id = type<T>::id();
+        if (!this->_links.contains(type_id))
+            this->_links[type_id] = {};
+        this->_links[type_id].push_back(handler);
     }
 
     /// @brief Unlink an event to a receiver
@@ -37,9 +37,9 @@ public:
     template<typename T>
     void unlink(IEventHandler *handler)
     {
-        const std::size_t type = Family::type<T>();
-        if (this->_links.contains(type))
-            this->_links.erase(type);
+        const std::size_t type_id = type<T>::id();
+        if (this->_links.contains(type_id))
+            this->_links.erase(type_id);
     }
 
     /// @brief Call all the even listeners
@@ -48,8 +48,8 @@ public:
     template<typename T>
     void broadcast(const T& event)
     {
-        const std::size_t type = Family::type<T>();
-        auto destinees = this->_links[type];
+        const std::size_t type_id = type<T>::id();
+        auto destinees = this->_links[type_id];
         for (auto destinee: destinees) {
             auto handler = dynamic_cast<EventHandler<T> *>(destinee);
             handler->receive(event);
