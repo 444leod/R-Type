@@ -48,7 +48,9 @@ concept part_of = is_part_of_v<T, Types...>;
  * @tparam Others Other component types.
  */
 template <typename Component, typename... Others>
-class View final : public ISparseSetObserver {
+class View final : public ISparseSetObserver
+{
+public:
     using ComponentsTuple = std::tuple<Component, Others...>;
 
     /**
@@ -133,7 +135,7 @@ class View final : public ISparseSetObserver {
          */
         template <typename T>
         [[nodiscard]] T& get(const Entity& entity) {
-            return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).get(entity);
+            return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).at(entity);
         }
 
         std::vector<size_t>::iterator _entityIdsIterator;
@@ -146,20 +148,20 @@ public:
      *
      * @param sparse_sets Reference to the map of sparse sets.
      */
-    View(const std::map<std::size_t, ISparseSet *>& sparse_sets) : _type_ids{type<Component>::id(), type<Others>::id()...}, _sparse_sets{sparse_sets} {
-        _queryEntities();
-        for (auto id : _type_ids)
-            if (_sparse_sets.contains(id))
-                _sparse_sets.at(id)->addObserver(this);
+    explicit View(const std::map<std::size_t, ISparseSet *>& sparse_sets) : _type_ids{type<Component>::id(), type<Others>::id()...}, _sparse_sets{sparse_sets} {
+        this->refresh();
+        for (auto id : this->_type_ids)
+            if (this->_sparse_sets.contains(id))
+                this->_sparse_sets.at(id)->addObserver(this);
     }
 
     /**
      * @brief Destructor to remove the view as an observer from the sparse sets.
      */
     ~View() override {
-        for (auto id : _type_ids)
-            if (_sparse_sets.contains(id))
-                _sparse_sets.at(id)->removeObserver(this);
+        for (auto id : this->_type_ids)
+            if (this->_sparse_sets.contains(id))
+                this->_sparse_sets.at(id)->removeObserver(this);
     }
 
     /**
@@ -168,7 +170,7 @@ public:
      * @param entity The entity that was erased.
      */
     void onEntityErased(const Entity& entity) override {
-        erase_if(_entities, [entity](const Entity& e) { return e == entity; });
+        std::erase_if(_entities, [entity](const Entity& e) { return e == entity; });
     }
 
     /**
@@ -177,14 +179,17 @@ public:
      * @param entity The entity that was set.
      */
     void onEntitySet(const Entity& entity) override {
-        this->refresh(); // not optimized at all, to change
+        for (auto [_, set] : this->_sparse_sets)
+            if (!set->contains(entity))
+                return;
+        this->_entities.push_back(entity);
     }
 
     /**
      * @brief Refresh the view by querying the entities again.
      */
     void refresh() {
-        _queryEntities();
+        this->_queryEntities();
     }
 
     /**
@@ -242,7 +247,7 @@ public:
     template <typename T>
     requires part_of<T, Component, Others...>
     [[nodiscard]] T& get(const Entity& entity) {
-        return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).get(entity);
+        return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).at(entity);
     }
 
     /**
@@ -300,8 +305,8 @@ private:
     std::map<std::size_t, ISparseSet *> _sparse_sets;
     std::vector<std::size_t> _type_ids;
     std::vector<Entity> _entities;
-    std::optional<Entity> _last_entity_checked = std::nullopt;
 
+private:
     /**
      * @brief Query the entities that have the required components.
      */
@@ -316,7 +321,7 @@ private:
         const auto first = _type_ids[0];
         const auto sparse = dynamic_cast<SparseSet<Component> *>(_sparse_sets.at(first));
 
-        auto entitiesList = sparse->getEntities();
+        auto entitiesList = sparse->entities();
 
         if constexpr (sizeof...(Others) > 0) {
             for (const auto &entity : entitiesList) {

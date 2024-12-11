@@ -48,7 +48,7 @@ public:
     {
         for (auto const &[id, sparse] : _sparse_sets)
             if (sparse->contains(entity))
-                sparse->erase(entity);
+                sparse->remove(entity);
         _entities.erase(std::find(_entities.begin(), _entities.end(), entity));
     }
 

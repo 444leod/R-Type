@@ -16,13 +16,13 @@ struct Sprite {
 struct Position {
     float x = 0;
     float y = 0;
-    float z = 0;
 };
 
 struct Self{};
 
 struct Velocity {
-    sf::Vector2f velocity;
+    float x = 0;
+    float y = 0;
 };
 
 struct Projectile {
@@ -45,7 +45,7 @@ void create_projectile(Registry& registry, const Position& pos) {
     registry.addComponent<sf::Sprite>(projectile, sprite);
     registry.addComponent<Position>(projectile, pos);
     registry.addComponent<Projectile>(projectile, Projectile{});
-    registry.addComponent<Velocity>(projectile, Velocity{.velocity = sf::Vector2f(10, 0)});
+    registry.addComponent<Velocity>(projectile, Velocity{ 600, 0 });
     registry.addComponent<Hitbox>(projectile, Hitbox{});
 }
 
@@ -74,62 +74,21 @@ int main(void)
     sprite.setOrigin(34 / 2, 18 / 2);
 
     registry.addComponent(spaceship, sprite);
-    auto position = Position{.x = 100, .y = 100};
-    registry.addComponent<Position>(spaceship, position);
-
+    registry.addComponent<Position>(spaceship, Position{100, 100});
+    // ALL VELOCITIES ARE COMPUTED IN PIXELS / SECONDS :)
+    registry.addComponent<Velocity>(spaceship, Velocity{0, 0});
     registry.addComponent<Self>(spaceship, Self{});
     registry.addComponent<Hitbox>(spaceship, Hitbox{});
 
     std::vector<sf::Keyboard::Key> pressed_keys;
 
     sf::Clock clock;
-    const sf::Time frameTime = sf::seconds(1.f / 60.f);
 
     while (running) {
-        window.clear(sf::Color::Black);
+        float dt = clock.restart().asSeconds();
 
-        sf::Time elapsed = clock.restart();
-
-        auto view = registry.view<sf::Sprite, Position>();
-
-        for (auto [entity, sp, pos] : view.each() ) {
-            sp.setPosition(pos.x, pos.y);
-            window.draw(sp);
-        }
-
-        // for (auto [entity, sp, pos] : view) {
-        //     sp.setPosition(pos.x, pos.y);
-        //     window.draw(sp);
-        // }
-
-        /*
-        for (auto entity : view.entities()) {
-            auto& sp = view.get<sf::Sprite>(entity);
-            const auto& pos = view.get<Position>(entity);
-
-            // auto& random_pos = view.get<Position>(876329);  will throw an exception
-            // auto& vel = view.get<Velocity>(entity);  will not compile
-
-            sp.setPosition(pos.x, pos.y);
-            window.draw(sp);
-        }
-        */
-
-        // view.each([&](sf::Sprite& sp, const Position& pos) {
-        //     sp.setPosition(pos.x, pos.y);
-        //     window.draw(sp);
-        // });
-
-        registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sp) {
-            const auto rect = sp.getGlobalBounds();
-            sf::RectangleShape shape(sf::Vector2f(rect.width, rect.height));
-            shape.setFillColor(sf::Color::Transparent);
-            shape.setPosition(rect.left, rect.top);
-            shape.setOutlineColor(sf::Color::Red);
-            shape.setOutlineThickness(1);
-            window.draw(shape);
-        });
-
+        auto self_vel = registry.view<Self, Velocity>();
+        self_vel.each([&](const Self&, Velocity& vel) { vel = Velocity{0, 0}; });
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 running = false;
@@ -150,46 +109,51 @@ int main(void)
         for (auto key : pressed_keys) {
             switch (key) {
                 case sf::Keyboard::Key::Right:
-                    registry.view<Self, Position>().each([&](const Self&, Position& pos) {
-                        pos.x += 5;
-                    });
+                    self_vel.each([&](const Self&, Velocity& vel) { vel.x = 300; });
                     break;
                 case sf::Keyboard::Key::Left:
-                    registry.view<Self, Position>().each([&](const Self&, Position& pos) {
-                        pos.x -= 5;
-                    });
+                    self_vel.each([&](const Self&, Velocity& vel) { vel.x = -300; });
                     break;
                 case sf::Keyboard::Key::Up:
-                    registry.view<Self, Position>().each([&](const Self&, Position& pos) {
-                        pos.y -= 5;
-                    });
+                    self_vel.each([&](const Self&, Velocity& vel) { vel.y = -300; });
                     break;
                 case sf::Keyboard::Key::Down:
-                    registry.view<Self, Position>().each([&](const Self&, Position& pos) {
-                        pos.y += 5;
-                    });
+                    self_vel.each([&](const Self&, Velocity& vel) { vel.y = 300; });
                     break;
                 default:
                     break;
             }
         }
 
-        registry.view<Position, Projectile, Velocity>().each([&](const std::size_t& entity, Position& pos, const Projectile&, const Velocity& vel) {
-            pos.x += vel.velocity.x;
-            pos.y += vel.velocity.y;
+        for (auto [_, pos, vel] : registry.view<Position, Velocity>()) {
+            pos.x += vel.x * dt;
+            pos.y += vel.y * dt;
+        }
 
+        registry.view<Position, Projectile>().each([&](const std::size_t& entity, Position& pos, const Projectile&) {
             if (pos.x > 1200) {
                 registry.remove(entity);
             }
         });
 
-        window.display();
+        window.clear(sf::Color::Black);
 
-        if (elapsed < frameTime) {
-            sf::sleep(frameTime - elapsed);
+        auto view = registry.view<sf::Sprite, Position>();
+        for (auto [entity, sp, pos] : view.each() ) {
+            sp.setPosition(pos.x, pos.y);
+            window.draw(sp);
         }
+        registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sp) {
+            const auto rect = sp.getGlobalBounds();
+            sf::RectangleShape shape(sf::Vector2f(rect.width, rect.height));
+            shape.setFillColor(sf::Color::Transparent);
+            shape.setPosition(rect.left, rect.top);
+            shape.setOutlineColor(sf::Color::Red);
+            shape.setOutlineThickness(1);
+            window.draw(shape);
+        });
+
+        window.display();
     }
-    std::cout << "Client said:" << std::endl;
-    Foo::say();
     return 0;
 }
