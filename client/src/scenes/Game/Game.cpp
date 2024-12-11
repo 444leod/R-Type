@@ -23,13 +23,31 @@ void Game::update(const double deltaTime) {
     });
 
     _registry.view<Transform, Velocity>().each([&](Transform& transform, const Velocity& velocity) {
-        transform.x += static_cast<float>(velocity.x * deltaTime);
-        transform.y += static_cast<float>(velocity.y * deltaTime);
+        transform.x += static_cast<float>((velocity.x * SCALE) * deltaTime);
+        transform.y += static_cast<float>((velocity.y * SCALE) * deltaTime);
     });
 
     _registry.view<Projectile, Transform>().each([&](const Entity& entity, const Projectile&, const Transform& transform) {
         if (transform.x > 2200) {
             _registry.remove(entity);
+        }
+    });
+
+    _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation & animation, sf::Sprite &sprite) {
+        if (animation.currentFrame == animation.frameCount) {
+            if (animation.loop) {
+                animation.currentFrame = 0;
+            } else {
+                _registry.removeComponent<Animation>(entity);
+                std::cout << "Entity " << entity << " has " << animation.components.size() << " components to queue after animation" << std::endl;
+                for (const auto& component : animation.components)
+                    _registry.addComponent(entity, component);
+            }
+        }
+        if (animation.clock.getElapsedTime().asSeconds() >= animation.speed) {
+            sprite.setTextureRect(sf::IntRect(animation.currentFrame * 16, 0, 16, 16));
+            animation.currentFrame++;
+            animation.clock.restart();
         }
     });
 }
@@ -84,7 +102,7 @@ void Game::onEnter() {
     const auto spaceship = _registry.create();
 
     auto spaceshipSprite = sf::Sprite(_spaceshipTex);
-    spaceshipSprite.setOrigin(_spaceshipTex.getSize().x / 2, _spaceshipTex.getSize().y / 2);
+    spaceshipSprite.setOrigin(0, 0);
     spaceshipSprite.setScale(SCALE, SCALE);
 
     _registry.addComponent(spaceship, spaceshipSprite);
@@ -114,18 +132,18 @@ void Game::onExit(const AScene& nextScene) {
 
 void Game::addProjectile(const Transform& transform){
     const auto projectile = _registry.create();
+    const auto spriteTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
 
     auto projectileSprite = sf::Sprite(_projectileTex);
-    projectileSprite.setOrigin(_projectileTex.getSize().x / 2, _projectileTex.getSize().y / 2);
+    projectileSprite.setOrigin(0, 0);
     projectileSprite.setScale(SCALE, SCALE);
-    projectileSprite.setPosition(transform.x, transform.y);
+    projectileSprite.setPosition(spriteTransform.x, spriteTransform.y);
+    projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
 
     _registry.addComponent(projectile, projectileSprite);
 
-    // random Z between 0 and 1
-    float randomZ = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
-    _registry.addComponent(projectile, Transform{.x = transform.x, .y = transform.y, .z = randomZ, .rotation = 0});
+    _registry.addComponent(projectile, spriteTransform);
     _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Velocity{.x = 400, .y = 0});
+    _registry.addComponent(projectile, Animation{.speed = .05, .frameCount = 3, .loop = false, .components = std::vector<std::any>{Velocity{.x = 200, .y = 0}}});
+    _registry.addComponent(projectile, Velocity{.x = 0, .y = 0});
 }

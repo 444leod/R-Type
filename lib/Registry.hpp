@@ -62,16 +62,21 @@ public:
     template <typename T>
     void addComponent(Entity entity, const T &component)
     {
+        std::cout << "Adding component to entity " << entity << std::endl;
         const auto id = type<T>::id();
         SparseSet<T> *set = nullptr;
 
         if (!this->_sparse_sets.contains(id))
         {
+            std::cout << "Creating sparse set for type " << id << std::endl;
             set = new SparseSet<T>();
             this->_sparse_sets[id] = set;
         }
         else
+        {
+            std::cout << "adding component in sparse of types " << id << std::endl;
             set = dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id));
+        }
         set->set(entity, component);
     }
 
@@ -84,7 +89,7 @@ public:
         {
             return;
         }
-        this->_sparse_sets.at(id)->erase(entity);
+        this->_sparse_sets.at(id)->remove(entity);
     }
 
     void displaySparse() const

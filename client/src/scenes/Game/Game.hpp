@@ -19,7 +19,7 @@ class Game final : public AScene {
 public:
     Game(ISceneManager& m, const std::string& n) : AScene(m, n) {
         _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
-        _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(208, 80, 16, 16));
+        _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
         _backgroundTex.loadFromFile("assets/rtype-background.png", sf::IntRect(0, 243, 3072, 205));
 
         _eventDispatcher.link<movement_event>(&_playerMovement);

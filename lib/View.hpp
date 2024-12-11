@@ -170,7 +170,7 @@ public:
      * @param entity The entity that was erased.
      */
     void onEntityErased(const Entity& entity) override {
-        std::erase_if(_entities, [entity](const Entity& e) { return e == entity; });
+        // std::erase_if(_entities, [entity](const Entity& e) { return e == entity; });
     }
 
     /**
@@ -179,10 +179,10 @@ public:
      * @param entity The entity that was set.
      */
     void onEntitySet(const Entity& entity) override {
-        for (auto [_, set] : this->_sparse_sets)
-            if (!set->contains(entity))
-                return;
-        this->_entities.push_back(entity);
+        // for (auto [_, set] : this->_sparse_sets)
+        //     if (!set->contains(entity))
+        //         return;
+        // this->_entities.push_back(entity);
     }
 
     /**
