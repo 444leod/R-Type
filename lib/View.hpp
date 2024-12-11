@@ -300,7 +300,6 @@ private:
     std::map<std::size_t, ISparseSet *> _sparse_sets;
     std::vector<std::size_t> _type_ids;
     std::vector<Entity> _entities;
-    std::optional<Entity> _last_entity_checked = std::nullopt;
 
     /**
      * @brief Query the entities that have the required components.

@@ -9,6 +9,7 @@
 #include "Registry.hpp"
 #include <iostream>
 #include <algorithm>
+#include <config.h>
 
 void Game::initialize() {
 
@@ -84,7 +85,7 @@ void Game::onEnter() {
 
     auto spaceshipSprite = sf::Sprite(_spaceshipTex);
     spaceshipSprite.setOrigin(_spaceshipTex.getSize().x / 2, _spaceshipTex.getSize().y / 2);
-    spaceshipSprite.setScale(3, 3);
+    spaceshipSprite.setScale(SCALE, SCALE);
 
     _registry.addComponent(spaceship, spaceshipSprite);
     _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
@@ -95,7 +96,7 @@ void Game::onEnter() {
     const auto background = _registry.create();
 
     auto backgroundSprite = sf::Sprite(_backgroundTex);
-    backgroundSprite.setScale(4, 4);
+    backgroundSprite.setScale(SCALE, SCALE);
 
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
@@ -112,11 +113,11 @@ void Game::onExit(const AScene& nextScene) {
 }
 
 void Game::addProjectile(const Transform& transform){
-    auto projectile = _registry.create();
+    const auto projectile = _registry.create();
 
     auto projectileSprite = sf::Sprite(_projectileTex);
     projectileSprite.setOrigin(_projectileTex.getSize().x / 2, _projectileTex.getSize().y / 2);
-    projectileSprite.setScale(2, 2);
+    projectileSprite.setScale(SCALE, SCALE);
     projectileSprite.setPosition(transform.x, transform.y);
 
     _registry.addComponent(projectile, projectileSprite);
