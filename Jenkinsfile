@@ -104,7 +104,7 @@ pipeline {
     }
     post {
         always {
-            sh 'su root -c "chmod -R 777 ."'
+            sh 'sudo chmod -R 777 .'
             cleanWs(deleteDirs: true, disableDeferredWipeout: true)
             echo "Pipeline OK"
         }
