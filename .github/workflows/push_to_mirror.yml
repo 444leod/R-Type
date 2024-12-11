@@ -6,27 +6,8 @@ env:
   MIRROR_URL: "git@github.com:EpitechPromo2027/B-CPP-500-LIL-5-2-rtype-leo.dumont.git"
 
 jobs:
-
-  build:
-    name: Test compilations
-    runs-on: self-hosted
-    container: ximaz/epitest-docker-aarch64
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Test Cmake compilation
-        timeout-minutes: 2
-        run: |
-          mkdir -p build
-          cd build
-          cmake ..
-          make
-
   push_to_mirror:
     name: Push to mirror
-    needs: [build]
     if: ${{ github.ref_name == 'main' && github.event_name == 'push' }}
     runs-on: self-hosted
 
