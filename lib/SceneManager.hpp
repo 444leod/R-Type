@@ -21,6 +21,7 @@
 #include <thread>
 #include "ISceneManager.hpp"
 #include "AScene.hpp"
+#include "config.h"
 
 #include <iostream>
 
@@ -211,7 +212,7 @@ private:
     std::string _loadingName;
 
     #ifndef __RTYPE_NO_DISPLAY__
-    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(1920, 1080), "R-Type");
+    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(384 * SCALE, 256 * SCALE), "R-Type");
     #endif
 };
 
