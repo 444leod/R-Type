@@ -75,6 +75,18 @@ public:
         set->set(entity, component);
     }
 
+    template <typename T>
+    void removeComponent(Entity entity)
+    {
+        const auto id = type<T>::id();
+
+        if (!this->_sparse_sets.contains(id))
+        {
+            return;
+        }
+        this->_sparse_sets.at(id)->erase(entity);
+    }
+
     void displaySparse() const
     {
         std::cout << "There is a sparse array for the following components: " << std::endl;

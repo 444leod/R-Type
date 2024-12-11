@@ -308,7 +308,7 @@ private:
     void _queryEntities() {
         for (const auto &component : _type_ids) {
             if (!_sparse_sets.contains(component)) {
-                std::cerr << "Component " << component << " is not in the registry" << std::endl;
+                // std::cerr << "Component " << component << " is not in the registry" << std::endl;
                 return;
             }
         }
