@@ -131,7 +131,7 @@ public:
             this->_pollEvents();
             #endif
 
-            this->_current->update(deltaTime);
+            this->_current->update(deltaTime, _window);
 
             #ifndef __RTYPE_NO_DISPLAY__
             this->_render();

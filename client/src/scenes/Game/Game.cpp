@@ -15,7 +15,7 @@ void Game::initialize() {
 
 }
 
-void Game::update(const double deltaTime) {
+void Game::update(const double deltaTime, const sf::RenderWindow &window) {
     _parallaxOffset += static_cast<float>(deltaTime * 25);
 
     _registry.view<Parallax, Transform>().each([&](const Parallax&, Transform& transform) {
@@ -32,7 +32,7 @@ void Game::update(const double deltaTime) {
     });
 
     _registry.view<Projectile, Transform>().each([&](const Entity& entity, const Projectile&, const Transform& transform) {
-        if (transform.x > 2200) {
+        if (transform.x > window.getSize().x) {
             _registry.remove(entity);
         }
     });

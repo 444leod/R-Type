@@ -24,7 +24,8 @@ public:
 
     /// @brief Called every frame
     /// @param deltaTime The time between this frame and the last
-    virtual void update(double deltaTime) = 0;
+    /// @param window The window to render to
+    virtual void update(double deltaTime, const sf::RenderWindow &window) = 0;
 
     /// @brief Used to render the elements in a scene
     /// @param window The  window to render to

@@ -27,7 +27,7 @@ public:
 
     void initialize() override;
 
-    void update(double deltaTime) override;
+    void update(double deltaTime, const sf::RenderWindow &window) override;
 
     void render(sf::RenderWindow &window) override;
 
