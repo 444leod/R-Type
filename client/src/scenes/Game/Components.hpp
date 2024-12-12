@@ -35,7 +35,7 @@ struct Animation {
     unsigned int currentFrame = 1;
     unsigned int frameCount{};
     bool loop{};
-    std::vector<std::any> components = {};
+    Velocity velocity{};
 };
 
 #endif //COMPONENTS_HPP

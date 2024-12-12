@@ -22,7 +22,11 @@ void Game::update(const double deltaTime) {
         transform.x = -_parallaxOffset;
     });
 
-    _registry.view<Transform, Velocity>().each([&](Transform& transform, const Velocity& velocity) {
+    auto view = _registry.view<Transform, Velocity>();
+
+    // std::cout << "Entities: " << view.entities() << std::endl;
+
+    view.each([&](const Entity& entity, Transform& transform, const Velocity& velocity) {
         transform.x += static_cast<float>((velocity.x * SCALE) * deltaTime);
         transform.y += static_cast<float>((velocity.y * SCALE) * deltaTime);
     });
@@ -39,9 +43,7 @@ void Game::update(const double deltaTime) {
                 animation.currentFrame = 0;
             } else {
                 _registry.removeComponent<Animation>(entity);
-                std::cout << "Entity " << entity << " has " << animation.components.size() << " components to queue after animation" << std::endl;
-                for (const auto& component : animation.components)
-                    _registry.addComponent(entity, component);
+                _registry.addComponent(entity, animation.velocity);
             }
         }
         if (animation.clock.getElapsedTime().asSeconds() >= animation.speed) {
@@ -144,6 +146,5 @@ void Game::addProjectile(const Transform& transform){
 
     _registry.addComponent(projectile, spriteTransform);
     _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Animation{.speed = .05, .frameCount = 3, .loop = false, .components = std::vector<std::any>{Velocity{.x = 200, .y = 0}}});
-    _registry.addComponent(projectile, Velocity{.x = 0, .y = 0});
+    _registry.addComponent(projectile, Animation{.speed = .05, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
 }
