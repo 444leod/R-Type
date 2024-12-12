@@ -7,9 +7,10 @@
 
 #include "Game.hpp"
 #include "Registry.hpp"
-#include <iostream>
 #include <algorithm>
+#include <cmath>
 #include <config.h>
+#include <iostream>
 
 void Game::initialize() {
 
@@ -23,8 +24,6 @@ void Game::update(const double deltaTime, const sf::RenderWindow &window) {
     });
 
     auto view = _registry.view<Transform, Velocity>();
-
-    // std::cout << "Entities: " << view.entities() << std::endl;
 
     view.each([&](const Entity& entity, Transform& transform, const Velocity& velocity) {
         transform.x += static_cast<float>((velocity.x * SCALE) * deltaTime);
@@ -43,14 +42,41 @@ void Game::update(const double deltaTime, const sf::RenderWindow &window) {
                 animation.currentFrame = 0;
             } else {
                 _registry.removeComponent<Animation>(entity);
-                _registry.addComponent(entity, animation.velocity);
+                if (animation.velocity.x != 0 || animation.velocity.y != 0)
+                    _registry.addComponent(entity, animation.velocity);
+                else
+                    _registry.remove(entity);
             }
         }
-        if (animation.clock.getElapsedTime().asSeconds() >= animation.speed) {
-            sprite.setTextureRect(sf::IntRect(animation.currentFrame * 16, 0, 16, 16));
+        if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
+            sprite.setTextureRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
             animation.currentFrame++;
             animation.clock.restart();
         }
+    });
+
+    _registry.view<Bug, sf::Sprite, Transform>().each([&](const Entity& entity, Bug& bug, sf::Sprite& sprite, Transform& transform) {
+        const auto movementFactor = std::sin(bug.clock.getElapsedTime().asSeconds() / .2);
+        transform.y += movementFactor * 8;
+        transform.rotation = 90 - 45 * movementFactor;
+    });
+
+    _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& entity, Enemy&, const sf::Sprite& sprite, const Transform& transform) {
+        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&, const Transform& projectileTransform) {
+            // FIX HITBOX
+            if (sprite.getGlobalBounds().intersects(sf::FloatRect(projectileTransform.x, projectileTransform.y, 16, 16))) {
+                const auto explosion = _registry.create();
+                auto explosionSprite = sf::Sprite(_explosionTex);
+                explosionSprite.setOrigin(16, 16);
+                explosionSprite.setScale(SCALE, SCALE);
+                explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+                _registry.addComponent(explosion, explosionSprite);
+                _registry.addComponent(explosion, Transform{.x = transform.x, .y = transform.y, .z = 1, .rotation = 0});
+                _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
+                _registry.remove(projectile);
+                _registry.remove(entity);
+            }
+        });
     });
 }
 
@@ -81,6 +107,19 @@ void Game::onEvent(sf::Event &event) {
                         addProjectile(transform);
                     });
                     break;
+                case sf::Keyboard::B: {
+                    const auto bug = _registry.create();
+                    auto bugSprite = sf::Sprite(_bugTex);
+                    bugSprite.setOrigin(16, 13);
+                    bugSprite.setScale(SCALE, SCALE);
+                    bugSprite.setPosition(2000, 250);
+                    _registry.addComponent(bug, bugSprite);
+                    _registry.addComponent(bug, Bug{});
+                    _registry.addComponent(bug, Enemy{});
+                    _registry.addComponent(bug, Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
+                    _registry.addComponent(bug, Velocity{.x = -100, .y = 0});
+                    break;
+                }
                 default:
                     _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = true});
                     break;
@@ -146,5 +185,5 @@ void Game::addProjectile(const Transform& transform){
 
     _registry.addComponent(projectile, spriteTransform);
     _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Animation{.speed = .05, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
+    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
 }
