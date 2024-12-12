@@ -16,6 +16,15 @@
 #include "Family.hpp"
 #include "SparseSet.hpp"
 
+inline std::ostream& operator<<(std::ostream& os, const std::vector<Entity>& vec) {
+    if (vec.empty())
+        return os << "[]";
+    os << "[" << vec[0];
+    for (size_t i = 1; i < vec.size(); ++i)
+        os << ", " << vec[i];
+    return os << "]";
+}
+
 /**
  * @brief Trait to check if T is in the list of types.
  */
@@ -149,6 +158,9 @@ public:
      * @param sparse_sets Reference to the map of sparse sets.
      */
     explicit View(const std::map<std::size_t, ISparseSet *>& sparse_sets) : _type_ids{type<Component>::id(), type<Others>::id()...}, _sparse_sets{sparse_sets} {
+        // std::cout << "View types: " << type<Component>::name();
+        // ((std::cout << ", " << type<Others>::name()), ...);
+        // std::cout << std::endl;
         this->refresh();
         for (auto id : this->_type_ids)
             if (this->_sparse_sets.contains(id))
@@ -227,6 +239,7 @@ public:
      */
     template <typename Func>
     void each(Func&& func) {
+        // std::cout << "each with entities: " << _entities << std::endl;
         for (auto entity : _entities) {
             if constexpr (std::is_invocable_v<Func, Entity, Component&, Others&...>) {
                 func(entity, this->get<Component>(entity), this->get<Others>(entity)...);
@@ -311,27 +324,40 @@ private:
      * @brief Query the entities that have the required components.
      */
     void _queryEntities() {
+        std::vector<std::vector<Entity>> entitiesList;
+        uint8_t minimum = -1;
+        uint8_t index = 0;
         for (const auto &component : _type_ids) {
             if (!_sparse_sets.contains(component)) {
                 // std::cerr << "Component " << component << " is not in the registry" << std::endl;
                 return;
             }
+            auto list = _sparse_sets.at(component)->entities();
+            if (list.size() < minimum) {
+                minimum = list.size();
+                index = entitiesList.size();
+            }
+            entitiesList.push_back(list);
         }
+        std::vector<Entity> entitiesListIntersection = entitiesList[index];
 
-        const auto first = _type_ids[0];
-        const auto sparse = dynamic_cast<SparseSet<Component> *>(_sparse_sets.at(first));
+        // TODO: optimize
+        std::vector<Entity> result;
 
-        auto entitiesList = sparse->entities();
-
-        if constexpr (sizeof...(Others) > 0) {
-            for (const auto &entity : entitiesList) {
-                if (!_entityContainComponents<Others...>(entity)) {
-                    entitiesList.erase(std::remove(entitiesList.begin(), entitiesList.end(), entity), entitiesList.end());
+        for (const auto& element : entitiesListIntersection) {
+            bool foundInAll = true;
+            for (const auto& vec : entitiesList) {
+                if (std::ranges::find(vec, element) == vec.end()) {
+                    foundInAll = false;
+                    break;
                 }
+            }
+            if (foundInAll) {
+                result.push_back(element);
             }
         }
 
-        _entities = entitiesList;
+        _entities = result;
     }
 
     /**

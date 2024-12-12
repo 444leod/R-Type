@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <type_traits>
+#include <iostream>
 
 /*
     This code is a simple implementation of a family class that generates a unique identifier for each type.
@@ -79,7 +80,15 @@ constexpr std::size_t hash(const char* str) {
     while (*str) {
         hash = hash * 101 + static_cast<unsigned char>(*str++);
     }
+
     return hash;
+}
+
+constexpr std::string get_type_name(const char* pretty_function) {
+    std::string_view name = pretty_function;
+    name.remove_prefix(37);
+    name.remove_suffix(1);
+    return std::string{name};
 }
 
 /**
@@ -128,6 +137,10 @@ struct GENERATOR_API final_type {
         constexpr auto value = hash(GENERATOR_PRETTY_FUNCTION);
         return value;
     }
+
+    static constexpr std::string name() {
+        return get_type_name(GENERATOR_PRETTY_FUNCTION);
+    }
 #else
     /**
      * @brief Returns the unique identifier for the type.
@@ -140,6 +153,10 @@ struct GENERATOR_API final_type {
     static std::size_t id() {
         static const std::size_t value = generator::next();
         return value;
+    }
+
+    static std::string name() {
+            return typeid(Type).name();
     }
 #endif
 };
@@ -165,6 +182,13 @@ struct GENERATOR_API type {
      */
     static constexpr std::size_t id() {
         return final_type<Type>::id();
+    }
+
+    static constexpr std::string name() {
+        std::string_view name = final_type<Type>::name();
+        name.remove_prefix(30);
+        name.remove_suffix(48);
+        return std::string{name};
     }
 };
 
