@@ -5,14 +5,27 @@
 ** main
 */
 
-#include "Foo.hpp"
-#include <asio.hpp> // found it
-#include <SFML/Graphics.hpp> // found it
+#include <thread>
+#include "Client.hpp"
 
 int main(void)
 {
-    std::cout << "Client said o:" << std::endl;
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
-    Foo::say();
+    asio::io_context ctx;
+    Client client(ctx);
+    std::thread t([&ctx](){
+        ctx.run();
+    });
+    client.run("127.0.0.1", 25565);
+    while (client.running())
+    {
+        sf::Event e;
+        while (client.window().pollEvent(e)) {
+            if (e.type == sf::Event::Closed)
+                client.stop();
+        }
+        client.window().clear();
+        client.window().display();
+    }
+    t.join();
     return 0;
 }
