@@ -12,7 +12,7 @@
 class NetworkAgent
 {
 public:
-    NetworkAgent(asio::io_context& ctx, std::uint32_t port) :
+    NetworkAgent(asio::io_context& ctx, std::uint32_t port = 0) :
         _socket(ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
     {
         this->_port = this->_socket.local_endpoint().port();
@@ -22,6 +22,11 @@ public:
 
 protected:
     virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const std::string& msg) = 0;
+
+    void _stop()
+    {
+        this->_socket.close();
+    }
 
     void _send(const asio::ip::udp::endpoint& dest, const std::string& msg)
     {
