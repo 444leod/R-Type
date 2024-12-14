@@ -28,12 +28,24 @@ struct UDPPacket {
     }
 
 public:
-    // TODO: implement something better
     uint16_t calculateChecksum() const {
         uint16_t sum = 0;
+
+        // little explaination: sequence and ack are 32 bits, but checksum is 16 bits (for optimization purposes)
+        // in order to checkum the whole 32 bits, we need to split them into 16 bits chunks
+        // for exemple: 0x12345678 -> 0x1234 + 0x5678
+        sum += (sequence_number >> 16) & 0xFFFF; // 0x00001234 => 0x1234
+        sum += sequence_number & 0xFFFF; // 0x5678
+
+        sum += (ack_number >> 16) & 0xFFFF;
+        sum += ack_number & 0xFFFF;
+
+        sum += payload_length;
+
         for (const auto& byte : payload) {
             sum += byte;
         }
+
         return sum;
     }
 };
