@@ -37,7 +37,7 @@ public:
         while (this->_running) {
             const auto tick_start = std::chrono::high_resolution_clock::now();
             // v v Server-loop here v v //
-            std::cout << "Tick: " << this->_tick++ << std::endl;
+            // std::cout << "Tick: " << this->_tick++ << std::endl;
             if (this->_tick && this->_tick % 100 == 0) {
                 std::stringstream ss;
                 ss << "You were here at tick " << this->_tick << "..." << std::endl;
@@ -49,9 +49,11 @@ public:
     }
 
 private:
-    virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const std::string& msg)
+    virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const UDPPacket& packet)
     {
-        std::cout << "Received: " << msg << std::endl;
+        std::string msg(packet.payload.begin(), packet.payload.end());
+        std::cout << "Received: " << msg << " (seq: " << packet.sequence_number
+                  << ", ack: " << packet.ack_number << ")" << std::endl;
 
         auto it = std::find(this->_clients.begin(), this->_clients.end(), src);
         if (it == this->_clients.end())

@@ -16,6 +16,7 @@ int main(void)
         ctx.run();
     });
     client.run("127.0.0.1", 25565);
+    client.sendMessage("Hello boop boop zib zib");
     while (client.running())
     {
         sf::Event e;

@@ -36,10 +36,17 @@ public:
     sf::RenderWindow &window() noexcept { return this->_window; }
     bool running() const noexcept { return this->_window.isOpen(); }
 
-private:
-    virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const std::string& msg)
+    void sendMessage(const std::string& msg)
     {
-        std::cout << "Received: " << msg << std::endl;
+        this->_send(this->_server, msg);
+    }
+
+private:
+    virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const UDPPacket& packet)
+    {
+        std::string msg(packet.payload.begin(), packet.payload.end());
+        std::cout << "Received: " << msg << " (seq: " << packet.sequence_number 
+                  << ", ack: " << packet.ack_number << ")" << std::endl;
     }
 
 protected:
