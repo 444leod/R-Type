@@ -43,4 +43,6 @@ struct Bug {
     sf::Clock clock = sf::Clock();
 };
 
+struct Debug {};
+
 #endif //COMPONENTS_HPP

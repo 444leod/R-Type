@@ -55,11 +55,11 @@ void Game::update(const double deltaTime, const sf::RenderWindow &window) {
             if (animation.loop) {
                 animation.currentFrame = 0;
             } else {
-                _registry.removeComponent<Animation>(entity);
                 if (animation.velocity.x != 0 || animation.velocity.y != 0)
                     _registry.addComponent(entity, animation.velocity);
                 else
                     _registry.remove(entity);
+                _registry.removeComponent<Animation>(entity);
             }
         }
         if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
@@ -75,30 +75,31 @@ void Game::update(const double deltaTime, const sf::RenderWindow &window) {
         transform.rotation = 90 - 45 * movementFactor;
     });
 
-    auto enemies = _registry.view<Enemy, sf::Sprite, Transform>().each();
-    for (auto& [enemy, _, sprite, transform] : enemies)
-    {
-        auto projectiles = _registry.view<Projectile, Transform>().each();
-        for (auto& [projectile, _, projectile_transform] : projectiles)
+    _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
+        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&, const Transform& projectile_transform)
         {
-            if (sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16))) {
-                const auto explosion = _registry.create();
-                std::cout << explosion << " is an explosion entity" << std::endl;
-                auto explosionSprite = sf::Sprite(_explosionTex);
-                explosionSprite.setOrigin(16, 16);
-                explosionSprite.setScale(SCALE, SCALE);
-                explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
-                _registry.addComponent(explosion, explosionSprite);
-                _registry.addComponent(explosion, Transform{.x = projectile_transform.x, .y = projectile_transform.y, .z = 1, .rotation = 0});
-                _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
-                _registry.remove(enemy);
-                _registry.remove(projectile);
-            }
-        }
-    }
+            if (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16)))
+                return;
 
-    auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
-    explosions.displaySets();
+            const auto explosion = _registry.create();
+            auto explosionSprite = sf::Sprite(_explosionTex);
+            explosionSprite.setOrigin(16, 16);
+            explosionSprite.setScale(SCALE, SCALE);
+            explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+            _registry.addComponent(explosion, explosionSprite);
+            _registry.addComponent(explosion, Transform{.x = projectile_transform.x, .y = projectile_transform.y, .z = 1, .rotation = 0});
+            _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
+            #if DEBUG
+                _registry.addComponent(explosion, Debug{});
+            #endif
+
+            _registry.remove(enemy);
+            _registry.remove(projectile);
+        });
+    });
+
+    // auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
+    // explosions.displaySets();
 }
 
 void Game::render(sf::RenderWindow& window) {
@@ -114,16 +115,33 @@ void Game::render(sf::RenderWindow& window) {
         return std::get<2>(a).z < std::get<2>(b).z;
     });
 
-    for (auto& [entity, sprite, transform] : vec) {
+    for (const auto& [entity, sprite, _] : vec) {
         window.draw(sprite);
-        sf::Text text;
-        text.setFont(font);
+    }
+
+    // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sprite) {
+    //     auto bounds = sprite.getGlobalBounds();
+    //     sf::RectangleShape hitbox(sf::Vector2f(bounds.width, bounds.height));
+    //     hitbox.setPosition(sprite.getPosition());
+    //     hitbox.setRotation(sprite.getRotation());
+    //     hitbox.setOutlineColor(sf::Color::Red);
+    //     hitbox.setOutlineThickness(1);
+    //     // hitbox.setOrigin(sprite.getOrigin());
+    //     hitbox.setFillColor(sf::Color::Transparent);
+    //     window.draw(hitbox);
+    // });
+
+    #if DEBUG
+    sf::Text text;
+    text.setFont(font);
+    text.setCharacterSize(30);
+    text.setFillColor(sf::Color::White);
+    _registry.view<Debug, Transform>().each([&](const Entity& entity, const Debug&, const Transform& transform) {
         text.setString(std::to_string(entity));
-        text.setCharacterSize(30);
-        text.setFillColor(sf::Color::White);
         text.setPosition(transform.x, transform.y);
         window.draw(text);
-    }
+    });
+    #endif
 }
 
 void Game::onEvent(sf::Event &event) {
@@ -138,7 +156,7 @@ void Game::onEvent(sf::Event &event) {
                 case sf::Keyboard::B: {
                     const auto bug = _registry.create();
                     auto bugSprite = sf::Sprite(_bugTex);
-                    bugSprite.setOrigin(16, 13);
+                    bugSprite.setOrigin(_bugTex.getSize().x / 2, _bugTex.getSize().y / 2);
                     bugSprite.setScale(SCALE, SCALE);
                     bugSprite.setPosition(2000, 250);
                     _registry.addComponent(bug, bugSprite);
@@ -146,6 +164,10 @@ void Game::onEvent(sf::Event &event) {
                     _registry.addComponent(bug, Enemy{});
                     _registry.addComponent(bug, Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
                     _registry.addComponent(bug, Velocity{.x = -100, .y = 0});
+                    _registry.addComponent(bug, Hitbox{});
+                    #if DEBUG
+                        _registry.addComponent(bug, Debug{});
+                    #endif
                     break;
                 }
                 default:
@@ -179,6 +201,9 @@ void Game::onEnter() {
     _registry.addComponent(spaceship, Self{});
     _registry.addComponent(spaceship, Hitbox{});
     _registry.addComponent(spaceship, Velocity{.x = 0, .y = 0});
+    #if DEBUG
+        _registry.addComponent(spaceship, Debug{});
+    #endif
 
     const auto background = _registry.create();
 
@@ -210,9 +235,15 @@ void Game::addProjectile(const Transform& transform){
     projectileSprite.setPosition(spriteTransform.x, spriteTransform.y);
     projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
 
+    #if DEBUG
+        _registry.addComponent(projectile, Debug{});
+    #endif
+
+    _registry.addComponent(projectile, Hitbox{});
     _registry.addComponent(projectile, projectileSprite);
 
     _registry.addComponent(projectile, spriteTransform);
     _registry.addComponent(projectile, Projectile{});
     _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
+
 }

@@ -6,5 +6,6 @@
 #define CONFIG_H
 
 #define SCALE 4
+#define DEBUG false
 
 #endif //CONFIG_H
