@@ -11,6 +11,20 @@
 #include <cmath>
 #include <config.h>
 #include <iostream>
+#include <ranges>
+#include <thread>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window/Keyboard.hpp>
+
+sf::Font get_default_font() {
+    sf::Font font;
+    font.loadFromFile("assets/arial.ttf");
+    return font;
+}
+
+static const auto font = get_default_font();
+
+
 
 void Game::initialize() {
 
@@ -61,40 +75,54 @@ void Game::update(const double deltaTime, const sf::RenderWindow &window) {
         transform.rotation = 90 - 45 * movementFactor;
     });
 
-    _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& entity, Enemy&, const sf::Sprite& sprite, const Transform& transform) {
-        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&, const Transform& projectileTransform) {
-            // FIX HITBOX
-            if (sprite.getGlobalBounds().intersects(sf::FloatRect(projectileTransform.x, projectileTransform.y, 16, 16))) {
+    auto enemies = _registry.view<Enemy, sf::Sprite, Transform>().each();
+    for (auto& [enemy, _, sprite, transform] : enemies)
+    {
+        auto projectiles = _registry.view<Projectile, Transform>().each();
+        for (auto& [projectile, _, projectile_transform] : projectiles)
+        {
+            if (sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16))) {
                 const auto explosion = _registry.create();
+                std::cout << explosion << " is an explosion entity" << std::endl;
                 auto explosionSprite = sf::Sprite(_explosionTex);
                 explosionSprite.setOrigin(16, 16);
                 explosionSprite.setScale(SCALE, SCALE);
                 explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
                 _registry.addComponent(explosion, explosionSprite);
-                _registry.addComponent(explosion, Transform{.x = transform.x, .y = transform.y, .z = 1, .rotation = 0});
+                _registry.addComponent(explosion, Transform{.x = projectile_transform.x, .y = projectile_transform.y, .z = 1, .rotation = 0});
                 _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
+                _registry.remove(enemy);
                 _registry.remove(projectile);
-                _registry.remove(entity);
             }
-        });
-    });
+        }
+    }
+
+    auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
+    explosions.displaySets();
 }
 
 void Game::render(sf::RenderWindow& window) {
-    auto vec = std::vector<std::tuple<sf::Sprite, Transform>>{};
+    auto vec = std::vector<std::tuple<Entity, sf::Sprite, Transform>>{};
 
-    _registry.view<sf::Sprite, Transform>().each([&](sf::Sprite &sprite, Transform &transform) {
-        vec.emplace_back(sprite, transform);
+    _registry.view<sf::Sprite, Transform>().each([&](const Entity& entity, sf::Sprite &sprite, Transform &transform) {
+        vec.emplace_back(entity, sprite, transform);
         sprite.setPosition(transform.x, transform.y);
         sprite.setRotation(transform.rotation);
     });
 
     std::ranges::sort(vec, [](const auto& a, const auto& b) {
-        return std::get<1>(a).z < std::get<1>(b).z;
+        return std::get<2>(a).z < std::get<2>(b).z;
     });
 
-    for (auto& [sprite, transform] : vec) {
+    for (auto& [entity, sprite, transform] : vec) {
         window.draw(sprite);
+        sf::Text text;
+        text.setFont(font);
+        text.setString(std::to_string(entity));
+        text.setCharacterSize(30);
+        text.setFillColor(sf::Color::White);
+        text.setPosition(transform.x, transform.y);
+        window.draw(text);
     }
 }
 
@@ -173,6 +201,7 @@ void Game::onExit(const AScene& nextScene) {
 
 void Game::addProjectile(const Transform& transform){
     const auto projectile = _registry.create();
+    std::cout << projectile << " is a projectile entity" << std::endl;
     const auto spriteTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
 
     auto projectileSprite = sf::Sprite(_projectileTex);

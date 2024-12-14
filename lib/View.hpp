@@ -182,7 +182,9 @@ public:
      * @param entity The entity that was erased.
      */
     void onEntityErased(const Entity& entity) override {
-        // std::erase_if(_entities, [entity](const Entity& e) { return e == entity; });
+        // const auto entity_it = std::ranges::find(_entities, entity);
+        // if (entity_it != _entities.end())
+        //     _entities.erase(entity_it);
     }
 
     /**
@@ -241,6 +243,8 @@ public:
     void each(Func&& func) {
         // std::cout << "each with entities: " << _entities << std::endl;
         for (auto entity : _entities) {
+            if (const auto entity_it = std::ranges::find(_entities, entity);entity_it == _entities.end())
+                continue;
             if constexpr (std::is_invocable_v<Func, Entity, Component&, Others&...>) {
                 func(entity, this->get<Component>(entity), this->get<Others>(entity)...);
             } else {
@@ -312,6 +316,13 @@ public:
             os << ", " << entity;
         os << std::endl;
         return os;
+    }
+
+    void displaySets() {
+        for (const auto& [id, set] : _sparse_sets) {
+            std::cout << "Sparse set for component " << id << std::endl;
+            set->display();
+        }
     }
 
 private:

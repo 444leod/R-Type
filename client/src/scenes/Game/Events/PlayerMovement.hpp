@@ -25,7 +25,6 @@ public:
     ~PlayerMovement() override = default;
 
     void receive(const movement_event& event) override {
-        std::cout << "PlayerMovement received event" << std::endl;
         _registry.view<Self, Velocity>().each([&](const Self&, Velocity& velocity) {
             switch (event.key) {
                 case sf::Keyboard::Key::Up:
