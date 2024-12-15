@@ -18,6 +18,13 @@ struct foo_message : public IEvent
 class Foo final : public EventHandler<foo_message>
 {
 public:
+
+    inline int id() const noexcept
+    {
+        static int id = 0;
+        return id++;
+    }
+
     static void say() noexcept
     {
         std::cout << "Hello world!" << std::endl;
