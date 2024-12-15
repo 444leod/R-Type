@@ -45,7 +45,7 @@ private:
     virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const UDPPacket& packet)
     {
         std::string msg(packet.payload.begin(), packet.payload.end());
-        std::cout << "Received: " << msg << " (seq: " << packet.sequence_number 
+        std::cout << "Received: " << msg << " (seq: " << packet.sequence_number
                   << ", ack: " << packet.ack_number << ")" << std::endl;
     }
 
