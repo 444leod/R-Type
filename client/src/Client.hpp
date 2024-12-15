@@ -21,7 +21,11 @@ public:
     {
         const auto addr = asio::ip::address::from_string(host);
         this->_server = asio::ip::udp::endpoint(addr, port);
-        this->_send(this->_server, "CONNECT");
+
+        UDPPacket packet;
+        packet << PACKET_TYPE::CONNECT;
+        packet << "CONNECT";
+        this->_send(this->_server, packet);
 
         this->_window.create(sf::VideoMode::getDesktopMode(), "R-Type");
         this->_window.setFramerateLimit(60);
@@ -38,14 +42,24 @@ public:
 
     void sendMessage(const std::string& msg)
     {
-        this->_send(this->_server, msg);
+        UDPPacket packet;
+        packet << PACKET_TYPE::MESSAGE;
+        packet << msg;
+        this->_send(this->_server, packet);
+    }
+
+    void send(const UDPPacket& packet)
+    {
+        this->_send(this->_server, packet);
     }
 
 private:
-    virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const UDPPacket& packet)
+     void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override
     {
-        std::string msg(packet.payload.begin(), packet.payload.end());
-        std::cout << "Received: " << msg << " (seq: " << packet.sequence_number
+        std::cout << "Received packet from " << src.address().to_string() << ":" << src.port() << std::endl;
+        const auto payload = packet.payload;
+
+        std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
                   << ", ack: " << packet.ack_number << ")" << std::endl;
     }
 

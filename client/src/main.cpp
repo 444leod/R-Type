@@ -16,7 +16,14 @@ int main(void)
         ctx.run();
     });
     client.run("127.0.0.1", 25565);
+
     client.sendMessage("Hello boop boop zib zib");
+
+    UDPPacket packet;
+    packet << PACKET_TYPE::POSITION;
+    packet << Position{10.0f, 20.0f};
+    client.send(packet);
+
     while (client.running())
     {
         sf::Event e;
