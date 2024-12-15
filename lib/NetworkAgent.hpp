@@ -16,7 +16,7 @@ public:
         _socket(ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
     {
         this->_port = this->_socket.local_endpoint().port();
-        this->_receive_packet();
+        this->_receivePacket();
     }
     ~NetworkAgent() = default;
 
@@ -28,7 +28,7 @@ protected:
         this->_socket.async_send_to(
             asio::buffer(msg), dest,
             std::bind(
-                &NetworkAgent::_handle_send, this,
+                &NetworkAgent::_handleSend, this,
                 asio::placeholders::error,
                 asio::placeholders::bytes_transferred
             )
@@ -36,19 +36,19 @@ protected:
     }
 
 private:
-    void _receive_packet()
+    void _receivePacket()
     {
         this->_socket.async_receive_from(
             asio::buffer(this->_buffer), this->_client,
             std::bind(
-                &NetworkAgent::_handle_receive, this,
+                &NetworkAgent::_handleReceive, this,
                 asio::placeholders::error,
                 asio::placeholders::bytes_transferred
             )
         );
     }
 
-    void _handle_receive(const std::error_code& e, std::size_t bytes)
+    void _handleReceive(const std::error_code& e, std::size_t bytes)
     {
         // Do not proceed in case of error
         if (e)
@@ -59,10 +59,10 @@ private:
         // Call overriden handler
         this->_onPacketReceived(this->_client, std::string(this->_buffer.data()));
         // Add job for another packet
-        this->_receive_packet();
+        this->_receivePacket();
     }
 
-    void _handle_send(const std::error_code& e, std::size_t bytes)
+    void _handleSend(const std::error_code& e, std::size_t bytes)
     {}
 
 protected:
