@@ -11,6 +11,31 @@
 #include <iostream>
 #include "UDPPacket.hpp"
 
+/**
+* This is temporary, for the example of how packets work.
+*/
+struct Position
+{
+    float x, y;
+};
+
+/**
+ * @brief This enum will describe what the packet is for.
+ *
+ *  - NONE: No packet type
+ *  - CONNECT: Connection packet
+ *  - DISCONNECT: Disconnection packet
+ *  - MESSAGE: Message packet (temporary
+ *  - POSITION: Position packet (temporary)
+*/
+enum class PACKET_TYPE {
+    NONE = 0,
+    CONNECT,
+    DISCONNECT,
+    MESSAGE,
+    POSITION
+};
+
 class NetworkAgent
 {
 public:
@@ -23,16 +48,15 @@ public:
     ~NetworkAgent() = default;
 
 protected:
-    virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const UDPPacket& packet) = 0;
+    virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) = 0;
 
     void _stop()
     {
         this->_socket.close();
     }
 
-    void _send(const asio::ip::udp::endpoint& dest, const std::string& msg)
+    void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet)
     {
-        UDPPacket packet(msg);
         auto serialized = packet.serialize();
         this->_socket.async_send_to(
             asio::buffer(serialized), dest,
@@ -68,7 +92,7 @@ private:
             if (calculated_checksum == packet.checksum) {
                 this->_onPacketReceived(this->_client, packet); // yipee
             } else {
-                std::cerr << "got some corrupted packet :(" << std::endl;
+                std::cerr << "got some corrupted packet :( (checksum mismatch: " << calculated_checksum << " != " << packet.checksum << ")" << std::endl;
             }
         }
         this->_receive_packet();
