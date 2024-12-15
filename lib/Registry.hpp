@@ -18,12 +18,6 @@
 #include "SparseSet.hpp"
 #include "View.hpp"
 
-inline Entity get_new_entity_id()
-{
-    static Entity value = 0;
-    return value++;
-}
-
 class Registry
 {
 public:
@@ -38,7 +32,7 @@ public:
 
     unsigned int create()
     {
-        const auto entity = get_new_entity_id();
+        const auto entity = Registry::_get_new_entity_id();
 
         _entities.emplace_back(entity);
         return entity;
@@ -95,6 +89,12 @@ public:
     }
 
 private:
+    static Entity _get_new_entity_id()
+    {
+        static Entity value = 0;
+        return value++;
+    }
+
     std::vector<Entity> _entities = {};
     std::map<std::size_t, ISparseSet *> _sparse_sets = {};
 };
