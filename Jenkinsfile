@@ -109,6 +109,7 @@ pipeline {
                             agent {
                                 docker {
                                     image 'ghcr.io/a9ex/ubuntu-24-mingw:latest'
+                                    args '-u root'
                                     reuseNode true
                                 }
                             }
