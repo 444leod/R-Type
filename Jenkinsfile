@@ -87,6 +87,7 @@ pipeline {
                             steps {
                                 script {
                                     sh '''#!/bin/bash
+                                        make clean
                                         make conan_ci
                                         source rtype_venv/bin/activate
                                         make deps
@@ -114,6 +115,7 @@ pipeline {
                             steps {
                                 script {
                                     sh '''#!/bin/bash
+                                        make clean
                                         make conan_ci
                                         source rtype_venv/bin/activate
                                         make deps_windows_release
