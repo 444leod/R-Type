@@ -26,7 +26,7 @@ deps:
 
 deps_windows_release:
 	conan profile detect --force
-	conan install . --output-folder=$(BUILD_DIR) --build=missing -c tools.system.package_manager:mode=install --profile=profiles/windows
+	conan install . --output-folder=$(BUILD_DIR) --build=missing -c tools.system.package_manager:mode=install --profile=profiles/windows --build=sfml
 
 configure:
 	cmake -S . -B $(BUILD_DIR) -DCMAKE_TOOLCHAIN_FILE=$(BUILD_DIR)/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release

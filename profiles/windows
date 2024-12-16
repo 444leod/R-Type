@@ -13,6 +13,10 @@ CXX=x86_64-w64-mingw32-g++
 LD=x86_64-w64-mingw32-ld
 WINDRES=x86_64-w64-mingw32-windres
 
+[options]
+sfml:shared=False
+asio:shared=False
+
 [generators]
 CMakeDeps
 CMakeToolchain
