@@ -75,64 +75,60 @@ pipeline {
         }
         stage('Build and Publish Binaries') {
             parallel {
-                node {
-                    stage('Linux') {
-                        stages {
-                            stage('Install deps and build') {
-                                agent {
-                                    docker {
-                                        image 'ghcr.io/a9ex/epitech-devcontainer@sha256:3222291beff662c9570eff60887c0d8e0cf02e4e26f8f4f58f91cd7120095fa4'
-                                        args '-u root'
-                                        reuseNode true
-                                    }
-                                }
-                                steps {
-                                    script {
-                                        sh '''#!/bin/bash
-                                            make clean
-                                            make conan_ci
-                                            source rtype_venv/bin/activate
-                                            make deps
-                                            make
-                                        '''
-                                    }
+                stage('Linux') {
+                    stages {
+                        stage('Install deps and build') {
+                            agent {
+                                docker {
+                                    image 'ghcr.io/a9ex/epitech-devcontainer@sha256:3222291beff662c9570eff60887c0d8e0cf02e4e26f8f4f58f91cd7120095fa4'
+                                    args '-u root'
+                                    reuseNode true
                                 }
                             }
-                            stage('Archive artifacts') {
-                                steps {
-                                    archiveArtifacts artifacts: 'r-type_*', fingerprint: true
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
+                                        make clean
+                                        make conan_ci
+                                        source rtype_venv/bin/activate
+                                        make deps
+                                        make
+                                    '''
                                 }
+                            }
+                        }
+                        stage('Archive artifacts') {
+                            steps {
+                                archiveArtifacts artifacts: 'r-type_*', fingerprint: true
                             }
                         }
                     }
                 }
-                node {
-                    stage('Windows') {
-                        stages {
-                            stage('Install deps and build') {
-                                agent {
-                                    docker {
-                                        image 'ghcr.io/a9ex/ubuntu-24-mingw:latest'
-                                        args '-u root'
-                                        reuseNode true
-                                    }
-                                }
-                                steps {
-                                    script {
-                                        sh '''#!/bin/bash
-                                            make clean
-                                            make conan_ci
-                                            source rtype_venv/bin/activate
-                                            make deps_windows_release
-                                            make
-                                        '''
-                                    }
+                stage('Windows') {
+                    stages {
+                        stage('Install deps and build') {
+                            agent {
+                                docker {
+                                    image 'ghcr.io/a9ex/ubuntu-24-mingw:latest'
+                                    args '-u root'
+                                    reuseNode true
                                 }
                             }
-                            stage('Archive artifacts') {
-                                steps {
-                                    archiveArtifacts artifacts: 'r-type_*', fingerprint: true
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
+                                        make clean
+                                        make conan_ci
+                                        source rtype_venv/bin/activate
+                                        make deps_windows_release
+                                        make
+                                    '''
                                 }
+                            }
+                        }
+                        stage('Archive artifacts') {
+                            steps {
+                                archiveArtifacts artifacts: 'r-type_*', fingerprint: true
                             }
                         }
                     }
