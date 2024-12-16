@@ -34,6 +34,7 @@ public:
      */
     void run(const std::string& host, std::uint32_t port)
     {
+        this->_running = true;
         const auto addr = asio::ip::address::from_string(host);
         this->_server = asio::ip::udp::endpoint(addr, port);
 
@@ -107,7 +108,7 @@ private:
 protected:
 private:
     asio::ip::udp::endpoint _server;
-    bool _running = true;
+    bool _running = false;
     sf::RenderWindow _window;
     std::map<PACKET_TYPE, std::function<void(UDPPacket&)>> _packet_handlers = {
         {

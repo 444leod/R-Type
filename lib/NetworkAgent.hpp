@@ -54,7 +54,7 @@ public:
         this->_port = this->_socket.local_endpoint().port();
         this->_receivePacket();
     }
-    virtual~NetworkAgent() = default;
+    virtual ~NetworkAgent() = default;
 
 protected:
     /**
