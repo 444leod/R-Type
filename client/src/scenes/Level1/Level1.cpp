@@ -58,7 +58,6 @@ void Level1::update(const double deltaTime) {
             }
         }
         if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
-            std::cout << "FrameOrigin : (" << animation.frameOrigin.first << ", " << animation.frameOrigin.second << "), FrameSize : (" << animation.frameSize.first << ", " << animation.frameSize.second << ")" << std::endl;
             sprite.setTextureRect(sf::IntRect(animation.frameOrigin.first + animation.currentFrame * animation.frameSize.first, animation.frameOrigin.second, animation.frameSize.first, animation.frameSize.second));
             animation.currentFrame++;
             animation.clock.restart();
@@ -248,7 +247,6 @@ void Level1::addProjectile(const Transform& transform, const int charge){
     _registry.addComponent(projectile, Hitbox{});
     _registry.addComponent(projectile, transform);
     _registry.addComponent(projectile, Projectile{});
-    std::cout << "Charge : " << charge << std::endl;
     if (charge <= 20) {
         projectileSprite.setTextureRect(sf::IntRect(0, 0, 80, 16));
         _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameOrigin = {0, 0}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
