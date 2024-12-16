@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <cmath>
 #include <config.h>
-#include <iostream>
 #include <ranges>
 #include <thread>
 #include <SFML/Graphics.hpp>
@@ -59,7 +58,8 @@ void Level1::update(const double deltaTime) {
             }
         }
         if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
-            sprite.setTextureRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
+            std::cout << "FrameOrigin : (" << animation.frameOrigin.first << ", " << animation.frameOrigin.second << "), FrameSize : (" << animation.frameSize.first << ", " << animation.frameSize.second << ")" << std::endl;
+            sprite.setTextureRect(sf::IntRect(animation.frameOrigin.first + animation.currentFrame * animation.frameSize.first, animation.frameOrigin.second, animation.frameSize.first, animation.frameSize.second));
             animation.currentFrame++;
             animation.clock.restart();
         }
@@ -83,7 +83,7 @@ void Level1::update(const double deltaTime) {
             explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
             _registry.addComponent(explosion, explosionSprite);
             _registry.addComponent(explosion, Transform{.x = projectile_transform.x, .y = projectile_transform.y, .z = 1, .rotation = 0});
-            _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
+            _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .frameOrigin = {0, 0}, .speed = 100, .frameCount = 6, .loop = false});
             #if DEBUG
                 _registry.addComponent(explosion, Debug{});
             #endif
@@ -91,6 +91,13 @@ void Level1::update(const double deltaTime) {
             _registry.remove(enemy);
             _registry.remove(projectile);
         });
+    });
+
+    _registry.view<sf::RectangleShape>().each([&](const Entity& entity, sf::RectangleShape &rectangle) {
+        int fillPercent = 0;
+        if (this->_spaceClock != nullptr)
+            fillPercent = std::min(static_cast<int>(this->_spaceClock->getElapsedTime().asSeconds() * 100), 100);
+        rectangle.setSize(sf::Vector2f(fillPercent, 25));
     });
 
     // auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
@@ -113,6 +120,12 @@ void Level1::render(sf::RenderWindow& window) {
     for (const auto& [entity, sprite, _] : vec) {
         window.draw(sprite);
     }
+
+    _registry.view<sf::RectangleShape, Transform>().each([&](const Entity& entity, sf::RectangleShape &rectangle, Transform &transform) {
+        rectangle.setPosition(transform.x, transform.y);
+        rectangle.setRotation(transform.rotation);
+        window.draw(rectangle);
+    });
 
     // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sprite) {
     //     auto bounds = sprite.getGlobalBounds();
@@ -144,9 +157,9 @@ void Level1::onEvent(sf::Event &event) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {
                 case sf::Keyboard::Space:
-                    _registry.view<Self, Transform>().each([&](const Self&, const Transform& transform) {
-                        addProjectile(Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0});
-                    });
+                    if (this->_spaceClock == nullptr) {
+                        this->_spaceClock = std::make_unique<sf::Clock>();
+                    }
                     break;
                 case sf::Keyboard::B: {
                      addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
@@ -159,6 +172,13 @@ void Level1::onEvent(sf::Event &event) {
             break;
         case sf::Event::KeyReleased:
             switch (event.key.code) {
+                case sf::Keyboard::Space:
+                    if (this->_spaceClock != nullptr) {
+                        _registry.view<Self, Transform>().each([&](const Self&, const Transform& transform) {
+                            addProjectile(Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0}, std::min(static_cast<int>(this->_spaceClock->getElapsedTime().asSeconds() * 100), 100));
+                        });
+                        this->_spaceClock = nullptr;
+                    }
                 default:
                     _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = false});
                     break;
@@ -195,6 +215,18 @@ void Level1::onEnter() {
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
     _registry.addComponent(background, Parallax{});
+    const auto beamLoading = _registry.create();
+
+    auto beamRectangle = sf::RectangleShape(sf::Vector2f(25, 25));
+    beamRectangle.setFillColor(sf::Color::Green);
+    beamRectangle.setPosition(0, 0);
+    beamRectangle.setOrigin(0, 0);
+    beamRectangle.setScale(SCALE, SCALE);
+    _registry.addComponent(beamLoading, beamRectangle);
+    _registry.addComponent(beamLoading, Transform{.x = 0, .y = 0, .z = 1, .rotation = 0});
+    #if DEBUG
+        _registry.addComponent(beamLoading, Debug{});
+    #endif
 }
 
 void Level1::onEnter(const AScene& lastScene) {
@@ -206,19 +238,28 @@ void Level1::onExit() {
 void Level1::onExit(const AScene& nextScene) {
 }
 
-void Level1::addProjectile(const Transform& transform){
+void Level1::addProjectile(const Transform& transform, const int charge){
     const auto projectile = _registry.create();
 
     auto projectileSprite = sf::Sprite(_projectileTex);
     projectileSprite.setOrigin(0, 0);
     projectileSprite.setScale(SCALE, SCALE);
     projectileSprite.setPosition(transform.x, transform.y);
-    projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
     _registry.addComponent(projectile, Hitbox{});
-    _registry.addComponent(projectile, projectileSprite);
     _registry.addComponent(projectile, transform);
     _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
+    std::cout << "Charge : " << charge << std::endl;
+    if (charge <= 20) {
+        projectileSprite.setTextureRect(sf::IntRect(0, 0, 80, 16));
+        _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameOrigin = {0, 0}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
+    } else {
+        const int chargeValue = charge / 20;
+        const std::pair frameOrigin = {0, 16 * chargeValue};
+        projectileSprite.setTextureRect(sf::IntRect(frameOrigin.first, frameOrigin.second, 80, 16));
+        _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameOrigin = frameOrigin, .speed = 75, .frameCount = 2, .loop = true});
+        _registry.addComponent(projectile, Velocity{.x = 200, .y = 0});
+    }
+    _registry.addComponent(projectile, projectileSprite);
     #if DEBUG
         _registry.addComponent(projectile, Debug{});
     #endif

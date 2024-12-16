@@ -30,6 +30,7 @@ struct Parallax {};
 struct Animation {
     sf::Clock clock = sf::Clock();
     std::pair<int, int> frameSize{};
+    std::pair<int, int> frameOrigin{};
     float speed{};
     unsigned int currentFrame = 1;
     unsigned int frameCount{};
