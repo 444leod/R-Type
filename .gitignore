@@ -63,3 +63,5 @@ rtype_venv
 
 # Docusaurus specific
 node_modules/**
+
+docs/html/**
