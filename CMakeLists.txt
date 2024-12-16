@@ -12,6 +12,11 @@ if(WIN32)
     set(CMAKE_CXX_COMPILER /usr/bin/x86_64-w64-mingw32-g++)
 endif()
 
+if(UNIX)
+    set(CMAKE_C_COMPILER /usr/bin/gcc)
+    set(CMAKE_CXX_COMPILER /usr/bin/g++)
+endif()
+
 find_package(SFML CONFIG REQUIRED)
 find_package(asio CONFIG REQUIRED)
 
