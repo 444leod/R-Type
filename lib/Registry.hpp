@@ -25,7 +25,11 @@ class Registry
 {
 public:
     Registry() = default;
-    ~Registry() = default;
+    ~Registry()
+    {
+        for (auto [_, sparse] : this->_sparse_sets)
+            delete sparse;
+    }
 
     /**
      * @brief Gives a view of the entities with a set of components
