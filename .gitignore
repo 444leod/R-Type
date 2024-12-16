@@ -59,3 +59,7 @@ r-type_server
 
 # Rtype conan venv
 rtype_venv
+
+# Generated docs
+docs/*
+!docs/Doxyfile
