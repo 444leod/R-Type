@@ -9,16 +9,29 @@
 #include <SFML/Graphics.hpp>
 #include <functional>
 #include <map>
+#include <optional>
 #include "NetworkAgent.hpp"
 
 #pragma once
 
+/**
+ * @brief Client representation of a network Client, receives updates from a Server and sends it some
+ */
 class Client: public NetworkAgent
 {
 public:
+    /**
+     * @brief Constructor for the Client class
+     * @param ctx The io_context to add the client's work to
+     */
     Client(asio::io_context& ctx): NetworkAgent(ctx) {}
     ~Client() override = default;
 
+    /**
+     * @brief Connect to a server & starts the Client's game loop
+     * @param host The server's address
+     * @param port The server's port
+     */
     void run(const std::string& host, std::uint32_t port)
     {
         const auto addr = asio::ip::address::from_string(host);
@@ -33,15 +46,31 @@ public:
         this->_window.setFramerateLimit(60);
     }
 
+    /**
+     * @brief Stops the client
+     */
     void stop()
     {
         this->_stop();
         this->_window.close();
     }
 
+    /**
+     * @brief Gets the Client's window
+     * @return A reference to the game window
+     */
     sf::RenderWindow &window() noexcept { return this->_window; }
+
+    /**
+     * @brief Check if the Client is still running
+     * @return `true` is the Client is running, `false` otherwise
+     */
     [[nodiscard]] bool running() const noexcept { return this->_window.isOpen() && this->_running; }
 
+    /**
+     * @brief Send a string message to the server
+     * @param msg The message to send
+     */
     void sendMessage(const std::string& msg)
     {
         UDPPacket packet;
@@ -50,6 +79,10 @@ public:
         this->_send(this->_server, packet);
     }
 
+    /**
+     * @brief Send a UDP Packet to the server
+     * @param packet The packet to send
+     */
     void send(const UDPPacket& packet)
     {
         this->_send(this->_server, packet);
