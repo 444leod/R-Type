@@ -15,4 +15,4 @@ WINDRES=x86_64-w64-mingw32-windres
 
 [conf]
 tools.cmake.cmaketoolchain:system_name=Windows
-tools.cmake.cmaketoolchain:compiler_executables={"c": "x86_64-w64-mingw32-gcc", "cpp": "x86_64-w64-mingw32-g++"}
+tools.build:compiler_executables={"c": "x86_64-w64-mingw32-gcc", "cpp": "x86_64-w64-mingw32-g++"}
