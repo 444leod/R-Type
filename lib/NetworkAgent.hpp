@@ -8,6 +8,34 @@
 #pragma once
 
 #include <asio.hpp>
+#include <iostream>
+#include "UDPPacket.hpp"
+
+/**
+* This is temporary, for the example of how packets work.
+*/
+struct Position
+{
+    float x, y;
+};
+
+/**
+ * @brief This enum will describe what the packet is for.
+ *
+ *  - NONE: No packet type
+ *  - CONNECT: Connection packet
+ *  - DISCONNECT: Disconnection packet
+ *  - MESSAGE: Message packet (temporary
+ *  - POSITION: Position packet (temporary)
+*/
+enum class PACKET_TYPE {
+    NONE = 0,
+    CONNECT,
+    DISCONNECT,
+    MESSAGE,
+    POSITION,
+    START
+};
 
 /**
  * @brief Class representation of an object connected via socket, that can receive and send packets.
@@ -26,15 +54,15 @@ public:
         this->_port = this->_socket.local_endpoint().port();
         this->_receivePacket();
     }
-    ~NetworkAgent() = default;
+    virtual ~NetworkAgent() = default;
 
 protected:
     /**
      * @brief Virtual method called when a packet was successfully received
      * @param src Where the packet was received from
-     * @param msg The message received
+     * @param packet The packet received
      */
-    virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const std::string& msg) = 0;
+    virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) = 0;
 
     /**
      * @brief Stops any asio work from this agent
@@ -47,12 +75,13 @@ protected:
     /**
      * @brief Try to send a message to an endpoint
      * @param dest The endpoint to send to
-     * @param msg The message to send
+     * @param packet The packet to send
      */
-    void _send(const asio::ip::udp::endpoint& dest, const std::string& msg)
+    void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet)
     {
+        auto serialized = packet.serialize();
         this->_socket.async_send_to(
-            asio::buffer(msg), dest,
+            asio::buffer(serialized), dest,
             std::bind(
                 &NetworkAgent::_handleSend, this,
                 asio::placeholders::error,
@@ -84,15 +113,18 @@ private:
      */
     void _handleReceive(const std::error_code& e, std::size_t bytes)
     {
-        // Do not proceed in case of error
         if (e)
             return;
-        // Limit buffer
-        if (bytes < 1024)
-            this->_buffer[bytes] = '\0';
-        // Call overriden handler
-        this->_onPacketReceived(this->_client, std::string(this->_buffer.data()));
-        // Add job for another packet
+
+        if (bytes > 0) {
+            UDPPacket packet(this->_buffer.data(), bytes);
+            uint16_t calculated_checksum = packet.calculateChecksum();
+            if (calculated_checksum == packet.checksum) {
+                this->_onPacketReceived(this->_client, packet); // yipee
+            } else {
+                std::cerr << "got some corrupted packet :( (checksum mismatch: " << calculated_checksum << " != " << packet.checksum << ")" << std::endl;
+            }
+        }
         this->_receivePacket();
     }
 
