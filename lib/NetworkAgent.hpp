@@ -46,7 +46,7 @@ public:
         this->_port = this->_socket.local_endpoint().port();
         this->_receive_packet();
     }
-    ~NetworkAgent() = default;
+    virtual~NetworkAgent() = default;
 
 protected:
     virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) = 0;

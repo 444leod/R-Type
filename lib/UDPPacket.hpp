@@ -45,7 +45,9 @@ struct UDPPacket {
 
     class Exception final : public std::exception {
     public:
-        explicit Exception(std::string  message) : _message(std::move(message)) {}
+        explicit Exception(const std::string  &message,
+                    const char* function = __builtin_FUNCTION(),
+                    int line = __builtin_LINE()) : _message(message + " in function: " + function + " at line: " + std::to_string(line)) {}
         [[nodiscard]] const char *what() const noexcept override { return this->_message.c_str(); }
     private:
         std::string _message;
@@ -269,7 +271,7 @@ private:
     template<typename T>
     void raw_append(const T& data)
     {
-        this->raw_append(&data, sizeof(data));
+        this->raw_append(&data, sizeof(T));
     }
 
     template<typename T>

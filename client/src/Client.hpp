@@ -17,7 +17,7 @@ class Client: public NetworkAgent
 {
 public:
     Client(asio::io_context& ctx): NetworkAgent(ctx) {}
-    ~Client() = default;
+    ~Client() override = default;
 
     void run(const std::string& host, std::uint32_t port)
     {
@@ -64,8 +64,8 @@ private:
         std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
                   << ", ack: " << packet.ack_number << ")" << std::endl;
 
-         PACKET_TYPE packet_type{};
-         packet >> packet_type;
+        PACKET_TYPE packet_type{};
+        packet >> packet_type;
         if (_packet_handlers.contains(packet_type))
             _packet_handlers.at(packet_type)(packet);
 
