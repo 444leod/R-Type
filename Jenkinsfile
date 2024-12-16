@@ -135,6 +135,7 @@ pipeline {
     post {
         always {
             sh 'sudo chmod -R 777 .'
+            cleanWs()
             echo "Pipeline OK"
         }
         failure {
