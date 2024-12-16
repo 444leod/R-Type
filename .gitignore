@@ -44,7 +44,8 @@ CMakeCache.txt
 CMakeFiles
 CMakeScripts
 Testing
-Makefile
+client/Makefile
+server/Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
@@ -56,4 +57,9 @@ cmake-build-debug/**
 # Bins
 r-type_client
 r-type_server
+
+# Rtype conan venv
+rtype_venv
+
+# Docusaurus specific
 node_modules/**
