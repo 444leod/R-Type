@@ -16,9 +16,16 @@
 
 #define TARGET_TICKRATE 30
 
+/**
+ * @brief Class representation of a game server, receives packet and can broadcast
+ */
 class Server: public NetworkAgent
 {
 public:
+    /**
+     * @brief Constructor for the Server, this instantly add asio work
+     * @param ctx An io_context to bind the sockets' work to
+     */
     Server(asio::io_context& ctx): NetworkAgent(ctx, 25565)
     {
         std::cout << "Server started, listening on port: " << this->_port << "..." << std::endl;
@@ -49,6 +56,11 @@ public:
     }
 
 private:
+    /**
+     * @brief Callback called when a packet was received
+     * @param src The source that sent the packet
+     * @param msg The message contained in the packet
+     */
     virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const std::string& msg)
     {
         std::cout << "Received: " << msg << std::endl;
@@ -58,6 +70,10 @@ private:
             this->_clients.push_back(src);
     }
 
+    /**
+     * @brief Broadcast a message to all known client
+     * @param message The message to broadcast
+     */
     void _broadcast(const std::string& message)
     {
         for (auto& client : this->_clients) {
