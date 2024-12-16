@@ -73,9 +73,38 @@ pipeline {
                 }
             }
         }
+        stage('Build binaries') {
+            stages {
+                stage('Install deps and build') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/epitech-devcontainer@sha256:3222291beff662c9570eff60887c0d8e0cf02e4e26f8f4f58f91cd7120095fa4'
+                            args '-u root'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        script {
+                            sh '''#!/bin/bash
+                                make conan_ci
+                                source rtype_venv/bin/activate
+                                make deps
+                                make
+                            '''
+                        }
+                    }
+                }
+                stage('Archive artifacts') {
+                    steps {
+                        archiveArtifacts artifacts: 'build/bin/*', fingerprint: true
+                    }
+                }
+            }
+        }
     }
     post {
         always {
+            sh 'sudo chmod -R 777 .'
             cleanWs(deleteDirs: true, disableDeferredWipeout: true)
             echo "Pipeline OK"
         }

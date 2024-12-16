@@ -45,7 +45,8 @@ CMakeCache.txt
 CMakeFiles
 CMakeScripts
 Testing
-Makefile
+client/Makefile
+server/Makefile
 cmake_install.cmake
 install_manifest.txt
 compile_commands.json
@@ -57,17 +58,3 @@ CMakeUserPresets.json
 r-type_client
 r-type_server
 rtype_venv
-
-# CMake
-CMakeLists.txt.user
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
-CMakeUserPresets.json
