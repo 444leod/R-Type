@@ -137,7 +137,6 @@ pipeline {
     post {
         always {
             sh 'sudo chmod -R 777 .'
-            cleanWs(deleteDirs: true, disableDeferredWipeout: true)
             echo "Pipeline OK"
         }
         failure {
