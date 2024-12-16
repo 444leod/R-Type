@@ -8,8 +8,8 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 if(WIN32)
-    set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc)
-    set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++)
+    set(CMAKE_C_COMPILER /usr/bin/x86_64-w64-mingw32-gcc)
+    set(CMAKE_CXX_COMPILER /usr/bin/x86_64-w64-mingw32-g++)
 endif()
 
 find_package(SFML CONFIG REQUIRED)
