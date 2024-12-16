@@ -12,3 +12,7 @@ CC=x86_64-w64-mingw32-gcc
 CXX=x86_64-w64-mingw32-g++
 LD=x86_64-w64-mingw32-ld
 WINDRES=x86_64-w64-mingw32-windres
+
+[conf]
+tools.cmake.cmaketoolchain:system_name=Windows
+tools.cmake.cmaketoolchain:compiler_executables={"c": "x86_64-w64-mingw32-gcc", "cpp": "x86_64-w64-mingw32-g++"}
