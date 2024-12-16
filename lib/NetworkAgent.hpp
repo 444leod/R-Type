@@ -33,7 +33,8 @@ enum class PACKET_TYPE {
     CONNECT,
     DISCONNECT,
     MESSAGE,
-    POSITION
+    POSITION,
+    START
 };
 
 class NetworkAgent

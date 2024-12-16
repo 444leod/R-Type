@@ -4,10 +4,10 @@
 
 int main(void)
 {
+    asio::io_context ctx;
     std::unique_ptr<std::thread> t;
     try
     {
-        asio::io_context ctx;
         Client client(ctx);
         t = std::make_unique<std::thread>([&ctx](){
             ctx.run();
@@ -29,6 +29,7 @@ int main(void)
             client.window().clear();
             client.window().display();
         }
+        client.stop();
         t->join();
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
