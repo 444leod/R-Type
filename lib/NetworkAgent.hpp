@@ -12,6 +12,11 @@
 class NetworkAgent
 {
 public:
+    /**
+     * @brief Constructor for the NetworkAgent class
+     * @param ctx The io_context
+     * @param port The port to create the agent at
+     */
     NetworkAgent(asio::io_context& ctx, std::uint32_t port) :
         _socket(ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
     {
@@ -21,8 +26,18 @@ public:
     ~NetworkAgent() = default;
 
 protected:
+    /**
+     * @brief Virtual method called when a packet was successfully received
+     * @param src Where the packet was received from
+     * @param msg The message received
+     */
     virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, const std::string& msg) = 0;
 
+    /**
+     * @brief Try to send a message to an endpoint
+     * @param dest The endpoint to send to
+     * @param msg The message to send
+     */
     void _send(const asio::ip::udp::endpoint& dest, const std::string& msg)
     {
         this->_socket.async_send_to(
@@ -36,6 +51,9 @@ protected:
     }
 
 private:
+    /**
+     * @brief Private method used to start receiving a packet
+     */
     void _receivePacket()
     {
         this->_socket.async_receive_from(
@@ -48,6 +66,11 @@ private:
         );
     }
 
+    /**
+     * @brief Handler used when receiving a packet, will determined if all went according to plan
+     * @param e Error code linked to the reception
+     * @param bytes The amount of bytes received
+     */
     void _handleReceive(const std::error_code& e, std::size_t bytes)
     {
         // Do not proceed in case of error
@@ -62,6 +85,11 @@ private:
         this->_receivePacket();
     }
 
+    /**
+     * @brief Handler used after sending a packer
+     * @param e Error code linked to the sending
+     * @param bytes The amount of bytes sent
+     */
     void _handleSend(const std::error_code& e, std::size_t bytes)
     {}
 
