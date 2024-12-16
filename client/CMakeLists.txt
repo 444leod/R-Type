@@ -2,9 +2,9 @@ set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
 
 add_executable(r-type_client
         src/main.cpp
-        src/scenes/Game/Game.cpp
-        src/scenes/Game/Events/PlayerMovement.cpp
-        src/scenes/Game/Events/PlayerMovement.hpp
+        src/scenes/Level1/Level1.cpp
+        src/scenes/Level1/Events/PlayerMovement.cpp
+        src/scenes/Level1/Events/PlayerMovement.hpp
 )
 target_include_directories(r-type_client PUBLIC ${LIB_DIR})
 target_include_directories(r-type_client PUBLIC ${CMAKE_SOURCE_DIR}/client/include)

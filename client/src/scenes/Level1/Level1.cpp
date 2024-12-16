@@ -5,7 +5,7 @@
 ** Game.cpp
 */
 
-#include "Game.hpp"
+#include "Level1.hpp"
 #include "Registry.hpp"
 #include <algorithm>
 #include <cmath>
@@ -24,11 +24,9 @@ sf::Font get_default_font() {
 
 static const auto font = get_default_font();
 
-void Game::initialize() {
+void Level1::initialize() {}
 
-}
-
-void Game::update(const double deltaTime, const sf::RenderWindow &window) {
+void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
     _parallaxOffset += static_cast<float>(deltaTime * 25);
 
     _registry.view<Parallax, Transform>().each([&](const Parallax&, Transform& transform) {
@@ -99,7 +97,7 @@ void Game::update(const double deltaTime, const sf::RenderWindow &window) {
     // explosions.displaySets();
 }
 
-void Game::render(sf::RenderWindow& window) {
+void Level1::render(sf::RenderWindow& window) {
     auto vec = std::vector<std::tuple<Entity, sf::Sprite, Transform>>{};
 
     _registry.view<sf::Sprite, Transform>().each([&](const Entity& entity, sf::Sprite &sprite, Transform &transform) {
@@ -141,7 +139,7 @@ void Game::render(sf::RenderWindow& window) {
     #endif
 }
 
-void Game::onEvent(sf::Event &event) {
+void Level1::onEvent(sf::Event &event) {
     switch (event.type) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {
@@ -172,7 +170,7 @@ void Game::onEvent(sf::Event &event) {
     }
 }
 
-void Game::onEnter() {
+void Level1::onEnter() {
     _registry.clear();
     const auto spaceship = _registry.create();
 
@@ -199,16 +197,16 @@ void Game::onEnter() {
     _registry.addComponent(background, Parallax{});
 }
 
-void Game::onEnter(const AScene& lastScene) {
+void Level1::onEnter(const AScene& lastScene) {
 }
 
-void Game::onExit() {
+void Level1::onExit() {
 }
 
-void Game::onExit(const AScene& nextScene) {
+void Level1::onExit(const AScene& nextScene) {
 }
 
-void Game::addProjectile(const Transform& transform){
+void Level1::addProjectile(const Transform& transform){
     const auto projectile = _registry.create();
 
     auto projectileSprite = sf::Sprite(_projectileTex);
@@ -226,7 +224,7 @@ void Game::addProjectile(const Transform& transform){
     #endif
 }
 
-void Game::addBug(const Transform& transform) {
+void Level1::addBug(const Transform& transform) {
     const auto bug = _registry.create();
     auto bugSprite = sf::Sprite(_bugTex);
     bugSprite.setOrigin(16, 13);

@@ -9,12 +9,12 @@
 #include <SFML/Graphics.hpp>
 
 #include "SceneManager.hpp"
-#include "scenes/Game/Game.hpp"
+#include "scenes/Level1/Level1.hpp"
 
 int main(void) {
     SceneManager sceneManager;
 
-    sceneManager.registerScene<Game>("Game");
+    sceneManager.registerScene<Level1>("Game");
 
     sceneManager.load("Game");
     sceneManager.run();
