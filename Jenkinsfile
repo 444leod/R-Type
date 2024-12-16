@@ -96,7 +96,7 @@ pipeline {
                 }
                 stage('Archive artifacts') {
                     steps {
-                        archiveArtifacts artifacts: 'build/bin/*', fingerprint: true
+                        archiveArtifacts artifacts: 'r-type_*', fingerprint: true
                     }
                 }
             }
