@@ -9,6 +9,9 @@
 
 #include <asio.hpp>
 
+/**
+ * @brief Class representation of an object connected via socket, that can receive and send packets.
+ */
 class NetworkAgent
 {
 public:
