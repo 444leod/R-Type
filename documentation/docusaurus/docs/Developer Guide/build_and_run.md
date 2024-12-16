@@ -54,3 +54,31 @@ While in the `documentation/docusaurus` directory, execute the following command
 :::tip
 Add `--watch` after `start` to enable live reload.
 :::
+
+# Conan (C++ Package Manager)
+
+### Prerequisites
+
+- `Make` version 4.4.1 or later
+- `Python`
+
+### Install Conan
+
+Execute the following commands at the root of the project:
+
+```bash
+make conan
+source rtype_venv/bin/activate
+sudo make deps
+```
+
+### Build
+
+Execute the following commands at the root of the project:
+```bash
+make
+```
+
+:::info
+Conan support cross-platform compilation (Windows, Linux)
+:::
