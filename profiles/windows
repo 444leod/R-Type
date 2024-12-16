@@ -2,15 +2,13 @@
 os=Windows
 arch=x86_64
 compiler=gcc
-compiler.version=11
+compiler.cppstd=gnu17
 compiler.libcxx=libstdc++11
+compiler.version=13
 build_type=Release
 
 [buildenv]
 CC=x86_64-w64-mingw32-gcc
 CXX=x86_64-w64-mingw32-g++
-RC=x86_64-w64-mingw32-windres
+LD=x86_64-w64-mingw32-ld
 WINDRES=x86_64-w64-mingw32-windres
-
-[conf]
-tools.cmake.cmaketoolchain:generator=Ninja
