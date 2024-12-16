@@ -61,5 +61,5 @@ r-type_server
 rtype_venv
 
 # Generated docs
-docs/*
-!docs/Doxyfile
+documentation/doxygen/html
+documentation/doxygen/css

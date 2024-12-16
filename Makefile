@@ -37,4 +37,5 @@ clean:
 	rm -rf $(CLEAN_TARGETS)
 
 docs:
-	doxygen ./docs/Doxyfile
+	./documentation/doxygen/generator
+	doxygen ./documentation/doxygen/Doxyfile
