@@ -24,8 +24,6 @@ sf::Font get_default_font() {
 
 static const auto font = get_default_font();
 
-
-
 void Game::initialize() {
 
 }
@@ -76,8 +74,7 @@ void Game::update(const double deltaTime, const sf::RenderWindow &window) {
     });
 
     _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
-        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&, const Transform& projectile_transform)
-        {
+        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&, const Transform& projectile_transform) {
             if (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16)))
                 return;
 
@@ -150,25 +147,12 @@ void Game::onEvent(sf::Event &event) {
             switch (event.key.code) {
                 case sf::Keyboard::Space:
                     _registry.view<Self, Transform>().each([&](const Self&, const Transform& transform) {
-                        addProjectile(transform);
+                        addProjectile(Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0});
                     });
                     break;
                 case sf::Keyboard::B: {
-                    const auto bug = _registry.create();
-                    auto bugSprite = sf::Sprite(_bugTex);
-                    bugSprite.setOrigin(_bugTex.getSize().x / 2, _bugTex.getSize().y / 2);
-                    bugSprite.setScale(SCALE, SCALE);
-                    bugSprite.setPosition(2000, 250);
-                    _registry.addComponent(bug, bugSprite);
-                    _registry.addComponent(bug, Bug{});
-                    _registry.addComponent(bug, Enemy{});
-                    _registry.addComponent(bug, Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
-                    _registry.addComponent(bug, Velocity{.x = -100, .y = 0});
-                    _registry.addComponent(bug, Hitbox{});
-                    #if DEBUG
-                        _registry.addComponent(bug, Debug{});
-                    #endif
-                    break;
+                     addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
+                     break;
                 }
                 default:
                     _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = true});
@@ -226,24 +210,35 @@ void Game::onExit(const AScene& nextScene) {
 
 void Game::addProjectile(const Transform& transform){
     const auto projectile = _registry.create();
-    std::cout << projectile << " is a projectile entity" << std::endl;
-    const auto spriteTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
 
     auto projectileSprite = sf::Sprite(_projectileTex);
     projectileSprite.setOrigin(0, 0);
     projectileSprite.setScale(SCALE, SCALE);
-    projectileSprite.setPosition(spriteTransform.x, spriteTransform.y);
+    projectileSprite.setPosition(transform.x, transform.y);
     projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
-
+    _registry.addComponent(projectile, Hitbox{});
+    _registry.addComponent(projectile, projectileSprite);
+    _registry.addComponent(projectile, transform);
+    _registry.addComponent(projectile, Projectile{});
+    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
     #if DEBUG
         _registry.addComponent(projectile, Debug{});
     #endif
+}
 
-    _registry.addComponent(projectile, Hitbox{});
-    _registry.addComponent(projectile, projectileSprite);
-
-    _registry.addComponent(projectile, spriteTransform);
-    _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
-
+void Game::addBug(const Transform& transform) {
+    const auto bug = _registry.create();
+    auto bugSprite = sf::Sprite(_bugTex);
+    bugSprite.setOrigin(16, 13);
+    bugSprite.setScale(SCALE, SCALE);
+    bugSprite.setPosition(transform.x, transform.y);
+    _registry.addComponent(bug, bugSprite);
+    _registry.addComponent(bug, Bug{});
+    _registry.addComponent(bug, Enemy{});
+    _registry.addComponent(bug, transform);
+    _registry.addComponent(bug, Velocity{.x = -100, .y = 0});
+    _registry.addComponent(bug, Hitbox{});
+    #if DEBUG
+        _registry.addComponent(bug, Debug{});
+    #endif
 }

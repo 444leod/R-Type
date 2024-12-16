@@ -44,6 +44,7 @@ public:
 
 private:
     void addProjectile(const Transform& transform);
+    void addBug(const Transform& transform);
 
 public:
 private:
