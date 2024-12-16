@@ -170,6 +170,25 @@ struct UDPPacket {
      template<typename T>
      UDPPacket& operator>>(std::vector<T&>& vector)
     {
+        // if (_pos == payload.size())
+        //     throw Exception("No remaining data to unpack.");
+        //
+        // if (this->remains() < sizeof(std::uint16_t) + sizeof(std::uint8_t))
+        //     throw Exception("Invalid data size.");
+        //
+        // const auto len = this->get<std::uint16_t>();
+        // const auto size = this->get_offset<std::uint8_t>(sizeof(std::uint16_t));
+        //
+        // if (size != sizeof(T))
+        //     throw Exception("Invalid data size.");
+        //
+        // if (this->remains() < (len * sizeof(T)) + sizeof(std::uint16_t) + sizeof(std::uint8_t))
+        //     throw Exception("Invalid data size (not enough data).");
+        //
+        // _pos += sizeof(std::uint16_t) + sizeof(std::uint8_t);
+        // vector.resize(len);
+        // this->raw_copy(vector.data(), len);
+
         return *this;
     }
 
@@ -181,6 +200,7 @@ struct UDPPacket {
         const std::uint8_t size = sizeof(T);
 
         const auto len = this->get<std::uint8_t>();
+
         if (len != size)
             throw Exception("Invalid data size.");
 
@@ -192,7 +212,6 @@ struct UDPPacket {
 
     void append(const void *data, const std::uint8_t size) noexcept
     {
-        std::cout << data << std::endl;
         const auto *raw_len = reinterpret_cast<const std::byte *>(&size);
         const auto *raw_data = static_cast<const std::byte *>(data);
 
@@ -289,6 +308,16 @@ private:
     {
         T var;
         this->get(&var);
+        return var;
+    }
+
+    template<typename T>
+    [[nodiscard]] T get_offset(const std::uint8_t offset)
+    {
+        T var;
+        _pos += offset;
+        this->get(&var);
+        _pos -= offset;
         return var;
     }
 

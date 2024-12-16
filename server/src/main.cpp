@@ -10,11 +10,17 @@
 
 int main(void)
 {
-    asio::io_context ctx;
-    Server server(ctx);
-    std::thread t([&ctx]() {
-        ctx.run();
-    });
-    server.run();
+    try
+    {
+        asio::io_context ctx;
+        Server server(ctx);
+        std::thread t([&ctx]() {
+            ctx.run();
+        });
+        server.run();
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
     return 0;
 }
