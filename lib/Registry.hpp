@@ -18,18 +18,31 @@
 #include "SparseSet.hpp"
 #include "View.hpp"
 
+/**
+ * @brief The class representation of the  Registry.
+ */
 class Registry
 {
 public:
     Registry() = default;
     ~Registry() = default;
 
+    /**
+     * @brief Gives a view of the entities with a set of components
+     * @tparam First The first kind of component to query
+     * @tparam ...Components Additional kind of components to query
+     * @return A new view with entities queried.
+     */
     template <typename First, typename... Components>
     View<First, Components...> view()
     {
         return View<First, Components...>(_sparse_sets);
     }
 
+    /**
+     * @brief Spawns a new Entity, used to attach components to
+     * @return An new unique Entity
+     */
     unsigned int create()
     {
         const auto entity = Registry::_get_new_entity_id();
@@ -38,6 +51,10 @@ public:
         return entity;
     }
 
+    /**
+     * @brief Deletes an Entity and all attached components
+     * @param entity The Entity to delete
+     */
     void remove(const Entity entity)
     {
         for (auto const &[id, sparse] : _sparse_sets)
@@ -46,6 +63,9 @@ public:
         _entities.erase(std::find(_entities.begin(), _entities.end(), entity));
     }
 
+    /**
+     * @brief Removes all the Entities
+     */
     void clear()
     {
         for (auto const &[id, sparse] : _sparse_sets)
@@ -53,6 +73,12 @@ public:
         _entities.clear();
     }
 
+    /**
+     * @brief Attaches a Component to an Entity
+     * @tparam T The type of component to attach. Can be deduced by the parameter
+     * @param entity The Entity to attach to
+     * @param component The Component informations to attach
+     */
     template <typename T>
     void addComponent(Entity entity, const T &component)
     {
@@ -69,6 +95,11 @@ public:
         set->set(entity, component);
     }
 
+    /**
+     * @brief Removes a component from an Entity
+     * @tparam T The type of component to remove
+     * @param entity The Entity to remove from
+     */
     template <typename T>
     void removeComponent(Entity entity)
     {
@@ -81,6 +112,9 @@ public:
         this->_sparse_sets.at(id)->erase(entity);
     }
 
+    /**
+     * @brief Used as debug to print out all the sparse-sets data
+     */
     void displaySparse() const
     {
         std::cout << "There is a sparse array for the following components: " << std::endl;
@@ -89,6 +123,10 @@ public:
     }
 
 private:
+    /**
+     * @brief Gets a new available Entity ID
+     * @return A new unique Entity ID
+     */
     static Entity _get_new_entity_id()
     {
         static Entity value = 0;
