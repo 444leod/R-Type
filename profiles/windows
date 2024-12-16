@@ -20,6 +20,3 @@ asio:shared=False
 [generators]
 CMakeDeps
 CMakeToolchain
-
-[conf]
-tools.build:cxxflags=["-static","-static-libgcc","-static-libstdc++"]
