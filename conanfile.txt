@@ -2,10 +2,6 @@
 asio/1.32.0
 sfml/2.6.2
 
-[options]
-sfml:shared=False
-openal:shared=False
-
 [generators]
 CMakeDeps
 CMakeToolchain

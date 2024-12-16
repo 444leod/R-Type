@@ -10,4 +10,5 @@ list(TRANSFORM SRC_FILES PREPEND "src/")
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE asio::asio sfml::sfml)
+target_link_libraries(${PROJECT_NAME} PRIVATE -static-libgcc -static-libstdc++)
 target_include_directories(${PROJECT_NAME} PRIVATE ${LIB_DIR})
