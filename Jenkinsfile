@@ -84,6 +84,7 @@ pipeline {
                                     args '-u root'
                                     reuseNode true
                                 }
+                                    label 'linux'
                             }
                             steps {
                                 script {
@@ -98,6 +99,9 @@ pipeline {
                             }
                         }
                         stage('Archive artifacts') {
+                            agent {
+                                label 'linux'
+                            }
                             steps {
                                 archiveArtifacts artifacts: 'r-type_*', fingerprint: true
                             }
@@ -113,6 +117,7 @@ pipeline {
                                     args '-u root'
                                     reuseNode true
                                 }
+                                label 'windows'
                             }
                             steps {
                                 script {
@@ -127,6 +132,9 @@ pipeline {
                             }
                         }
                         stage('Archive artifacts') {
+                            agent {
+                                label 'windows'
+                            }
                             steps {
                                 archiveArtifacts artifacts: 'r-type_*', fingerprint: true
                             }
