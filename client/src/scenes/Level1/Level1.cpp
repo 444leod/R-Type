@@ -26,7 +26,7 @@ static const auto font = get_default_font();
 
 void Level1::initialize() {}
 
-void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
+void Level1::update(const double deltaTime) {
     _parallaxOffset += static_cast<float>(deltaTime * 25);
 
     _registry.view<Parallax, Transform>().each([&](const Parallax&, Transform& transform) {
@@ -41,7 +41,7 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
     });
 
     _registry.view<Projectile, Transform>().each([&](const Entity& entity, const Projectile&, const Transform& transform) {
-        if (transform.x > window.getSize().x) {
+        if (transform.x > WINDOW_WIDTH * SCALE) {
             _registry.remove(entity);
         }
     });

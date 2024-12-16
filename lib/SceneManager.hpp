@@ -131,7 +131,7 @@ public:
             this->_pollEvents();
             #endif
 
-            this->_current->update(deltaTime, _window);
+            this->_current->update(deltaTime);
 
             #ifndef __RTYPE_NO_DISPLAY__
             this->_render();
@@ -212,7 +212,7 @@ private:
     std::string _loadingName;
 
     #ifndef __RTYPE_NO_DISPLAY__
-    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(384 * SCALE, 256 * SCALE), "R-Type");
+    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(WINDOW_WIDTH * SCALE, WINDOW_HEIGHT * SCALE), "R-Type");
     #endif
 };
 
