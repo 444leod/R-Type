@@ -76,16 +76,14 @@ pipeline {
         stage('Build and Publish Binaries') {
             parallel {
                 stage('Linux') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/epitech-devcontainer@sha256:3222291beff662c9570eff60887c0d8e0cf02e4e26f8f4f58f91cd7120095fa4'
+                            args '-u root'
+                        }
+                    }
                     stages {
                         stage('Install deps and build') {
-                            agent {
-                                docker {
-                                    image 'ghcr.io/a9ex/epitech-devcontainer@sha256:3222291beff662c9570eff60887c0d8e0cf02e4e26f8f4f58f91cd7120095fa4'
-                                    args '-u root'
-                                    reuseNode true
-                                }
-                                    label 'linux'
-                            }
                             steps {
                                 script {
                                     sh '''#!/bin/bash
@@ -99,9 +97,6 @@ pipeline {
                             }
                         }
                         stage('Archive artifacts') {
-                            agent {
-                                label 'linux'
-                            }
                             steps {
                                 archiveArtifacts artifacts: 'r-type_*', fingerprint: true
                             }
@@ -109,16 +104,14 @@ pipeline {
                     }
                 }
                 stage('Windows') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:latest'
+                            args '-u root'
+                        }
+                    }
                     stages {
                         stage('Install deps and build') {
-                            agent {
-                                docker {
-                                    image 'ghcr.io/a9ex/ubuntu-24-mingw:latest'
-                                    args '-u root'
-                                    reuseNode true
-                                }
-                                label 'windows'
-                            }
                             steps {
                                 script {
                                     sh '''#!/bin/bash
@@ -132,9 +125,6 @@ pipeline {
                             }
                         }
                         stage('Archive artifacts') {
-                            agent {
-                                label 'windows'
-                            }
                             steps {
                                 archiveArtifacts artifacts: 'r-type_*', fingerprint: true
                             }
