@@ -1,0 +1,239 @@
+/*
+** EPITECH PROJECT, 2024
+** rtype
+** File description:
+** Game.cpp
+*/
+
+#include "WaitingRoom.hpp"
+#include "Registry.hpp"
+#include <algorithm>
+#include <cmath>
+#include <config.h>
+#include <iostream>
+#include <ranges>
+#include <thread>
+#include <SFML/Graphics.hpp>
+#include <SFML/Window/Keyboard.hpp>
+
+inline bool isInputAvailable() {
+    fd_set readfds;
+    struct timeval tv;
+    FD_ZERO(&readfds);
+    FD_SET(STDIN_FILENO, &readfds);
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    return select(STDIN_FILENO + 1, &readfds, nullptr, nullptr, &tv) > 0;
+}
+
+void WaitingRoom::initialize()
+{
+    std::cout << "Game is running..." << std::endl;
+    std::cout << "> " << std::flush;
+}
+
+void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
+{
+    if (isInputAvailable()) {
+        std::string input;
+        if (!std::getline(std::cin, input))
+        {
+            if (std::cin.eof())
+            {
+                _command_handlers["exit"]({});
+            } else
+            {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
+        }
+        else
+        {
+            if (_command_handlers.contains(input)) {
+                std::vector<std::string> args;
+                std::istringstream iss(input);
+                std::string arg;
+                while (iss >> arg)
+                    args.push_back(arg);
+                _command_handlers.at(input)(args);
+            }
+        }
+
+        std::cout << "> " << std::flush;
+    }
+}
+
+void WaitingRoom::render(sf::RenderWindow& window)
+{
+    // _registry.view<Position, Renderable>().each([&](const auto& entity, auto& pos, auto& renderable) {
+    //     renderable.text.setPosition(pos.x, pos.y);
+    //     window.draw(renderable.text);
+    // });
+
+    // _registry.view<Position, Button>().each([&](const auto& entity, auto& pos, auto& button) {
+    //     button.shape.setPosition(pos.x, pos.y);
+    //     window.draw(button.shape);
+
+    //     sf::Text buttonText(button.label, font, 20);
+    //     buttonText.setPosition(pos.x + 10, pos.y + 10);
+    //     buttonText.setFillColor(sf::Color::White);
+    //     window.draw(buttonText);
+    // });
+}
+
+void WaitingRoom::onEvent(sf::Event &event) {
+
+    // if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+    //     sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+    //     _registry.view<Position, Button>().each([&](const auto& entity, auto& pos, auto& button) {
+    //         if (button.shape.getGlobalBounds().contains(mousePos)) {
+    //             std::cout << "Button clicked: " << button.label << std::endl;
+    //             button.onClick();
+    //             return;
+    //         }
+    //     });
+    //     std::cout << "After button click" << std::endl;
+    // }
+    switch (event.type) {
+        case sf::Event::KeyPressed:
+            switch (event.key.code) {
+                case sf::Keyboard::Space:
+                    break;
+                case sf::Keyboard::B: {
+                     break;
+                }
+                default:
+                    // _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = true});
+                    break;
+            }
+            break;
+        case sf::Event::KeyReleased:
+            switch (event.key.code) {
+                default:
+                    // _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = false});
+                    break;
+            }
+            break;
+        case sf::Event::MouseButtonPressed:
+            break;
+        default:break;
+    }
+}
+
+void WaitingRoom::onEnter() {
+    _registry.clear();
+
+    // float y = 50.0f;
+    // for (const auto& client : this->_clients) {
+    //     auto entity = _registry.create();
+    //     _registry.addComponent<Position>(entity, {50.0f, y});
+    //     sf::Text clientText("Client " + std::to_string(client.id.value()), font, 20);
+    //     clientText.setFillColor(sf::Color::White);
+    //     _registry.addComponent<Renderable>(entity, {clientText});
+    //     y += 30.0f;
+    // }
+
+    // auto exitButtonEntity = _registry.create();
+    // _registry.addComponent<Position>(exitButtonEntity, {20.0f, 540.0f});
+    // sf::RectangleShape exitButtonShape({100.0f, 40.0f});
+    // exitButtonShape.setFillColor(sf::Color::Red);
+    // _registry.addComponent<Button>(exitButtonEntity, {exitButtonShape, "Exit", [this](){ _onExit({}); }});
+
+    // auto startButtonEntity = _registry.create();
+    // _registry.addComponent<Position>(startButtonEntity, {140.0f, 540.0f});
+    // sf::RectangleShape startButtonShape({100.0f, 40.0f});
+    // startButtonShape.setFillColor(sf::Color::Green);
+    // _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){ _onStart({}); }});
+}
+
+void WaitingRoom::onEnter(const AScene& lastScene)
+{
+}
+
+void WaitingRoom::onExit() {
+    std::cout << "Exiting totally..." << std::endl;
+}
+
+void WaitingRoom::onExit(const AScene& nextScene) {
+}
+
+void WaitingRoom::_onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
+
+    const auto payload = packet.payload;
+    std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
+        << ", ack: " << packet.ack_number << ")" << std::endl;
+
+    PACKET_TYPE packet_type{};
+    packet >> packet_type;
+
+    auto it = std::find_if(this->_clients.begin(), this->_clients.end(), [&src](const auto& client) {
+        return client.endpoint == src;
+    });
+
+    if (it == this->_clients.end())
+    {
+        if (packet_type != PACKET_TYPE::CONNECT)
+            return;
+        this->_clients.push_back(ClientInformations{
+            .endpoint = src,
+            .type = (this->_clients.size() > 4) ? ClientInformations::Type::VIEWER : ClientInformations::Type::PLAYER,
+            .id = this->_clients.size()
+        });
+        std::cout << "Client connected: " << src << std::endl;
+        it = this->_clients.end() - 1;
+    }
+
+    if (_packet_handlers.contains(packet_type))
+        _packet_handlers.at(packet_type)(*it, packet);
+}
+
+void WaitingRoom::_broadcast(const UDPPacket& packet) {
+    for (auto& client : this->_clients)
+    {
+        this->_send(client.endpoint, packet);
+    }
+}
+
+void WaitingRoom::_onConnect(const ClientInformations& source, UDPPacket& packet) {
+    std::string name;
+    packet >> name;
+    std::cout << "Client connected: " << name << std::endl;
+
+    UDPPacket response;
+    response << PACKET_TYPE::CONNECT;
+    response << source.id.value();
+
+}
+
+void WaitingRoom::_onDisconnect(const ClientInformations& source, UDPPacket& packet) {
+    std::cout << "Client disconnected: " << source.endpoint << std::endl;
+    this->_clients.erase(std::remove_if(this->_clients.begin(), this->_clients.end(), [&source](const auto& client) {
+        return client.endpoint == source.endpoint;
+    }), this->_clients.end());
+
+    //send informations about players connected
+}
+
+void WaitingRoom::_onMessage(const ClientInformations& source, UDPPacket& packet) {
+    std::string message;
+    packet >> message;
+    std::cout << "Message from " << source.endpoint << ": " << message << std::endl;
+}
+
+void WaitingRoom::_onExit(const std::vector<std::string>& args) {
+    std::cout << "Exiting..." << std::endl;
+    _manager.stop();
+
+    this->_broadcast(UDPPacket{} << PACKET_TYPE::DISCONNECT);
+}
+
+void WaitingRoom::_onStart(const std::vector<std::string>& args) {
+    std::cout << "Starting game..." << std::endl;
+
+    if (this->_clients.empty())
+    {
+        std::cout << "Not enough players to start the game." << std::endl;
+        return;
+    }
+    // _manager.load("Game");
+}

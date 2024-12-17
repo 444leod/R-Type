@@ -19,9 +19,11 @@
 #include <utility>
 #include <exception>
 #include <thread>
+#include <asio.hpp>
 #include "ISceneManager.hpp"
 #include "AScene.hpp"
 #include "config.h"
+#include "NetworkedScene.hpp"
 
 #include <iostream>
 
@@ -34,7 +36,7 @@ namespace scene {
      * @brief Concept to ensure the type is derived from AScene.
      */
     template<typename T>
-    concept SceneType = std::is_base_of_v<AScene, T>;
+    concept SceneType = std::is_base_of_v<AScene, T> && std::is_base_of_v<NetworkAgent, T>;
 }
 
 /**
@@ -69,7 +71,8 @@ public:
         std::string _message; ///< The exception message.
     };
 
-    SceneManager() {
+    explicit SceneManager(asio::io_context& io_context) : _io_context(io_context)
+    {
         _window.setKeyRepeatEnabled(false);
     }
     ~SceneManager() override = default;
@@ -85,7 +88,7 @@ public:
     {
         if (name.empty())
             throw Exception("Scene name cannot be empty");
-        std::shared_ptr<T> scene = std::make_shared<T>(*this, name);
+        std::shared_ptr<T> scene = std::make_shared<T>(*this, name, _io_context);
         scene->initialize();
         this->_scenes[name] = scene;
     }
@@ -210,6 +213,8 @@ private:
     std::map<std::string, std::shared_ptr<AScene>> _scenes = {};
     std::shared_ptr<AScene> _current = nullptr;
     std::string _loadingName;
+
+    asio::io_context& _io_context;
 
     #ifndef __RTYPE_NO_DISPLAY__
     sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(384 * SCALE, 256 * SCALE), "R-Type");

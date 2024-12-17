@@ -17,7 +17,7 @@
 
 class Level1 final : public AScene {
 public:
-    Level1(ISceneManager& m, const std::string& n) : AScene(m, n) {
+    Level1(ISceneManager& m, const std::string& n, asio::io_context& io_ctx) : AScene(m, n, io_ctx) {
         _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
         _backgroundTex.loadFromFile("assets/rtype-background.png", sf::IntRect(0, 243, 3072, 205));

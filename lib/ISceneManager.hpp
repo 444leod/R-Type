@@ -9,6 +9,7 @@
 #define ISCENEMANAGER_HPP
 
 #include <string>
+#include <asio.hpp>
 
 /**
  * @class ISceneManager

@@ -93,6 +93,9 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
             _registry.remove(projectile);
         });
     });
+
+    // auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
+    // explosions.displaySets();
 }
 
 void Level1::render(sf::RenderWindow& window) {
