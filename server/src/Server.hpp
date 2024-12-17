@@ -15,6 +15,7 @@
 #include <functional>
 #include <map>
 #include "NetworkAgent.hpp"
+#include "Components.hpp"
 
 #define TARGET_TICKRATE 30
 
@@ -49,7 +50,7 @@ public:
      */
     void run()
     {
-         constexpr std::uint32_t target_tick_delta = 1000 / TARGET_TICKRATE;
+        constexpr std::uint32_t target_tick_delta = 1000 / TARGET_TICKRATE;
 
         this->_running = true;
         std::cout << "Game is running..." << std::endl;

@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <any>
 
 /**
  * @brief Serves as a tag for any kind of structure that aims to be an event

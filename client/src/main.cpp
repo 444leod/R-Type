@@ -5,40 +5,29 @@
 ** main
 */
 
-#include <SFML/Graphics.hpp>
 #include <thread>
 #include <memory>
-#include "Client.hpp"
+#include <SFML/Graphics.hpp>
 
-int main(void)
-{
+#include "Client.hpp"
+#include "SceneManager.hpp"
+#include "scenes/WaitingRoom/WaitingRoom.hpp"
+#include "scenes/Level1/Level1.hpp"
+
+int main(void) {
     asio::io_context ctx;
     std::unique_ptr<std::thread> t;
     try
     {
-        Client client(ctx);
+        SceneManager sceneManager(ctx);
         t = std::make_unique<std::thread>([&ctx](){
             ctx.run();
         });
-        client.run("127.0.0.1", 25565);
-        client.sendMessage("Hello boop boop zib zib");
-        UDPPacket packet;
-        packet << PACKET_TYPE::POSITION;
-        packet << Position{10.0f, 20.0f};
-        client.send(packet);
-
-        while (client.running())
-        {
-            sf::Event e;
-            while (client.window().pollEvent(e)) {
-                if (e.type == sf::Event::Closed)
-                    client.stop();
-            }
-            client.window().clear();
-            client.window().display();
-        }
-        client.stop();
-        t->join();
+        sceneManager.registerScene<WaitingRoom>("WaitingRoom");
+        sceneManager.registerScene<Level1>("Level1");
+        sceneManager.load("WaitingRoom");
+        sceneManager.run();
+        std::cout << "Game ended..." << std::endl;
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         if (t && t->joinable()) {
@@ -46,6 +35,8 @@ int main(void)
         }
         return 1;
     }
-
+    if (t && t->joinable()) {
+        t->join();
+    }
     return 0;
 }

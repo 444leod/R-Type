@@ -22,7 +22,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Push to mirror
         uses: pixta-dev/repository-mirroring-action@v1
         with:

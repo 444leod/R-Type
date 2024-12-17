@@ -18,10 +18,20 @@
 
 #include <utility>
 #include <exception>
+#include <thread>
+#include <asio.hpp>
 #include "ISceneManager.hpp"
 #include "AScene.hpp"
+#include "config.h"
+#include "NetworkedScene.hpp"
+
+#include <iostream>
 
 namespace scene {
+
+    constexpr int TARGET_FPS = 60;
+    const std::chrono::milliseconds FRAME_DURATION(1000 / TARGET_FPS);
+
     /**
      * @brief Concept to ensure the type is derived from AScene.
      */
@@ -33,7 +43,7 @@ namespace scene {
  * @class SceneManager
  * @brief Manages the scenes in the application.
  */
-class SceneManager final : public ISceneManager {
+class SceneManager final : public ISceneManager, public NetworkAgent {
 public:
     /**
      * @class Exception
@@ -61,7 +71,10 @@ public:
         std::string _message; ///< The exception message.
     };
 
-    SceneManager() = default;
+    explicit SceneManager(asio::io_context& io_context, const int& port = 0) : NetworkAgent(io_context, port)
+    {
+        _window.setKeyRepeatEnabled(false);
+    }
     ~SceneManager() override = default;
 
     /**
@@ -121,11 +134,16 @@ public:
             this->_pollEvents();
             #endif
 
-            this->_current->update(deltaTime);
+            this->_current->update(deltaTime, _window);
 
             #ifndef __RTYPE_NO_DISPLAY__
             this->_render();
-           #endif
+            const double elapsed = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(std::chrono::high_resolution_clock::now() - now).count() / 1000.0;
+            if (elapsed < scene::FRAME_DURATION.count())
+                std::this_thread::sleep_for(scene::FRAME_DURATION - std::chrono::milliseconds(static_cast<int>(elapsed)));
+            #endif
+
+            this->_current->flush();
         }
     }
 
@@ -137,6 +155,17 @@ public:
         this->_running = false;
         if (this->_current != nullptr)
             this->_current->onExit();
+    }
+
+    /**
+     * @brief Sends a packet to a destination.
+     *
+     * @param dest The destination to send the packet to.
+     * @param packet The packet to send.
+     */
+    void send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet) override
+    {
+        this->_send(dest, packet);
     }
 
 private:
@@ -191,6 +220,15 @@ private:
 
     #endif
 
+    void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override
+    {
+        if (this->_current != nullptr)
+        {
+            this->_current->onPacketReceived(src, packet);
+        }
+    }
+
+
 private:
     bool _running = true;
 
@@ -199,7 +237,7 @@ private:
     std::string _loadingName;
 
     #ifndef __RTYPE_NO_DISPLAY__
-    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(800, 600), "R-Type");
+    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(384 * SCALE, 256 * SCALE), "R-Type");
     #endif
 };
 

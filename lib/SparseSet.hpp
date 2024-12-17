@@ -33,6 +33,7 @@ public:
     [[nodiscard]] virtual std::size_t capacity() const noexcept = 0;
     virtual void addObserver(ISparseSetObserver *observer) noexcept = 0;
     virtual void removeObserver(ISparseSetObserver *observer) noexcept = 0;
+    virtual void display() const = 0;
     friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
 };
 
@@ -68,7 +69,7 @@ public:
     [[nodiscard]] T& at(const Entity& entity)
     {
         if (!this->contains(entity))
-            throw std::out_of_range("Entity not present in the set.");
+            throw std::out_of_range("Entity " + std::to_string(entity) + " is not in the set");
         return this->_components[this->_sparse[entity]];
     }
 
@@ -152,6 +153,18 @@ public:
      * @return std::size_t
      */
     [[nodiscard]] std::size_t capacity() const noexcept override { return this->_sparse.capacity(); }
+
+    void display() const override
+    {
+      if (this->_dense.empty()) {
+        return;
+      }
+      std::cout << type<T>::name() << " set:" << std::endl;
+      std::cout << "Index | Dense Index | Dense Content | Component" << std::endl;
+      for (std::size_t i = 0; i < this->_dense.size(); i++) {
+        std::cout << i << "    | sparse[" << i << "] = " << this->_sparse[i] << " | dense[" << i << "] = " << this->_dense[i] << " | component = " << &this->_components[i] << std::endl;
+      }
+    }
 
 private:
     /**
