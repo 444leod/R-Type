@@ -172,9 +172,14 @@ pipeline {
             steps {
                 script {
                     def version = sh(
-                        script: "grep 'project(R-Type VERSION' CMakeLists.txt | grep -o '[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+'",
+                        script: "sed -n 's/project(rtype VERSION \([^)]*\))/\1/p' CMakeLists.txt",
                         returnStdout: true
                     ).trim()
+
+                    if (!version) {
+                        error "Could not extract version from CMakeLists.txt"
+                    }
+
                     def tag = "v${version}"
                     def repo = "444leod/R-Type"
 
