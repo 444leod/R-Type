@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 id: 'CppWhy'
-title: 'Why C++ is a adapted language for an ECS?'
+title: 'Why C++ is an adapted language for an ECS?'
 ---
 
 # Why C++ is a adapted language for an ECS?
