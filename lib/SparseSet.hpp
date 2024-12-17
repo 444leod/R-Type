@@ -67,7 +67,7 @@ public:
     [[nodiscard]] T& at(const Entity& entity)
     {
         if (!this->contains(entity))
-            throw std::out_of_range("Entity not present in the set.");
+            throw std::out_of_range("Entity " + std::to_string(entity) + " is not in the set");
         return this->_components[this->_sparse[entity]];
     }
 

@@ -15,7 +15,7 @@ class SceneManager;
 
 class AScene {
 public:
-    AScene(ISceneManager& manager, const std::string& name):
+    AScene(ISceneManager& manager, const std::string& name) :
         _manager(manager), _name(name) {}
     virtual~AScene() = default;
 

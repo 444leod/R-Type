@@ -1,10 +1,15 @@
+project(r-type_server VERSION 0.0.1)
+
 set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/server/include)
 set(SRC_FILES
     main.cpp
+    scenes/WaitingRoom/WaitingRoom.cpp
 )
 list(TRANSFORM SRC_FILES PREPEND "src/")
-add_executable(r-type_server ${SRC_FILES})
-target_include_directories(r-type_server PUBLIC ${LIB_DIR})
-set_target_properties(r-type_server PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
-)
+add_executable(${PROJECT_NAME} ${SRC_FILES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE asio::asio sfml::sfml)
+target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR})

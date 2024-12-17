@@ -1,14 +1,17 @@
-set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
+project(r-type_client VERSION 0.0.1)
 
-add_executable(r-type_client
-        src/main.cpp
-        src/scenes/Level1/Level1.cpp
-        src/scenes/Level1/Events/PlayerMovement.cpp
-        src/scenes/Level1/Events/PlayerMovement.hpp
+set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
+set(SRC_FILES
+    main.cpp
+    scenes/WaitingRoom/WaitingRoom.cpp
+#    scenes/Level1/Level1.cpp
+#    scenes/Level1/Events/PlayerMovement.cpp
 )
-target_include_directories(r-type_client PUBLIC ${LIB_DIR})
+
+list(TRANSFORM SRC_FILES PREPEND "src/")
+
+add_executable(${PROJECT_NAME} ${SRC_FILES})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE asio::asio sfml::sfml)
+target_include_directories(${PROJECT_NAME} PRIVATE ${LIB_DIR})
 target_include_directories(r-type_client PUBLIC ${CMAKE_SOURCE_DIR}/client/include)
-target_link_libraries(r-type_client PRIVATE sfml-graphics sfml-window sfml-system)
-set_target_properties(r-type_client PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
-)
