@@ -172,7 +172,7 @@ pipeline {
             steps {
                 script {
                     def version = sh(
-                        script: "sed -n 's/project(rtype VERSION \([^)]*\))/\1/p' CMakeLists.txt",
+                        script: "sed -n 's/project(rtype VERSION \\([^)]*\\))/\\1/p' CMakeLists.txt",
                         returnStdout: true
                     ).trim()
 
