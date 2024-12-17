@@ -15,6 +15,7 @@
 #include <functional>
 #include <map>
 #include "NetworkAgent.hpp"
+#include "Components.hpp"
 
 #define TARGET_TICKRATE 30
 

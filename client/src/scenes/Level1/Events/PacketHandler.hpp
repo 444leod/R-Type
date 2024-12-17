@@ -66,7 +66,6 @@ public:
             Velocity velocity{};
             Transform position{};
             event.packet >> id >> velocity >> position;
-            std::cout << "Received movement packet for " << id << ": " << velocity.x << ", " << velocity.y << std::endl;
             for (auto &[entity, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>().each())
             {
                 if (ship.id != id)
@@ -82,20 +81,20 @@ public:
             std::uint32_t projectileId;
             std::uint32_t shipId;
             event.packet >> shipId >> projectileId;
-            std::cout << "New projecitle emited by: " << shipId << std::endl;
             for (auto [entity, ship, transform] : _registry.view<Ship, Transform>().each())
             {
                 if (ship.id != shipId)
                     continue;
                 const auto projectile = _registry.create();
+                const auto shootTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
                 auto projectileSprite = sf::Sprite(_projectileTex);
                 projectileSprite.setOrigin(0, 0);
                 projectileSprite.setScale(SCALE, SCALE);
-                projectileSprite.setPosition(transform.x, transform.y);
+                projectileSprite.setPosition(shootTransform.x, shootTransform.y);
                 projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
                 _registry.addComponent(projectile, Hitbox{});
                 _registry.addComponent(projectile, projectileSprite);
-                _registry.addComponent(projectile, Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0});
+                _registry.addComponent(projectile, shootTransform);
                 _registry.addComponent(projectile, Projectile{ .id = projectileId });
                 _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
             }
