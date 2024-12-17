@@ -1,0 +1,8 @@
+#!/bin/sh
+
+CSS_PATH="./documentation/doxygen/css/awesome.css"
+URL="https://raw.githubusercontent.com/jothepro/doxygen-awesome-css/refs/heads/main/doxygen-awesome.css"
+if [ -f $CSS_PATH ]; then
+    exit 0
+fi;
+curl $URL > $CSS_PATH

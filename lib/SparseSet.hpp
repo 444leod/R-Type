@@ -9,6 +9,7 @@
 #define SPARSESET_HPP
 
 #include <vector>
+#include <cstdint>
 #include <stdexcept>
 #include "Entity.hpp"
 
@@ -33,6 +34,7 @@ public:
     virtual void addObserver(ISparseSetObserver *observer) noexcept = 0;
     virtual void removeObserver(ISparseSetObserver *observer) noexcept = 0;
     virtual void display() const = 0;
+    friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
 };
 
 /**

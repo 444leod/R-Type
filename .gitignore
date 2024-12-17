@@ -53,13 +53,18 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+cmake-build-debug/**
 
 # Bins
 r-type_client
 r-type_server
-
-# Rtype conan venv
 rtype_venv
 
+# Generated docs
+documentation/doxygen/html
+documentation/doxygen/css
 # Bear
 .cache
+
+docs/html/**
+node_modules/**

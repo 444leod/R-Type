@@ -5,9 +5,11 @@
 ** main
 */
 
-
+#include <thread>
+#include <memory>
 #include <SFML/Graphics.hpp>
 
+#include "Client.hpp"
 #include "SceneManager.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
 #include "scenes/Level1/Level1.hpp"
@@ -37,4 +39,4 @@ int main(void) {
         t->join();
     }
     return 0;
-}   
+}
