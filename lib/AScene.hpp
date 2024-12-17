@@ -56,14 +56,13 @@ public:
     virtual void onExit(const AScene& nextScene) = 0;
 
     virtual void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) = 0;
-protected:
-    /**
-    * @brief Virtual method called when a packet was successfully received
-    *
-    * @param src Where the packet was received from
-    * @param packet The packet received
-    */
 
+    void flush()
+    {
+        this->_registry.flush();
+    }
+
+protected:
     ISceneManager& _manager;
     Registry _registry;
 

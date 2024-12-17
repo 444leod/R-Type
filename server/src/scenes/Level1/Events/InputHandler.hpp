@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2024
 ** rtype
 ** File description:
-** PlayerMovement.hpp
+** InputHandler.hpp
 */
 
 #ifndef PLAYERMOVEMENT_HPP
@@ -15,10 +15,10 @@
 
 #include <SFML/Window/Keyboard.hpp>
 
-class PlayerMovement : public EventHandler<UserInput> {
+class InputHandler : public EventHandler<UserInput> {
 public:
-    explicit PlayerMovement(Registry& registry) : _registry(registry) {}
-    ~PlayerMovement() override = default;
+    explicit InputHandler(Registry& registry) : _registry(registry) {}
+    ~InputHandler() override = default;
 
     void receive(const UserInput& event) override {
     }

@@ -12,7 +12,7 @@
 #include "Registry.hpp"
 #include "EventDispatcher.hpp"
 #include "Components.hpp"
-#include "Events/PlayerMovement.hpp"
+#include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
 #include <chrono>
 
@@ -24,7 +24,7 @@ public:
         _backgroundTex.loadFromFile("assets/rtype-background.png", sf::IntRect(0, 243, 3072, 205));
         _bugTex.loadFromFile("assets/r-typesheet8.gif");
         _explosionTex.loadFromFile("assets/r-typesheet44.gif", sf::IntRect(131, 0, 192, 32));
-        _eventDispatcher.link<UserInput>(&_playerMovement);
+        _eventDispatcher.link<UserInput>(&_inputHandler);
         _eventDispatcher.link<PacketInformations>(&_packetHandler);
     }
 
@@ -57,7 +57,7 @@ private:
 
     asio::ip::udp::endpoint _server{};
 
-    PlayerMovement _playerMovement{_registry, _manager};
+    InputHandler _inputHandler{_registry, _manager};
     PacketHandler _packetHandler{_registry, _manager};
 
     std::vector<ClientInformations> _clients;

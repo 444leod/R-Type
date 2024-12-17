@@ -12,7 +12,7 @@
 #include "Registry.hpp"
 #include "EventDispatcher.hpp"
 #include "Components.hpp"
-#include "Events/PlayerMovement.hpp"
+#include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
 #include <chrono>
 
@@ -47,15 +47,16 @@ public:
     void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
 
 private:
-    void addProjectile(const Transform& transform);
     void addBug(const Transform& transform);
 
 public:
 private:
+    float _bugTimer = 0.f;
+    std::uint32_t _enemyId = 0;
     float _parallaxOffset = 0;
     EventDispatcher _eventDispatcher;
 
-    PlayerMovement _playerMovement{_registry};
+    InputHandler _inputHandler{_registry};
     PacketHandler _packetHandler{_registry, _manager};
 
     //this is temporary, if this texture get deleted, then the sprite will not be able to render

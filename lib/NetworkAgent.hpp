@@ -33,7 +33,9 @@ enum class PACKET_TYPE {
     NEW_SHIP,
     SHIP_MOVEMENT,
     USER_INPUT,
-
+    NEW_PROJECTILE,
+    NEW_MONSTER,
+    MONSTER_KILLED
 };
 
 struct ClientInformations {

@@ -18,7 +18,9 @@
 #include "NetworkAgent.hpp"
 #include "../WaitingRoom/WaitingRoom.hpp"
 
-void Level1::initialize() {}
+void Level1::initialize()
+{
+}
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
     _parallaxOffset += static_cast<float>(deltaTime * 25);
@@ -65,6 +67,8 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
         transform.rotation = 90 - 45 * movementFactor;
     });
 
+
+/*
     _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
         _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&, const Transform& projectile_transform) {
             if (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16)))
@@ -87,7 +91,7 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
             _registry.remove(projectile);
         });
     });
-
+*/
     // auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
     // explosions.displaySets();
 }
@@ -138,11 +142,6 @@ void Level1::onEvent(sf::Event &event) {
     switch (event.type) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {
-                case sf::Keyboard::Space:
-                    _registry.view<Self, Transform>().each([&](const Self&, const Transform& transform) {
-                        addProjectile(Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0});
-                    });
-                    break;
                 case sf::Keyboard::B: {
                      addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
                      break;

@@ -21,6 +21,7 @@
 void Level1::initialize() {}
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
+    this->_bugTimer -= deltaTime;
     _parallaxOffset += static_cast<float>(deltaTime * 25);
 
     _registry.view<Parallax, Transform>().each([&](const Parallax&, Transform& transform) {
@@ -65,10 +66,15 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
         transform.rotation = 90 - 45 * movementFactor;
     });
 
-    _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
-        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&, const Transform& projectile_transform) {
+    _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&e_enemy, const sf::Sprite& sprite, const Transform& transform)  {
+        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&p_projectile, const Transform& projectile_transform) {
             if (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16)))
                 return;
+
+            UDPPacket packet;
+            packet << PACKET_TYPE::MONSTER_KILLED << e_enemy.id << p_projectile.id;
+            for (auto client: CLIENTS)
+                _manager.send(client.endpoint, packet);
 
             const auto explosion = _registry.create();
             auto explosionSprite = sf::Sprite(_explosionTex);
@@ -87,6 +93,12 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
             _registry.remove(projectile);
         });
     });
+
+    if (this->_bugTimer < 0)
+    {
+        this->_bugTimer = 5.f;
+        this->addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
+    }
 
     // auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
     // explosions.displaySets();
@@ -138,15 +150,6 @@ void Level1::onEvent(sf::Event &event) {
     switch (event.type) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {
-                case sf::Keyboard::Space:
-                    _registry.view<Self, Transform>().each([&](const Self&, const Transform& transform) {
-                        addProjectile(Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0});
-                    });
-                    break;
-                case sf::Keyboard::B: {
-                     addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
-                     break;
-                }
                 default:
                     _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = true});
                     break;
@@ -277,25 +280,8 @@ void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& pac
         _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet, .source = *begin});
 }
 
-void Level1::addProjectile(const Transform& transform){
-    const auto projectile = _registry.create();
-
-    auto projectileSprite = sf::Sprite(_projectileTex);
-    projectileSprite.setOrigin(0, 0);
-    projectileSprite.setScale(SCALE, SCALE);
-    projectileSprite.setPosition(transform.x, transform.y);
-    projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
-    _registry.addComponent(projectile, Hitbox{});
-    _registry.addComponent(projectile, projectileSprite);
-    _registry.addComponent(projectile, transform);
-    _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
-    #if DEBUG
-        _registry.addComponent(projectile, Debug{});
-    #endif
-}
-
 void Level1::addBug(const Transform& transform) {
+
     const auto bug = _registry.create();
     auto bugSprite = sf::Sprite(_bugTex);
     bugSprite.setOrigin(16, 13);
@@ -303,11 +289,17 @@ void Level1::addBug(const Transform& transform) {
     bugSprite.setPosition(transform.x, transform.y);
     _registry.addComponent(bug, bugSprite);
     _registry.addComponent(bug, Bug{});
-    _registry.addComponent(bug, Enemy{});
+    _registry.addComponent(bug, Enemy{ .id = _enemyId });
     _registry.addComponent(bug, transform);
     _registry.addComponent(bug, Velocity{.x = -100, .y = 0});
     _registry.addComponent(bug, Hitbox{});
     #if DEBUG
         _registry.addComponent(bug, Debug{});
     #endif
+
+    UDPPacket packet;
+    packet << PACKET_TYPE::NEW_MONSTER << _enemyId << transform;
+    for (auto client: CLIENTS)
+        _manager.send(client.endpoint,  packet);
+    _enemyId++;
 }

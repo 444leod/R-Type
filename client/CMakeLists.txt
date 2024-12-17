@@ -5,7 +5,7 @@ set(SRC_FILES
     main.cpp
     scenes/WaitingRoom/WaitingRoom.cpp
     scenes/Level1/Level1.cpp
-    scenes/Level1/Events/PlayerMovement.cpp
+    scenes/Level1/Events/InputHandler.cpp
     scenes/Level1/Events/PacketHandler.cpp
 )
 
