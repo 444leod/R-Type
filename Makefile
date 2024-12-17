@@ -40,3 +40,4 @@ clean:
 docs:
 	./documentation/doxygen/generator
 	doxygen ./documentation/doxygen/Doxyfile
+	xdg-open documentation/doxygen/html/index.html

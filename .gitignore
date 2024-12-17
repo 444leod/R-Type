@@ -68,7 +68,7 @@ node_modules/**
 # Generated docs
 docs/html/**
 documentation/doxygen/html
-documentation/doxygen/css
+documentation/doxygen/css/awesome.css
 # Bear
 .cache
 
