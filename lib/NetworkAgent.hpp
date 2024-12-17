@@ -12,7 +12,7 @@
 #include "UDPPacket.hpp"
 #include "Events.hpp"
 #include <cstdint>
-
+#include <SFML/Graphics.hpp>
 /**
  * @brief This enum will describe what the packet is for.
  *

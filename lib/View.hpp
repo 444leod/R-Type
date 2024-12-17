@@ -16,6 +16,7 @@
 #include "Entity.hpp"
 #include "Family.hpp"
 #include "SparseSet.hpp"
+#include <ranges>
 
 inline std::ostream& operator<<(std::ostream& os, const std::vector<Entity>& vec) {
     if (vec.empty())
