@@ -167,6 +167,44 @@ pipeline {
                 }
             }
         }
+
+        stage('Create GitHub Release') {
+            // when {
+            //     branch 'main'
+            // }
+            steps {
+                script {
+                    // Extract version from CMakeLists.txt
+                    def version = sh(
+                        script: "grep 'project(R-Type VERSION' CMakeLists.txt | grep -o '[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+'",
+                        returnStdout: true
+                    ).trim()
+                    def tag = "v${version}"
+                    withCredentials([string(credentialsId: 'github_pat_packages', variable: 'GITHUB_TOKEN')]) {
+                        sh """
+                            if ! command -v gh &> /dev/null; then
+                                sudo apt-get update
+                                sudo apt-get install -y gh
+                            fi
+
+                            echo "$GITHUB_TOKEN" | gh auth login --with-token
+
+                            if gh release view ${tag} &> /dev/null; then
+                                gh release delete ${tag} -y
+                                git push origin :refs/tags/${tag} || true
+                            fi
+
+                            gh release create ${tag} \
+                                --title "R-Type ${version}" \
+                                --notes "Release ${version}" \
+                                $(find ./build -name "r-type_*" -type f)
+
+                            gh auth logout
+                        """
+                    }
+                }
+            }
+        }
     }
     post {
         always {
