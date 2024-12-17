@@ -15,4 +15,4 @@ add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE asio::asio sfml::sfml)
 target_include_directories(${PROJECT_NAME} PRIVATE ${LIB_DIR})
-target_include_directories(r-type_client PUBLIC ${CMAKE_SOURCE_DIR}/client/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/client/include)
