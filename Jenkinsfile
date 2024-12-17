@@ -143,7 +143,7 @@ pipeline {
                                 script {
                                     sh '''#!/bin/bash
                                         source rtype_venv/bin/activate
-                                        make deps
+                                        make deps_windows_release
                                     '''
                                 }
                             }
