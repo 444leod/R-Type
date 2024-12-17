@@ -22,6 +22,7 @@ public:
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 84, 240, 96));
         _backgroundTex.loadFromFile("assets/rtype-background.png", sf::IntRect(0, 243, 3072, 205));
         _bugTex.loadFromFile("assets/r-typesheet8.gif");
+        _fastTex.loadFromFile("assets/r-typesheet5.gif", sf::IntRect(0, 1, 264, 32));
         _explosionTex.loadFromFile("assets/r-typesheet44.gif", sf::IntRect(131, 0, 192, 32));
         _eventDispatcher.link<movement_event>(&_playerMovement);
     }
@@ -45,6 +46,7 @@ public:
 private:
     void addProjectile(const Transform& transform, const int charge);
     void addBug(const Transform& transform);
+    void addFast(const Transform& transform);
 
 public:
 private:
@@ -59,6 +61,7 @@ private:
     sf::Texture _projectileTex;
     sf::Texture _backgroundTex;
     sf::Texture _bugTex;
+    sf::Texture _fastTex;
     sf::Texture _explosionTex;
     std::shared_ptr<sf::Clock> _spaceClock;
 };

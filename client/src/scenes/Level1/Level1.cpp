@@ -70,6 +70,11 @@ void Level1::update(const double deltaTime) {
         transform.rotation = 90 - 45 * movementFactor;
     });
 
+    _registry.view<Fast, sf::Sprite, Transform>().each([&](const Entity& entity, Fast& fast, sf::Sprite& sprite, Transform& transform) {
+        const auto movementFactor = std::sin(fast.clock.getElapsedTime().asSeconds() / .2);
+        transform.y += movementFactor * 5;
+    });
+
     _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
         _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&, const Transform& projectile_transform) {
             if (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16)))
@@ -159,10 +164,14 @@ void Level1::onEvent(sf::Event &event) {
                     if (this->_spaceClock == nullptr) {
                         this->_spaceClock = std::make_unique<sf::Clock>();
                     }
-                    break;
+                break;
                 case sf::Keyboard::B: {
-                     addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
-                     break;
+                    addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
+                    break;
+                }
+                case sf::Keyboard::F: {
+                    addFast(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 0});
+                    break;
                 }
                 default:
                     _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = true});
@@ -277,5 +286,23 @@ void Level1::addBug(const Transform& transform) {
     _registry.addComponent(bug, Hitbox{});
     #if DEBUG
         _registry.addComponent(bug, Debug{});
+    #endif
+}
+
+void Level1::addFast(const Transform& transform) {
+    const auto fast = _registry.create();
+    auto fastSprite = sf::Sprite(_fastTex);
+    fastSprite.setOrigin(16, 18);
+    fastSprite.setScale(SCALE, SCALE);
+    fastSprite.setPosition(transform.x, transform.y);
+    _registry.addComponent(fast, fastSprite);
+    _registry.addComponent(fast, Fast{});
+    _registry.addComponent(fast, Enemy{});
+    _registry.addComponent(fast, transform);
+    _registry.addComponent(fast, Animation{.frameSize = {32, 36}, .frameOrigin = {0, 0}, .speed = 75, .frameCount = 8, .loop = true});
+    _registry.addComponent(fast, Velocity{.x = -100, .y = 0});
+    _registry.addComponent(fast, Hitbox{});
+    #if DEBUG
+        _registry.addComponent(fast, Debug{});
     #endif
 }
