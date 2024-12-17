@@ -5,7 +5,6 @@ pipeline {
     environment {
         GITHUB_GHCR_PAT = credentials('github_pat_packages')
         TOKEN_TA_NOTIFIER = credentials('my_ta_notifier_api')
-        GITHUB_TOKEN = credentials('github-token')
     }
     stages {
         stage('Build, Publish, Deploy Docusaurus') {
