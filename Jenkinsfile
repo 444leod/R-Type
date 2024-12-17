@@ -167,48 +167,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Create GitHub Release') {
-            steps {
-                script {
-                    def version = sh(
-                        script: "sed -n 's/project(rtype VERSION \\([^)]*\\))/\\1/p' CMakeLists.txt",
-                        returnStdout: true
-                    ).trim()
-
-                    if (!version) {
-                        error "Could not extract version from CMakeLists.txt"
-                    }
-
-                    def tag = "v${version}"
-                    def repo = "444leod/R-Type"
-
-                    withCredentials([string(credentialsId: 'github_pat_packages', variable: 'GITHUB_TOKEN')]) {
-                        sh """
-                            if ! command -v gh &> /dev/null; then
-                                sudo apt-get update
-                                sudo apt-get install -y gh
-                            fi
-
-                            echo "\$GITHUB_TOKEN" | gh auth login --with-token
-
-                            if gh release view ${tag} --repo github.com/${repo} &> /dev/null; then
-                                gh release delete ${tag} -y --repo github.com/${repo}
-                                git push origin :refs/tags/${tag} || true
-                            fi
-
-                            gh release create ${tag} \\
-                                --repo github.com/${repo} \\
-                                --title "R-Type ${version}" \\
-                                --notes "Release \${version}" \\
-                                \$(find ./build -name "r-type_*" -type f)
-
-                            gh auth logout
-                        """
-                    }
-                }
-            }
-        }
     }
     post {
         always {
