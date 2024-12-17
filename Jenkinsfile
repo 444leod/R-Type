@@ -83,14 +83,30 @@ pipeline {
                         }
                     }
                     stages {
-                        stage('Install deps and build') {
+                        stage('Install conan') {
                             steps {
                                 script {
                                     sh '''#!/bin/bash
                                         make clean
                                         make conan_ci
+                                    '''
+                                }
+                            }
+                        }
+                        stage('Install deps') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
                                         source rtype_venv/bin/activate
                                         make deps
+                                    '''
+                                }
+                            }
+                        }
+                        stage('Build binaries') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
                                         make
                                     '''
                                 }
@@ -112,14 +128,30 @@ pipeline {
                         }
                     }
                     stages {
-                        stage('Install deps and build') {
+                        stage('Install conan') {
                             steps {
                                 script {
                                     sh '''#!/bin/bash
                                         make clean
                                         make conan_ci
+                                    '''
+                                }
+                            }
+                        }
+                        stage('Install deps') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
                                         source rtype_venv/bin/activate
-                                        make deps_windows_release
+                                        make deps
+                                    '''
+                                }
+                            }
+                        }
+                        stage('Build exe') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
                                         make
                                     '''
                                 }
