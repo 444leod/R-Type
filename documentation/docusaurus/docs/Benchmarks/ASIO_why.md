@@ -10,6 +10,8 @@ title: 'What is Asio and why is it an adapted library?'
 
 [Source](https://think-async.com/Asio/)
 
+![Visu](../../static/img/overview.gif)
+
 ### Asio vs Windows Sockets and BSD Sockets
 
 Here’s why using the **Asio library** for networking is generally better compared to relying on OS-specific network APIs, such as **BSD Sockets** on Linux or **Windows Sockets** on Windows:
