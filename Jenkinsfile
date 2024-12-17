@@ -98,7 +98,8 @@ pipeline {
                         }
                         stage('Archive artifacts') {
                             steps {
-                                archiveArtifacts artifacts: 'r-type_*', fingerprint: true
+                                archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
+                                archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
                             }
                         }
                     }
@@ -126,7 +127,8 @@ pipeline {
                         }
                         stage('Archive artifacts') {
                             steps {
-                                archiveArtifacts artifacts: 'r-type_*', fingerprint: true
+                                archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
+                                archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
                             }
                         }
                     }
