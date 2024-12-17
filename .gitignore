@@ -4,6 +4,7 @@
 
 # Build
 !build/.gitkeep
+build
 build/*
 
 # Precompiled Headers
@@ -57,8 +58,6 @@ cmake-build-debug/**
 # Bins
 r-type_client
 r-type_server
-
-# Rtype conan venv
 rtype_venv
 
 # Docusaurus specific
