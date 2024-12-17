@@ -168,6 +168,9 @@ pipeline {
             }
         }
         stage('Create Release') {
+            when {
+                branch 'main'
+            }
             steps {
                 sh """
                     chmod +x ./create_github_release.sh
