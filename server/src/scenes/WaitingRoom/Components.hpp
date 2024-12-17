@@ -5,10 +5,11 @@
 ** Components.hpp
 */
 
-#ifndef COMPONENTS_HPP
-#define COMPONENTS_HPP
+#ifndef WAITING_ROOM_COMPONENTS_HPP
+#define WAITING_ROOM_COMPONENTS_HPP
 
 #include <SFML/Graphics.hpp>
+#include <functional>
 
 struct Position { float x, y; };
 struct Renderable { sf::Text text; };
@@ -16,4 +17,4 @@ struct Button { sf::RectangleShape shape; std::string label; std::function<void(
 
 struct Debug {};
 
-#endif //COMPONENTS_HPP
+#endif //WAITING_ROOM_COMPONENTS_HPP

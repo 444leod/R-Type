@@ -11,6 +11,7 @@
 #include <string>
 #include <asio.hpp>
 #include "UDPPacket.hpp"
+#include "NetworkAgent.hpp"
 
 /**
  * @class ISceneManager

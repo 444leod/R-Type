@@ -16,23 +16,13 @@
 #include <chrono>
 #include <functional>
 #include <optional>
+#include "Global.hpp"
 
 inline sf::Font get_default_font() {
     sf::Font font;
     font.loadFromFile("assets/arial.ttf");
     return font;
 }
-
-struct ClientInformations {
-    asio::ip::udp::endpoint endpoint;
-    enum class Type {
-        VIEWER,
-        PLAYER
-    } type;
-    std::optional<std::string> name = std::nullopt;
-    std::optional<std::uint32_t> id = std::nullopt;
-
-};
 
 class WaitingRoom final : public AScene {
 public:
@@ -69,8 +59,6 @@ private:
 public:
 private:
     sf::Font font = get_default_font();
-
-    asio::ip::udp::endpoint _server{};
 
     std::optional<std::uint32_t> _id = std::nullopt;
 

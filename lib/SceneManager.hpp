@@ -216,13 +216,16 @@ private:
         this->_window.display();
     }
 
+    #endif
+
     void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override
     {
         if (this->_current != nullptr)
+        {
             this->_current->onPacketReceived(src, packet);
+        }
     }
 
-    #endif
 
 private:
     bool _running = true;

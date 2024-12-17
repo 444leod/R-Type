@@ -18,31 +18,6 @@
 
 void WaitingRoom::initialize()
 {
-    std::cout << "Game is running..." << std::endl;
-
-    std::cout << "Ip of the host (enter for localhost): " << std::flush;
-    std::string ip;
-    std::getline(std::cin, ip);
-    if (ip.empty())
-        ip = "127.0.0.1";
-
-    std::cout << "Port of the host (enter for 25565): " << std::flush;
-    std::uint32_t port;
-    std::string port_str;
-    std::getline(std::cin, port_str);
-    if (port_str.empty())
-        port = 25565;
-    else
-        port = std::stoi(port_str);
-
-    const auto addr = asio::ip::address::from_string(ip);
-    this->_server = asio::ip::udp::endpoint(addr, port);
-
-    UDPPacket packet;
-    packet << PACKET_TYPE::CONNECT;
-    packet << "CONNECT";
-
-    _manager.send(this->_server, packet);
 }
 
 void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
@@ -101,6 +76,31 @@ void WaitingRoom::onEvent(sf::Event &event)
 void WaitingRoom::onEnter() {
     _registry.clear();
 
+    std::cout << "Game is running..." << std::endl;
+
+    std::cout << "Ip of the host (enter for localhost): " << std::flush;
+    std::string ip;
+    std::getline(std::cin, ip);
+    if (ip.empty())
+        ip = "127.0.0.1";
+
+    std::cout << "Port of the host (enter for 25565): " << std::flush;
+    std::uint32_t port;
+    std::string port_str;
+    std::getline(std::cin, port_str);
+    if (port_str.empty())
+        port = 25565;
+    else
+        port = std::stoi(port_str);
+
+    const auto addr = asio::ip::address::from_string(ip);
+    SERVER = asio::ip::udp::endpoint(addr, port);
+
+    UDPPacket packet;
+    packet << PACKET_TYPE::CONNECT;
+    packet << "ClientName";
+
+    _manager.send(SERVER, packet);
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene)
@@ -130,7 +130,7 @@ void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket
 
 void WaitingRoom::send(const UDPPacket& packet)
 {
-    _manager.send(this->_server, packet);
+    _manager.send(SERVER, packet);
 }
 
 void WaitingRoom::_onConnect(UDPPacket& packet)
@@ -145,6 +145,7 @@ void WaitingRoom::_onConnect(UDPPacket& packet)
 
 void WaitingRoom::_onDisconnect(UDPPacket& packet)
 {
+    std::cout << "Disconnection from the server" << std::endl;
     _manager.stop();
 }
 
@@ -152,10 +153,11 @@ void WaitingRoom::_onMessage(UDPPacket& packet)
 {
     std::string message;
     packet >> message;
-    std::cout << "Message from " << this->_server << ": " << message << std::endl;
+    std::cout << "Message from " << SERVER << ": " << message << std::endl;
 }
 
 void WaitingRoom::_onStart(UDPPacket& packet)
 {
     std::cout << "Game starting..." << std::endl;
+    _manager.load("Level1");
 }

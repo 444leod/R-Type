@@ -10,6 +10,7 @@
 #include <asio.hpp>
 #include <iostream>
 #include "UDPPacket.hpp"
+#include "Events.hpp"
 
 /**
  * @brief This enum will describe what the packet is for.
@@ -26,7 +27,35 @@ enum class PACKET_TYPE {
     DISCONNECT,
     MESSAGE,
     POSITION,
-    START
+    START,
+    YOUR_SHIP,
+    NEW_SHIP,
+    SHIP_MOVEMENT,
+    USER_INPUT,
+
+};
+
+struct ClientInformations {
+    asio::ip::udp::endpoint endpoint;
+    enum class Type {
+        VIEWER,
+        PLAYER
+    } type;
+    std::string name;
+    std::uint32_t id = 0;
+
+    ClientInformations(asio::ip::udp::endpoint endpoint, Type type, std::uint32_t id, std::string name = "") :
+        endpoint(endpoint), type(type), id(id)
+    {}
+
+    ClientInformations(const ClientInformations&) = default;
+
+    ClientInformations& operator=(const ClientInformations&) = default;
+};
+
+struct UserInput : public IEvent {
+    sf::Keyboard::Key key;
+    bool pressed;
 };
 
 /**
@@ -73,6 +102,8 @@ protected:
     void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet)
     {
         auto serialized = packet.serialize();
+        // std::cout << "Sending packet to " << dest << " (" << serialized.size() << " bytes)" << std::endl;
+        // std::cout << "Payload: " << packet.payload << std::endl;
         this->_socket.async_send_to(
             asio::buffer(serialized), dest,
             std::bind(

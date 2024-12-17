@@ -14,23 +14,13 @@
 #include "Components.hpp"
 #include "NetworkedScene.hpp"
 #include <chrono>
+#include <functional>
 
 inline sf::Font get_default_font() {
     sf::Font font;
     font.loadFromFile("assets/arial.ttf");
     return font;
 }
-
-struct ClientInformations {
-    asio::ip::udp::endpoint endpoint;
-    enum class Type {
-        VIEWER,
-        PLAYER
-    } type;
-    std::optional<std::string> name = std::nullopt;
-    std::optional<std::uint32_t> id = std::nullopt;
-
-};
 
 class WaitingRoom final : public AScene {
 public:
@@ -55,7 +45,6 @@ public:
     void onExit(const AScene& nextScene) override;
 
     void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
-
 private:
 
     void _onConnect(const ClientInformations& src, UDPPacket& packet);
@@ -67,14 +56,13 @@ private:
 
     void _broadcast(const UDPPacket& packet);
 
+
 public:
 private:
     Registry _registry;
     EventDispatcher _eventDispatcher;
 
     sf::Font font = get_default_font();
-
-    std::vector<ClientInformations> _clients;
 
     std::map<PACKET_TYPE, std::function<void(const ClientInformations& client, UDPPacket& packet)>> _packet_handlers = {
         {PACKET_TYPE::CONNECT,      [this](const ClientInformations& src, UDPPacket& packet)   { this->_onConnect(src, packet); }},

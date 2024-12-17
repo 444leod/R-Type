@@ -10,6 +10,7 @@
 
 #include "SceneManager.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
+#include "scenes/Level1/Level1.hpp"
 
 int main(void) {
     asio::io_context ctx;
@@ -21,6 +22,7 @@ int main(void) {
             ctx.run();
         });
         sceneManager.registerScene<WaitingRoom>("WaitingRoom");
+        sceneManager.registerScene<Level1>("Level1");
         sceneManager.load("WaitingRoom");
         sceneManager.run();
         std::cout << "Game ended..." << std::endl;

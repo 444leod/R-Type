@@ -5,8 +5,6 @@
 ** Game.cpp
 */
 
-#include "Level1.hpp"
-#include "Registry.hpp"
 #include <algorithm>
 #include <cmath>
 #include <config.h>
@@ -15,14 +13,10 @@
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
-
-sf::Font get_default_font() {
-    sf::Font font;
-    font.loadFromFile("assets/arial.ttf");
-    return font;
-}
-
-static const auto font = get_default_font();
+#include "Level1.hpp"
+#include "Registry.hpp"
+#include "NetworkAgent.hpp"
+#include "Global.hpp"
 
 void Level1::initialize() {}
 
@@ -154,14 +148,14 @@ void Level1::onEvent(sf::Event &event) {
                      break;
                 }
                 default:
-                    _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = true});
+                    _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = true});
                     break;
             }
             break;
         case sf::Event::KeyReleased:
             switch (event.key.code) {
                 default:
-                    _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = false});
+                    _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = false});
                     break;
             }
             break;
@@ -198,13 +192,89 @@ void Level1::onEnter() {
     _registry.addComponent(background, Parallax{});
 }
 
-void Level1::onEnter(const AScene& lastScene) {
+void Level1::onEnter(const AScene& lastScene)
+{
+    for (const auto& client : CLIENTS) {
+        std::cout << "Client " << client.id << " connected" << std::endl;
+        std::cout << "Endpoint: " << client.endpoint << std::endl;
+
+        _manager.send(client.endpoint, UDPPacket{} << PACKET_TYPE::MESSAGE << "Welcome to the game!");
+    }
+
+    _registry.clear();
+
+    auto spaceshipSprite = sf::Sprite(_spaceshipTex);
+    spaceshipSprite.setOrigin(0, 0);
+    spaceshipSprite.setScale(SCALE, SCALE);
+
+    for (const auto& client : CLIENTS) {
+        const auto spaceship = _registry.create();
+        _registry.addComponent(spaceship, spaceshipSprite);
+        _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
+        _registry.addComponent(spaceship, Ship{ .id = client.id });
+        _registry.addComponent(spaceship, Hitbox{});
+        _registry.addComponent(spaceship, Velocity{.x = 0, .y = 0});
+        #if DEBUG
+            _registry.addComponent(spaceship, Debug{});
+        #endif
+
+        {
+            UDPPacket packet;
+            packet << PACKET_TYPE::NEW_SHIP << client.id;
+            for (const auto& subclient : CLIENTS) {
+                if (subclient.id == client.id)
+                    continue;
+                _manager.send(subclient.endpoint, packet);
+            }
+        }
+
+        UDPPacket self_ship;
+        self_ship << PACKET_TYPE::YOUR_SHIP << client.id;
+        _manager.send(client.endpoint, self_ship);
+    }
+
+    const auto background = _registry.create();
+
+    auto backgroundSprite = sf::Sprite(_backgroundTex);
+    backgroundSprite.setScale(SCALE, SCALE);
+
+    _registry.addComponent(background, backgroundSprite);
+    _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
+    _registry.addComponent(background, Parallax{});
 }
 
-void Level1::onExit() {
+void Level1::onExit()
+{
+    UDPPacket packet;
+    packet << PACKET_TYPE::DISCONNECT;
+
+    for (const auto& client : CLIENTS) {
+        _manager.send(client.endpoint, packet);
+    }
 }
 
-void Level1::onExit(const AScene& nextScene) {
+void Level1::onExit(const AScene& nextScene)
+{
+}
+
+void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
+        auto type = PACKET_TYPE{};
+        packet >> type;
+
+        auto begin = CLIENTS.begin();
+
+        while (begin != CLIENTS.end()) {
+            if (begin->endpoint == src) {
+                break;
+            }
+            begin++;
+        }
+
+        if (begin == CLIENTS.end()) {
+            return;
+        }
+
+        _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet, .source = *begin});
 }
 
 void Level1::addProjectile(const Transform& transform){

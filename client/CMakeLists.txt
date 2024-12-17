@@ -4,8 +4,9 @@ set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
 set(SRC_FILES
     main.cpp
     scenes/WaitingRoom/WaitingRoom.cpp
-#    scenes/Level1/Level1.cpp
-#    scenes/Level1/Events/PlayerMovement.cpp
+    scenes/Level1/Level1.cpp
+    scenes/Level1/Events/PlayerMovement.cpp
+    scenes/Level1/Events/PacketHandler.cpp
 )
 
 list(TRANSFORM SRC_FILES PREPEND "src/")

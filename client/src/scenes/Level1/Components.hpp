@@ -5,8 +5,8 @@
 ** Components.hpp
 */
 
-#ifndef COMPONENTS_HPP
-#define COMPONENTS_HPP
+#ifndef LEVEL1_COMPONENTS_HPP
+#define LEVEL1_COMPONENTS_HPP
 
 #include <SFML/Graphics.hpp>
 
@@ -43,6 +43,9 @@ struct Bug {
     sf::Clock clock = sf::Clock();
 };
 
-struct Debug {};
+struct Ship
+{
+    std::uint32_t id;
+};
 
-#endif //COMPONENTS_HPP
+#endif //LEVEL1_COMPONENTS_HPP

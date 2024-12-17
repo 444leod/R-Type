@@ -5,8 +5,6 @@
 ** Game.cpp
 */
 
-#include "Level1.hpp"
-#include "Registry.hpp"
 #include <algorithm>
 #include <cmath>
 #include <config.h>
@@ -15,14 +13,10 @@
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
-
-sf::Font get_default_font() {
-    sf::Font font;
-    font.loadFromFile("assets/arial.ttf");
-    return font;
-}
-
-static const auto font = get_default_font();
+#include "Level1.hpp"
+#include "Registry.hpp"
+#include "NetworkAgent.hpp"
+#include "../WaitingRoom/WaitingRoom.hpp"
 
 void Level1::initialize() {}
 
@@ -93,6 +87,9 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
             _registry.remove(projectile);
         });
     });
+
+    // auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
+    // explosions.displaySets();
 }
 
 void Level1::render(sf::RenderWindow& window) {
@@ -151,14 +148,14 @@ void Level1::onEvent(sf::Event &event) {
                      break;
                 }
                 default:
-                    _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = true});
+                    _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = true});
                     break;
             }
             break;
         case sf::Event::KeyReleased:
             switch (event.key.code) {
                 default:
-                    _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = false});
+                    _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = false});
                     break;
             }
             break;
@@ -195,13 +192,40 @@ void Level1::onEnter() {
     _registry.addComponent(background, Parallax{});
 }
 
-void Level1::onEnter(const AScene& lastScene) {
+void Level1::onEnter(const AScene& lastScene)
+{
+    _registry.clear();
+
+    const auto background = _registry.create();
+    auto backgroundSprite = sf::Sprite(_backgroundTex);
+    backgroundSprite.setScale(SCALE, SCALE);
+
+    _registry.addComponent(background, backgroundSprite);
+    _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
+    _registry.addComponent(background, Parallax{});
 }
 
-void Level1::onExit() {
+void Level1::onExit()
+{
+    UDPPacket packet;
+    packet << PACKET_TYPE::DISCONNECT;
+
+    _manager.send(this->_server, packet);
 }
 
-void Level1::onExit(const AScene& nextScene) {
+void Level1::onExit(const AScene& nextScene)
+{
+}
+
+void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
+        auto type = PACKET_TYPE{};
+        packet >> type;
+
+        _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet});
+
+//    auto spaceshipSprite = sf::Sprite(_spaceshipTex);
+//    spaceshipSprite.setOrigin(0, 0);
+//    spaceshipSprite.setScale(SCALE, SCALE);
 }
 
 void Level1::addProjectile(const Transform& transform){

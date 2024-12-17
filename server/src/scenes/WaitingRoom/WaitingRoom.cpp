@@ -15,6 +15,7 @@
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include "Global.hpp"
 
 inline bool isInputAvailable() {
     fd_set readfds;
@@ -123,10 +124,10 @@ void WaitingRoom::onEnter()
     _registry.clear();
 
     float y = 50.0f;
-    for (const auto& client : this->_clients) {
+    for (const auto& client : CLIENTS) {
         auto entity = _registry.create();
         _registry.addComponent<Position>(entity, {50.0f, y});
-        sf::Text clientText("Client " + std::to_string(client.id.value()), font, 20);
+        sf::Text clientText("Client " + std::to_string(client.id), font, 20);
         clientText.setFillColor(sf::Color::White);
         _registry.addComponent<Renderable>(entity, {clientText});
         y += 30.0f;
@@ -149,7 +150,12 @@ void WaitingRoom::onEnter(const AScene& lastScene)
 {
 }
 
-void WaitingRoom::onExit() {
+void WaitingRoom::onExit()
+{
+    UDPPacket packet;
+    packet << PACKET_TYPE::DISCONNECT;
+
+    this->_broadcast(packet);
 }
 
 void WaitingRoom::onExit(const AScene& nextScene)
@@ -166,21 +172,23 @@ void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket
     PACKET_TYPE packet_type{};
     packet >> packet_type;
 
-    auto it = std::find_if(this->_clients.begin(), this->_clients.end(), [&src](const auto& client) {
+    auto it = std::find_if(CLIENTS.begin(), CLIENTS.end(), [&src](const auto& client) {
         return client.endpoint == src;
     });
 
-    if (it == this->_clients.end())
+    if (it == CLIENTS.end())
     {
         if (packet_type != PACKET_TYPE::CONNECT)
             return;
-        this->_clients.push_back(ClientInformations{
-            .endpoint = src,
-            .type = (this->_clients.size() > 4) ? ClientInformations::Type::VIEWER : ClientInformations::Type::PLAYER,
-            .id = this->_clients.size()
-        });
+        CLIENTS.push_back(ClientInformations(src,
+            (CLIENTS.size() > 4) ? ClientInformations::Type::VIEWER : ClientInformations::Type::PLAYER,
+            CLIENTS.size()
+        ));
+
+        std::cout << "New client, new size: " << CLIENTS.size() << std::endl;
+
         std::cout << "Client connected: " << src << std::endl;
-        it = this->_clients.end() - 1;
+        it = CLIENTS.end() - 1;
     }
 
     if (_packet_handlers.contains(packet_type))
@@ -189,13 +197,13 @@ void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket
 
 void WaitingRoom::_broadcast(const UDPPacket& packet)
 {
-    for (auto&[endpoint, type, name, id] : this->_clients)
+    for (auto&[endpoint, type, name, id] : CLIENTS)
     {
         _manager.send(endpoint, packet);
     }
 }
 
-void WaitingRoom::_onConnect(const ClientInformations& source, UDPPacket& packet)
+void WaitingRoom::_onConnect(const ClientInformations& src, UDPPacket& packet)
 {
     std::string name;
     packet >> name;
@@ -203,22 +211,22 @@ void WaitingRoom::_onConnect(const ClientInformations& source, UDPPacket& packet
 
     UDPPacket response;
     response << PACKET_TYPE::CONNECT;
-    response << source.id.value();
+    response << src.id;
 
-    _manager.send(source.endpoint, response);
+    _manager.send(src.endpoint, response);
 
     auto entity = _registry.create();
-    _registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * _clients.size()});
-    sf::Text clientText("Client " + std::to_string(source.id.value()), font, 20);
+    _registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * CLIENTS.size()});
+    sf::Text clientText("Client " + std::to_string(src.id), font, 20);
     clientText.setFillColor(sf::Color::White);
     _registry.addComponent<Renderable>(entity, {clientText});
 }
 
-void WaitingRoom::_onDisconnect(const ClientInformations& source, UDPPacket& packet) {
-    std::cout << "Client disconnected: " << source.endpoint << std::endl;
-    this->_clients.erase(std::remove_if(this->_clients.begin(), this->_clients.end(), [&source](const auto& client) {
-        return client.endpoint == source.endpoint;
-    }), this->_clients.end());
+void WaitingRoom::_onDisconnect(const ClientInformations& src, UDPPacket& packet) {
+    std::cout << "Client disconnected: " << src.endpoint << std::endl;
+    std::erase_if(CLIENTS, [&src](const auto& client) {
+        return client.endpoint == src.endpoint;
+    });
 
     //send informations about players connected
 }
@@ -242,10 +250,12 @@ void WaitingRoom::_onStart(const std::vector<std::string>& args)
 {
     std::cout << "Starting game..." << std::endl;
 
-    if (this->_clients.empty())
+    if (CLIENTS.empty())
     {
         std::cout << "Not enough players to start the game." << std::endl;
         return;
     }
-    // _manager.load("Game");
+
+    this->_broadcast(UDPPacket{} << PACKET_TYPE::START);
+    _manager.load("Level1");
 }

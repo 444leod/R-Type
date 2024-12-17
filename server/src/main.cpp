@@ -9,14 +9,7 @@
 // #include "Server.hpp"
 #include "SceneManager.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
-
-    // asio::io_context io_context;
-    // SceneManager sceneManager(io_context);
-
-    // sceneManager.registerScene<Level1>("Game");
-
-    // sceneManager.load("Game");
-    // sceneManager.run();
+#include "scenes/Level1/Level1.hpp"
 
 int main(void)
 {
@@ -29,6 +22,7 @@ int main(void)
             ctx.run();
         });
         sceneManager.registerScene<WaitingRoom>("WaitingRoom");
+        sceneManager.registerScene<Level1>("Level1");
         sceneManager.load("WaitingRoom");
         sceneManager.run();
         std::cout << "Game ended..." << std::endl;
