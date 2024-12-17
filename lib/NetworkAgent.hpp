@@ -11,6 +11,7 @@
 #include <iostream>
 #include "UDPPacket.hpp"
 #include "Events.hpp"
+#include <cstdint>
 
 /**
  * @brief This enum will describe what the packet is for.

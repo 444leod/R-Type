@@ -9,6 +9,7 @@
 #define LEVEL1_COMPONENTS_HPP
 
 #include <SFML/Graphics.hpp>
+#include <cstdint>
 
 struct Transform {
     float x, y, z;

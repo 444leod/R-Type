@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include <cstdint>
 
 /**
  * @brief Overload of the << operator for std::byte.

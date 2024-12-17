@@ -15,6 +15,7 @@
 #include "NetworkAgent.hpp"
 #include "Global.hpp"
 #include "ISceneManager.hpp"
+#include <cstdint>
 
 struct PacketInformations : public IEvent {
     PACKET_TYPE type;
