@@ -8,7 +8,7 @@
 BUILD_DIR = build
 CLEAN_TARGETS = $(BUILD_DIR) CMakeCache.txt CMakeFiles
 
-.PHONY: all deps configure build install clean conan
+.PHONY: all deps configure build install clean conan docs
 
 all: install
 
@@ -36,3 +36,7 @@ install: build
 
 clean:
 	rm -rf $(CLEAN_TARGETS)
+
+docs:
+	./documentation/doxygen/generator
+	doxygen ./documentation/doxygen/Doxyfile

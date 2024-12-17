@@ -53,6 +53,7 @@ CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
 cmake-build-debug/**
+cmake-build-debug/**
 
 # Bins
 r-type_client
@@ -64,4 +65,10 @@ rtype_venv
 # Docusaurus specific
 node_modules/**
 
+# Generated docs
 docs/html/**
+documentation/doxygen/html
+documentation/doxygen/css
+# Bear
+.cache
+

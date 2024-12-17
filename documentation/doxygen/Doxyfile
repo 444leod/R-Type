@@ -1,0 +1,49 @@
+
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = "👾 R-TYPE"
+PROJECT_NUMBER         =
+PROJECT_BRIEF          = ""
+PROJECT_LOGO           =
+OUTPUT_DIRECTORY       = ./documentation/doxygen
+CREATE_SUBDIRS         = NO
+EXTRACT_ALL            = YES
+QUIET                  = YES
+WARNINGS               = YES
+RECURSIVE              = YES
+EXCLUDE                =
+USE_MDFILE_AS_MAINPAGE = README.md
+HTML_EXTRA_STYLESHEET  = ./documentation/doxygen/css/awesome.css
+GENERATE_LATEX         = NO
+
+ABBREVIATE_BRIEF       = "The $name class" \
+                         "The $name widget" \
+                         "The $name file" \
+                         is \
+                         provides \
+                         specifies \
+                         contains \
+                         represents \
+                         a \
+                         an \
+                         the
+
+INPUT                  =    client \
+                            server \
+                            lib \
+                            network \
+                            README.md \
+
+FILE_PATTERNS          = *.c \
+                         *.cc \
+                         *.cxx \
+                         *.cpp \
+                         *.c++ \
+                         *.h \
+                         *.hh \
+                         *.hxx \
+                         *.hpp \
+                         *.h++ \
+                         *.m \
+                         *.markdown \
+                         *.md \
+
