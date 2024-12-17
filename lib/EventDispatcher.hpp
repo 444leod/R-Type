@@ -12,16 +12,20 @@
 #include "Events.hpp"
 #include "Family.hpp"
 
-/// @brief A class used to register events listeners and call events based on a type
+/**
+ * @brief A class used to register events listeners and call events based on a type
+ */
 class EventDispatcher
 {
 public:
     EventDispatcher() = default;
     ~EventDispatcher() = default;
 
-    /// @brief Link an event to a receiver
-    /// @tparam T The type of event to link to
-    /// @param handler The receiver object
+    /**
+     * @brief Link an event to a receiver
+     * @tparam T The type of event to link to
+     * @param handler The receiver object
+     */
     template<typename T>
     void link(IEventHandler *handler)
     {
@@ -31,9 +35,11 @@ public:
         this->_links[type_id].push_back(handler);
     }
 
-    /// @brief Unlink an event to a receiver
-    /// @tparam T The type of event to unlink to
-    /// @param handler The receiver object
+    /**
+     * @brief Unlink an event to a receiver
+     * @tparam T The type of event to unlink to
+     * @param handler The receiver object
+     */
     template<typename T>
     void unlink(IEventHandler *handler)
     {
@@ -42,9 +48,11 @@ public:
             this->_links.erase(type_id);
     }
 
-    /// @brief Call all the even listeners
-    /// @tparam T The type of event to boradcast
-    /// @param event The value to pass as event
+    /**
+     * @brief Call all the even listeners
+     * @tparam T The type of event to boradcast
+     * @param event The value to pass as event
+     */
     template<typename T>
     void broadcast(const T& event)
     {
