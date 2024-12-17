@@ -72,3 +72,4 @@ documentation/doxygen/css/awesome.css
 # Bear
 .cache
 
+package-lock.json
