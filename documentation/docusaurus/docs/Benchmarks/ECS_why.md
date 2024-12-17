@@ -81,7 +81,7 @@ Traditional object-oriented design relies heavily on inheritance, which leads to
    - Requires robust logging and tracing mechanisms
 
 :::info
-More info on how we tackled these challenges in our project can be found in the [ECS Implementation](./ECS_implementation) section.
+More info on how we tackled these challenges in our project can be found in the [ECS Implementation](/docs/Developer%20Guide/GameEngine/ECS_implementation.md) section.
 :::
 
 ## How it fits to our project:

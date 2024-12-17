@@ -206,6 +206,6 @@ This particular implementation provides a lightweight, template-based approach t
 
 ### More
 
-You might have noticed that the registry implementation uses a sparse set data structure to store components efficiently. Sparse sets are a key optimization technique in ECS architectures, allowing for fast component access and iteration while minimizing memory usage. More on our sparse set implementation can be found in the [SparseSet](./SPARSE_SET_implementation) documentation.
+You might have noticed that the registry implementation uses a sparse set data structure to store components efficiently. Sparse sets are a key optimization technique in ECS architectures, allowing for fast component access and iteration while minimizing memory usage. More on our sparse set implementation can be found in the [SparseSet](/docs/Developer%20Guide/GameEngine/SPARSE_SET_implementation.md) documentation.
 
-It also uses a `View` class to provide a convenient way to query entities based on their component types. The `View` class is a critical component in ECS systems, enabling systems to process entities efficiently based on their component composition. More on how views work can be found in the [View](./VIEW_implementation) documentation.
+It also uses a `View` class to provide a convenient way to query entities based on their component types. The `View` class is a critical component in ECS systems, enabling systems to process entities efficiently based on their component composition. More on how views work can be found in the [View](/docs/Developer%20Guide/GameEngine/VIEW_implementation.md) documentation.

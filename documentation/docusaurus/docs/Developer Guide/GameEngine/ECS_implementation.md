@@ -181,4 +181,4 @@ int main(void)
 
 ### More
 
-As you can see in the exemple, most of the magic happens in the `registry` object. Let's see the implementation of the `Registry` class in the [next section](./ECS_implementation).
+As you can see in the exemple, most of the magic happens in the `registry` object. Let's see the implementation of the `Registry` class in the [next section](/docs/Developer%20Guide/GameEngine/REGISTRY_implementation.md).
