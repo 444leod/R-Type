@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 id: 'EcsWhy'
 title: 'Why an ECS?'
 ---
@@ -81,7 +81,7 @@ Traditional object-oriented design relies heavily on inheritance, which leads to
    - Requires robust logging and tracing mechanisms
 
 :::info
-More info on how we tackled these challenges in our project can be found in the [ECS Implementation](../GameEngine/ECS_implementation) section.
+More info on how we tackled these challenges in our project can be found in the [ECS Implementation](./ECS_implementation) section.
 :::
 
 ## How it fits to our project:
