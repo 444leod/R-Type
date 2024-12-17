@@ -3,7 +3,7 @@ sidebar_position: 2
 id: 'Buid and Run'
 ---
 
-# Build And Run
+# Getting Started !
 
 This section describes how to build and run the different parts of the project.
 

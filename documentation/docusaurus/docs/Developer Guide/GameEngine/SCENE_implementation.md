@@ -209,3 +209,7 @@ SceneManager sceneManager;
 sceneManager.registerScene(std::make_unique<GameScene>(sceneManager));
 sceneManager.switchToScene("GameScene");
 ```
+
+### Visual Representation
+
+![Visu](../../../static/SceneManager.drawio.svg)
