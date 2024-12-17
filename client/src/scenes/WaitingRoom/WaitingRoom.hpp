@@ -15,6 +15,7 @@
 #include "UDPPacket.hpp"
 #include <chrono>
 #include <functional>
+#include <optional>
 
 inline sf::Font get_default_font() {
     sf::Font font;
@@ -33,11 +34,10 @@ struct ClientInformations {
 
 };
 
-class WaitingRoom final : public NetworkAgent, public AScene {
+class WaitingRoom final : public AScene {
 public:
-    WaitingRoom(ISceneManager& m, const std::string& n, asio::io_context& io_ctx) : NetworkAgent(io_ctx,  0), AScene(m, n)
+    WaitingRoom(ISceneManager& m, const std::string& n) : AScene(m, n)
     {
-        std::cout << "WaitingRoom started, listening on port: " << this->_port << "..." << std::endl;
     }
 
     void initialize() override;
@@ -56,9 +56,9 @@ public:
 
     void onExit(const AScene& nextScene) override;
 
-private:
-    void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
+    void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
 
+private:
     void _onConnect(UDPPacket& packet);
     void _onDisconnect(UDPPacket& packet);
     void _onMessage(UDPPacket& packet);
@@ -68,11 +68,11 @@ private:
 
 public:
 private:
-    asio::ip::udp::endpoint _server{};
-
     sf::Font font = get_default_font();
 
-    bool _connected = false;
+    asio::ip::udp::endpoint _server{};
+
+    std::optional<std::uint32_t> _id = std::nullopt;
 
     Registry _registry;
     EventDispatcher _eventDispatcher;

@@ -36,14 +36,14 @@ namespace scene {
      * @brief Concept to ensure the type is derived from AScene.
      */
     template<typename T>
-    concept SceneType = std::is_base_of_v<AScene, T> && std::is_base_of_v<NetworkAgent, T>;
+    concept SceneType = std::is_base_of_v<AScene, T>;
 }
 
 /**
  * @class SceneManager
  * @brief Manages the scenes in the application.
  */
-class SceneManager final : public ISceneManager {
+class SceneManager final : public ISceneManager, public NetworkAgent {
 public:
     /**
      * @class Exception
@@ -71,7 +71,7 @@ public:
         std::string _message; ///< The exception message.
     };
 
-    explicit SceneManager(asio::io_context& io_context) : _io_context(io_context)
+    explicit SceneManager(asio::io_context& io_context, const int& port = 0) : NetworkAgent(io_context, port)
     {
         _window.setKeyRepeatEnabled(false);
     }
@@ -88,7 +88,7 @@ public:
     {
         if (name.empty())
             throw Exception("Scene name cannot be empty");
-        std::shared_ptr<T> scene = std::make_shared<T>(*this, name, _io_context);
+        std::shared_ptr<T> scene = std::make_shared<T>(*this, name);
         scene->initialize();
         this->_scenes[name] = scene;
     }
@@ -155,6 +155,17 @@ public:
             this->_current->onExit();
     }
 
+    /**
+     * @brief Sends a packet to a destination.
+     *
+     * @param dest The destination to send the packet to.
+     * @param packet The packet to send.
+     */
+    void send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet) override
+    {
+        this->_send(dest, packet);
+    }
+
 private:
     /**
      * @brief Updates the state of the current scene.
@@ -205,6 +216,13 @@ private:
         this->_window.display();
     }
 
+    void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override
+    {
+        std::cout << "Received packet from " << src.address().to_string() << ":" << src.port() << std::endl;
+        if (this->_current != nullptr)
+            this->_current->onPacketReceived(src, packet);
+    }
+
     #endif
 
 private:
@@ -213,8 +231,6 @@ private:
     std::map<std::string, std::shared_ptr<AScene>> _scenes = {};
     std::shared_ptr<AScene> _current = nullptr;
     std::string _loadingName;
-
-    asio::io_context& _io_context;
 
     #ifndef __RTYPE_NO_DISPLAY__
     sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(384 * SCALE, 256 * SCALE), "R-Type");

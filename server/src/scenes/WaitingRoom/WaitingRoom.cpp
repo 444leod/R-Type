@@ -65,35 +65,35 @@ void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
 
 void WaitingRoom::render(sf::RenderWindow& window)
 {
-    // _registry.view<Position, Renderable>().each([&](const auto& entity, auto& pos, auto& renderable) {
-    //     renderable.text.setPosition(pos.x, pos.y);
-    //     window.draw(renderable.text);
-    // });
+    _registry.view<Position, Renderable>().each([&](const auto& entity, auto& pos, auto& renderable) {
+        renderable.text.setPosition(pos.x, pos.y);
+        window.draw(renderable.text);
+    });
 
-    // _registry.view<Position, Button>().each([&](const auto& entity, auto& pos, auto& button) {
-    //     button.shape.setPosition(pos.x, pos.y);
-    //     window.draw(button.shape);
+    _registry.view<Position, Button>().each([&](const auto& entity, auto& pos, auto& button) {
+        button.shape.setPosition(pos.x, pos.y);
+        window.draw(button.shape);
 
-    //     sf::Text buttonText(button.label, font, 20);
-    //     buttonText.setPosition(pos.x + 10, pos.y + 10);
-    //     buttonText.setFillColor(sf::Color::White);
-    //     window.draw(buttonText);
-    // });
+        sf::Text buttonText(button.label, font, 20);
+        buttonText.setPosition(pos.x + 10, pos.y + 10);
+        buttonText.setFillColor(sf::Color::White);
+        window.draw(buttonText);
+    });
 }
 
 void WaitingRoom::onEvent(sf::Event &event) {
 
-    // if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-    //     sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
-    //     _registry.view<Position, Button>().each([&](const auto& entity, auto& pos, auto& button) {
-    //         if (button.shape.getGlobalBounds().contains(mousePos)) {
-    //             std::cout << "Button clicked: " << button.label << std::endl;
-    //             button.onClick();
-    //             return;
-    //         }
-    //     });
-    //     std::cout << "After button click" << std::endl;
-    // }
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+        sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+        _registry.view<Position, Button>().each([&](const auto& entity, auto& pos, auto& button) {
+            if (button.shape.getGlobalBounds().contains(mousePos)) {
+                std::cout << "Button clicked: " << button.label << std::endl;
+                button.onClick();
+                return;
+            }
+        });
+        std::cout << "After button click" << std::endl;
+    }
     switch (event.type) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {
@@ -123,27 +123,27 @@ void WaitingRoom::onEvent(sf::Event &event) {
 void WaitingRoom::onEnter() {
     _registry.clear();
 
-    // float y = 50.0f;
-    // for (const auto& client : this->_clients) {
-    //     auto entity = _registry.create();
-    //     _registry.addComponent<Position>(entity, {50.0f, y});
-    //     sf::Text clientText("Client " + std::to_string(client.id.value()), font, 20);
-    //     clientText.setFillColor(sf::Color::White);
-    //     _registry.addComponent<Renderable>(entity, {clientText});
-    //     y += 30.0f;
-    // }
+    float y = 50.0f;
+    for (const auto& client : this->_clients) {
+        auto entity = _registry.create();
+        _registry.addComponent<Position>(entity, {50.0f, y});
+        sf::Text clientText("Client " + std::to_string(client.id.value()), font, 20);
+        clientText.setFillColor(sf::Color::White);
+        _registry.addComponent<Renderable>(entity, {clientText});
+        y += 30.0f;
+    }
 
-    // auto exitButtonEntity = _registry.create();
-    // _registry.addComponent<Position>(exitButtonEntity, {20.0f, 540.0f});
-    // sf::RectangleShape exitButtonShape({100.0f, 40.0f});
-    // exitButtonShape.setFillColor(sf::Color::Red);
-    // _registry.addComponent<Button>(exitButtonEntity, {exitButtonShape, "Exit", [this](){ _onExit({}); }});
+    auto exitButtonEntity = _registry.create();
+    _registry.addComponent<Position>(exitButtonEntity, {20.0f, 540.0f});
+    sf::RectangleShape exitButtonShape({100.0f, 40.0f});
+    exitButtonShape.setFillColor(sf::Color::Red);
+    _registry.addComponent<Button>(exitButtonEntity, {exitButtonShape, "Exit", [this](){ _onExit({}); }});
 
-    // auto startButtonEntity = _registry.create();
-    // _registry.addComponent<Position>(startButtonEntity, {140.0f, 540.0f});
-    // sf::RectangleShape startButtonShape({100.0f, 40.0f});
-    // startButtonShape.setFillColor(sf::Color::Green);
-    // _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){ _onStart({}); }});
+    auto startButtonEntity = _registry.create();
+    _registry.addComponent<Position>(startButtonEntity, {140.0f, 540.0f});
+    sf::RectangleShape startButtonShape({100.0f, 40.0f});
+    startButtonShape.setFillColor(sf::Color::Green);
+    _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){ _onStart({}); }});
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene)
@@ -157,7 +157,7 @@ void WaitingRoom::onExit() {
 void WaitingRoom::onExit(const AScene& nextScene) {
 }
 
-void WaitingRoom::_onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
+void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
 
     const auto payload = packet.payload;
     std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
@@ -188,9 +188,9 @@ void WaitingRoom::_onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacke
 }
 
 void WaitingRoom::_broadcast(const UDPPacket& packet) {
-    for (auto& client : this->_clients)
+    for (auto&[endpoint, type, name, id] : this->_clients)
     {
-        this->_send(client.endpoint, packet);
+        _manager.send(endpoint, packet);
     }
 }
 
@@ -203,6 +203,13 @@ void WaitingRoom::_onConnect(const ClientInformations& source, UDPPacket& packet
     response << PACKET_TYPE::CONNECT;
     response << source.id.value();
 
+    _manager.send(source.endpoint, response);
+
+    auto entity = _registry.create();
+    _registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * _clients.size()});
+    sf::Text clientText("Client " + std::to_string(source.id.value()), font, 20);
+    clientText.setFillColor(sf::Color::White);
+    _registry.addComponent<Renderable>(entity, {clientText});
 }
 
 void WaitingRoom::_onDisconnect(const ClientInformations& source, UDPPacket& packet) {

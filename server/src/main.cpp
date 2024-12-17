@@ -24,7 +24,7 @@ int main(void)
     std::unique_ptr<std::thread> t;
     try
     {
-        SceneManager sceneManager(ctx);
+        SceneManager sceneManager(ctx, 25565);
         t = std::make_unique<std::thread>([&ctx](){
             ctx.run();
         });

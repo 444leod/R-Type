@@ -11,6 +11,7 @@
 class SceneManager;
 
 #include <SFML/Graphics.hpp>
+#include "UDPPacket.hpp"
 #include "ISceneManager.hpp"
 
 class AScene {
@@ -53,7 +54,16 @@ public:
     /// @param nextScene A reference to the successor
     virtual void onExit(const AScene& nextScene) = 0;
 
+    virtual void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) = 0;
+
 protected:
+    /**
+    * @brief Virtual method called when a packet was successfully received
+    *
+    * @param src Where the packet was received from
+    * @param packet The packet received
+    */
+
     ISceneManager& _manager;
 
 private:

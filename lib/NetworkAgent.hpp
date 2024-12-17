@@ -91,7 +91,6 @@ private:
      */
     void _receivePacket()
     {
-        std::cout << "Waiting for packet..." << std::endl;
         this->_socket.async_receive_from(
             asio::buffer(this->_buffer), this->_client,
             std::bind(

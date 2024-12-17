@@ -44,7 +44,7 @@ void WaitingRoom::initialize()
     packet << PACKET_TYPE::CONNECT;
     packet << "CONNECT";
 
-    this->_send(this->_server, packet);
+    _manager.send(this->_server, packet);
     std::cout << "Connecting to the server..." << std::endl;
 }
 
@@ -54,7 +54,7 @@ void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
 
 void WaitingRoom::render(sf::RenderWindow& window)
 {
-    if (this->_connected) {
+    if (this->_id.has_value()) {
         sf::Text text;
         text.setFont(font);
         text.setCharacterSize(30);
@@ -117,10 +117,11 @@ void WaitingRoom::onExit() {
 void WaitingRoom::onExit(const AScene& nextScene) {
 }
 
-void WaitingRoom::_onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
+void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
 
-    std::cout << "Received packet from " << src.address().to_string() << ":" << src.port() << std::endl;
     const auto payload = packet.payload;
+
+    std::cout << "quoicoubeh" << std::endl;
 
     std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
               << ", ack: " << packet.ack_number << ")" << std::endl;
@@ -132,28 +133,20 @@ void WaitingRoom::_onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacke
 }
 
 void WaitingRoom::send(const UDPPacket& packet) {
-    this->_send(this->_server, packet);
+    _manager.send(this->_server, packet);
 }
 
 void WaitingRoom::_onConnect(UDPPacket& packet) {
-//    std::string name;
-//    packet >> name;
-//    std::cout << "Client connected: " << name << std::endl;
-//
-//    UDPPacket response;
-//    response << PACKET_TYPE::CONNECT;
-//    response << source.id.value();
+
+    std::uint32_t id;
+    packet >> id;
+
+    this->_id = id;
     std::cout << "Connected to the server" << std::endl;
-    this->_connected = true;
 }
 
 void WaitingRoom::_onDisconnect(UDPPacket& packet) {
-//    std::cout << "Client disconnected: " << source.endpoint << std::endl;
-//    this->_clients.erase(std::remove_if(this->_clients.begin(), this->_clients.end(), [&source](const auto& client) {
-//        return client.endpoint == source.endpoint;
-//    }), this->_clients.end());
-
-    //send informations about players connected
+    _manager.stop();
 }
 
 void WaitingRoom::_onMessage(UDPPacket& packet) {

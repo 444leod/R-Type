@@ -32,11 +32,10 @@ struct ClientInformations {
 
 };
 
-class WaitingRoom final : public NetworkAgent, public AScene {
+class WaitingRoom final : public AScene {
 public:
-    WaitingRoom(ISceneManager& m, const std::string& n, asio::io_context& io_ctx) : AScene(m, n), NetworkAgent(io_ctx, 25565)
+    WaitingRoom(ISceneManager& m, const std::string& n) : AScene(m, n)
     {
-        std::cout << "WaitingRoom started, listening on port: " << this->_port << "..." << std::endl;
     }
 
     void initialize() override;
@@ -55,8 +54,9 @@ public:
 
     void onExit(const AScene& nextScene) override;
 
+    void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
+
 private:
-    void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
 
     void _onConnect(const ClientInformations& src, UDPPacket& packet);
     void _onDisconnect(const ClientInformations& src, UDPPacket& packet);
