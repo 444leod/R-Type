@@ -171,7 +171,6 @@ pipeline {
         stage('Create GitHub Release') {
             steps {
                 script {
-                    // Extract version from CMakeLists.txt
                     def version = sh(
                         script: "grep 'project(R-Type VERSION' CMakeLists.txt | grep -o '[0-9]\\+\\.[0-9]\\+\\.[0-9]\\+'",
                         returnStdout: true
@@ -186,18 +185,18 @@ pipeline {
                                 sudo apt-get install -y gh
                             fi
 
-                            echo "$GITHUB_TOKEN" | gh auth login --with-token
+                            echo "\$GITHUB_TOKEN" | gh auth login --with-token
 
                             if gh release view ${tag} --repo github.com/${repo} &> /dev/null; then
                                 gh release delete ${tag} -y --repo github.com/${repo}
                                 git push origin :refs/tags/${tag} || true
                             fi
 
-                            gh release create ${tag} \
-                                --repo github.com/${repo} \
-                                --title "R-Type ${version}" \
-                                --notes "Release ${version}" \
-                                $(find ./build -name "r-type_*" -type f)
+                            gh release create ${tag} \\
+                                --repo github.com/${repo} \\
+                                --title "R-Type ${version}" \\
+                                --notes "Release \${version}" \\
+                                \$(find ./build -name "r-type_*" -type f)
 
                             gh auth logout
                         """
