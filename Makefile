@@ -6,7 +6,7 @@
 ##
 
 BUILD_DIR = build
-CLEAN_TARGETS = $(BUILD_DIR) CMakeCache.txt CMakeFiles
+CLEAN_TARGETS = $(BUILD_DIR) CMakeCache.txt CMakeFiles documentation/doxygen/html
 
 .PHONY: all deps configure build install clean conan docs
 
