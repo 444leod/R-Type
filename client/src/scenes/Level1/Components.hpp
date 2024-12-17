@@ -23,7 +23,9 @@ struct Self {};
 
 struct Hitbox {};
 
-struct Projectile {};
+struct Projectile {
+    std::uint32_t id;
+};
 
 struct Parallax {};
 
@@ -37,7 +39,9 @@ struct Animation {
     Velocity velocity{};
 };
 
-struct Enemy {};
+struct Enemy {
+    std::uint32_t id;
+};
 
 struct Bug {
     sf::Clock clock = sf::Clock();

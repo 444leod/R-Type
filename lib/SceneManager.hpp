@@ -141,7 +141,9 @@ public:
             const double elapsed = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(std::chrono::high_resolution_clock::now() - now).count() / 1000.0;
             if (elapsed < scene::FRAME_DURATION.count())
                 std::this_thread::sleep_for(scene::FRAME_DURATION - std::chrono::milliseconds(static_cast<int>(elapsed)));
-           #endif
+            #endif
+
+            this->_current->flush();
         }
     }
 

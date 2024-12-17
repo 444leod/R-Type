@@ -46,10 +46,19 @@ public:
 
     void remove(const Entity entity)
     {
-        for (auto const &[id, sparse] : _sparse_sets)
-            if (sparse->contains(entity))
-                sparse->remove(entity);
-        _entities.erase(std::find(_entities.begin(), _entities.end(), entity));
+        _queue_remove.push_back(entity);
+    }
+
+    void flush()
+    {
+        for (auto entity: _queue_remove)
+        {
+            for (auto const &[id, sparse] : _sparse_sets)
+                if (sparse->contains(entity))
+                    sparse->remove(entity);
+            _entities.erase(std::find(_entities.begin(), _entities.end(), entity));
+        }
+        _queue_remove.clear();
     }
 
     void clear()
@@ -97,6 +106,7 @@ public:
     }
 
 private:
+    std::vector<Entity> _queue_remove = {};
     std::vector<Entity> _entities = {};
     std::map<std::size_t, ISparseSet *> _sparse_sets = {};
 };

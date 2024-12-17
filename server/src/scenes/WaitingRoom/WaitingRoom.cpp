@@ -134,13 +134,13 @@ void WaitingRoom::onEnter()
     }
 
     auto exitButtonEntity = _registry.create();
-    _registry.addComponent<Position>(exitButtonEntity, {20.0f, 540.0f});
+    _registry.addComponent<Position>(exitButtonEntity, {20.0f, 20.0f});
     sf::RectangleShape exitButtonShape({100.0f, 40.0f});
     exitButtonShape.setFillColor(sf::Color::Red);
     _registry.addComponent<Button>(exitButtonEntity, {exitButtonShape, "Exit", [this](){ _onExit({}); }});
 
     auto startButtonEntity = _registry.create();
-    _registry.addComponent<Position>(startButtonEntity, {140.0f, 540.0f});
+    _registry.addComponent<Position>(startButtonEntity, {140.0f, 20.0f});
     sf::RectangleShape startButtonShape({100.0f, 40.0f});
     startButtonShape.setFillColor(sf::Color::Green);
     _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){ _onStart({}); }});
