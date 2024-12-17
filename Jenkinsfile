@@ -169,9 +169,6 @@ pipeline {
         }
 
         stage('Create GitHub Release') {
-            // when {
-            //     branch 'main'
-            // }
             steps {
                 script {
                     // Extract version from CMakeLists.txt
@@ -180,6 +177,8 @@ pipeline {
                         returnStdout: true
                     ).trim()
                     def tag = "v${version}"
+                    def repo = "444leod/R-Type"
+
                     withCredentials([string(credentialsId: 'github_pat_packages', variable: 'GITHUB_TOKEN')]) {
                         sh """
                             if ! command -v gh &> /dev/null; then
@@ -189,12 +188,13 @@ pipeline {
 
                             echo "$GITHUB_TOKEN" | gh auth login --with-token
 
-                            if gh release view ${tag} &> /dev/null; then
-                                gh release delete ${tag} -y
+                            if gh release view ${tag} --repo github.com/${repo} &> /dev/null; then
+                                gh release delete ${tag} -y --repo github.com/${repo}
                                 git push origin :refs/tags/${tag} || true
                             fi
 
                             gh release create ${tag} \
+                                --repo github.com/${repo} \
                                 --title "R-Type ${version}" \
                                 --notes "Release ${version}" \
                                 $(find ./build -name "r-type_*" -type f)
