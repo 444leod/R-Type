@@ -16,7 +16,6 @@ Download the latest release and install it. Also download the assets.
 
 ### How to use
 
-
 - Launch the server with the assets in the same folder
 - Launch the client with the assets in the same folder
 
@@ -27,3 +26,11 @@ Commands:
 - 'right' to move right
 - 'space' to shoot
 
+The goal is to kill the enemies and reach the end of the level.
+
+Shoot the enemies to kill them.
+
+[one](../../static/img/image.png)
+
+
+[one](../../static/img/enemy_dead.png)
