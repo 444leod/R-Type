@@ -1,3 +1,11 @@
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description:
+** main
+*/
+
+#include <SFML/Graphics.hpp>
 #include <thread>
 #include <memory>
 #include "Client.hpp"
