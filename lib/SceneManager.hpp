@@ -218,7 +218,6 @@ private:
 
     void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override
     {
-        std::cout << "Received packet from " << src.address().to_string() << ":" << src.port() << std::endl;
         if (this->_current != nullptr)
             this->_current->onPacketReceived(src, packet);
     }

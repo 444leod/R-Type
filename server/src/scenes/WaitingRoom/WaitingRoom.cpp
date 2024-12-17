@@ -81,18 +81,16 @@ void WaitingRoom::render(sf::RenderWindow& window)
     });
 }
 
-void WaitingRoom::onEvent(sf::Event &event) {
-
+void WaitingRoom::onEvent(sf::Event &event)
+{
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
         sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
         _registry.view<Position, Button>().each([&](const auto& entity, auto& pos, auto& button) {
             if (button.shape.getGlobalBounds().contains(mousePos)) {
-                std::cout << "Button clicked: " << button.label << std::endl;
                 button.onClick();
                 return;
             }
         });
-        std::cout << "After button click" << std::endl;
     }
     switch (event.type) {
         case sf::Event::KeyPressed:
@@ -120,7 +118,8 @@ void WaitingRoom::onEvent(sf::Event &event) {
     }
 }
 
-void WaitingRoom::onEnter() {
+void WaitingRoom::onEnter()
+{
     _registry.clear();
 
     float y = 50.0f;
@@ -151,17 +150,18 @@ void WaitingRoom::onEnter(const AScene& lastScene)
 }
 
 void WaitingRoom::onExit() {
-    std::cout << "Exiting totally..." << std::endl;
 }
 
-void WaitingRoom::onExit(const AScene& nextScene) {
+void WaitingRoom::onExit(const AScene& nextScene)
+{
 }
 
-void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
+void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet)
+{
 
     const auto payload = packet.payload;
-    std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
-        << ", ack: " << packet.ack_number << ")" << std::endl;
+    // std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
+    //     << ", ack: " << packet.ack_number << ")" << std::endl;
 
     PACKET_TYPE packet_type{};
     packet >> packet_type;
@@ -187,14 +187,16 @@ void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket
         _packet_handlers.at(packet_type)(*it, packet);
 }
 
-void WaitingRoom::_broadcast(const UDPPacket& packet) {
+void WaitingRoom::_broadcast(const UDPPacket& packet)
+{
     for (auto&[endpoint, type, name, id] : this->_clients)
     {
         _manager.send(endpoint, packet);
     }
 }
 
-void WaitingRoom::_onConnect(const ClientInformations& source, UDPPacket& packet) {
+void WaitingRoom::_onConnect(const ClientInformations& source, UDPPacket& packet)
+{
     std::string name;
     packet >> name;
     std::cout << "Client connected: " << name << std::endl;
@@ -221,20 +223,23 @@ void WaitingRoom::_onDisconnect(const ClientInformations& source, UDPPacket& pac
     //send informations about players connected
 }
 
-void WaitingRoom::_onMessage(const ClientInformations& source, UDPPacket& packet) {
+void WaitingRoom::_onMessage(const ClientInformations& source, UDPPacket& packet)
+{
     std::string message;
     packet >> message;
     std::cout << "Message from " << source.endpoint << ": " << message << std::endl;
 }
 
-void WaitingRoom::_onExit(const std::vector<std::string>& args) {
+void WaitingRoom::_onExit(const std::vector<std::string>& args)
+{
     std::cout << "Exiting..." << std::endl;
     _manager.stop();
 
     this->_broadcast(UDPPacket{} << PACKET_TYPE::DISCONNECT);
 }
 
-void WaitingRoom::_onStart(const std::vector<std::string>& args) {
+void WaitingRoom::_onStart(const std::vector<std::string>& args)
+{
     std::cout << "Starting game..." << std::endl;
 
     if (this->_clients.empty())

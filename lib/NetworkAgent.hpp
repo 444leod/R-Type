@@ -73,8 +73,6 @@ protected:
     void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet)
     {
         auto serialized = packet.serialize();
-        std::cout << "Sending packet to " << dest.address().to_string() << ":" << dest.port() << std::endl;
-        std::cout << "Packet content: " << packet.payload << std::endl;
         this->_socket.async_send_to(
             asio::buffer(serialized), dest,
             std::bind(

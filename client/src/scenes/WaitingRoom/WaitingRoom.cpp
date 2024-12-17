@@ -38,14 +38,11 @@ void WaitingRoom::initialize()
     const auto addr = asio::ip::address::from_string(ip);
     this->_server = asio::ip::udp::endpoint(addr, port);
 
-    std::cout << "Connecting to the server: " << ip << ":" << port << std::endl;
-
     UDPPacket packet;
     packet << PACKET_TYPE::CONNECT;
     packet << "CONNECT";
 
     _manager.send(this->_server, packet);
-    std::cout << "Connecting to the server..." << std::endl;
 }
 
 void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
@@ -110,21 +107,20 @@ void WaitingRoom::onEnter(const AScene& lastScene)
 {
 }
 
-void WaitingRoom::onExit() {
-    std::cout << "Exiting totally..." << std::endl;
+void WaitingRoom::onExit()
+{
 }
 
-void WaitingRoom::onExit(const AScene& nextScene) {
+void WaitingRoom::onExit(const AScene& nextScene)
+{
 }
 
-void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
-
+void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet)
+{
     const auto payload = packet.payload;
 
-    std::cout << "quoicoubeh" << std::endl;
-
-    std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
-              << ", ack: " << packet.ack_number << ")" << std::endl;
+    // std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
+    //           << ", ack: " << packet.ack_number << ")" << std::endl;
 
     PACKET_TYPE packet_type{};
     packet >> packet_type;
@@ -132,11 +128,13 @@ void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket
         _packet_handlers.at(packet_type)(packet);
 }
 
-void WaitingRoom::send(const UDPPacket& packet) {
+void WaitingRoom::send(const UDPPacket& packet)
+{
     _manager.send(this->_server, packet);
 }
 
-void WaitingRoom::_onConnect(UDPPacket& packet) {
+void WaitingRoom::_onConnect(UDPPacket& packet)
+{
 
     std::uint32_t id;
     packet >> id;
@@ -145,16 +143,19 @@ void WaitingRoom::_onConnect(UDPPacket& packet) {
     std::cout << "Connected to the server" << std::endl;
 }
 
-void WaitingRoom::_onDisconnect(UDPPacket& packet) {
+void WaitingRoom::_onDisconnect(UDPPacket& packet)
+{
     _manager.stop();
 }
 
-void WaitingRoom::_onMessage(UDPPacket& packet) {
+void WaitingRoom::_onMessage(UDPPacket& packet)
+{
     std::string message;
     packet >> message;
     std::cout << "Message from " << this->_server << ": " << message << std::endl;
 }
 
-void WaitingRoom::_onStart(UDPPacket& packet) {
+void WaitingRoom::_onStart(UDPPacket& packet)
+{
     std::cout << "Game starting..." << std::endl;
 }
