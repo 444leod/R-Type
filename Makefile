@@ -6,7 +6,7 @@
 ##
 
 BUILD_DIR = build
-CLEAN_TARGETS = $(BUILD_DIR) CMakeCache.txt CMakeFiles
+CLEAN_TARGETS = $(BUILD_DIR) CMakeCache.txt CMakeFiles documentation/doxygen/html
 
 .PHONY: all deps configure build install clean conan docs
 
@@ -22,7 +22,8 @@ conan_ci:
 
 deps:
 	conan profile detect --force
-	conan install . --output-folder=$(BUILD_DIR) --build=missing -c tools.system.package_manager:mode=install
+	conan install . --output-folder=$(BUILD_DIR) --build=missing -c tools.system.package_manager:mode=install -c tools.system.package_manager:sudo=True
+
 
 deps_windows_release:
 	conan profile detect --force
@@ -43,3 +44,4 @@ clean:
 docs:
 	./documentation/doxygen/generator
 	doxygen ./documentation/doxygen/Doxyfile
+	xdg-open documentation/doxygen/html/index.html

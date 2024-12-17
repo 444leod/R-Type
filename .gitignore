@@ -60,11 +60,14 @@ r-type_client
 r-type_server
 rtype_venv
 
+# Docusaurus specific
+node_modules/**
+
 # Generated docs
+docs/html/**
 documentation/doxygen/html
-documentation/doxygen/css
+documentation/doxygen/css/awesome.css
 # Bear
 .cache
 
-docs/html/**
-node_modules/**
+package-lock.json
