@@ -28,26 +28,55 @@ pipeline {
                                 }
                             }
                         }
-                        stage('Docker Build and Publish') {
+                        stage('Docker Build') {
                             when {
                                 expression { (!!changes) == true }
                             }
                             steps {
-                                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                                    script {
+                                script {
+                                    env.DOCKER_BUILD_SUCCESS = 'false'
+                                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                                         sh '''
                                             cd documentation/docusaurus
                                             docker build -t rtype-documentation:latest .
                                         '''
+                                        env.DOCKER_BUILD_SUCCESS = 'true'
+                                    }
+                                }
+                            }
+                        }
+                        stage('Docker Publish') {
+                            when {
+                                expression { (!!changes) == true && env.DOCKER_BUILD_SUCCESS == 'true' }
+                            }
+                            steps {
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                                    script {
                                         sh 'echo $GITHUB_GHCR_PAT | docker login ghcr.io -u a9ex --password-stdin'
                                         sh 'docker tag rtype-documentation:latest ghcr.io/epitechpromo2027/rtype-documentation:latest'
                                         sh 'docker push ghcr.io/epitechpromo2027/rtype-documentation:latest'
+                                    }
+                                }
+                            }
+                        }
+                        stage('Notify Server') {
+                            when {
+                                expression { (!!changes) == true && env.DOCKER_BUILD_SUCCESS == 'true' }
+                            }
+                            steps {
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                                    script {
                                         sh 'curl --fail-with-body --header "Authorization: Bearer $TOKEN_TA_NOTIFIER" https://mytanotifier.a1ex.fr/api/build-rtype-docs'
                                     }
                                 }
                             }
-                            post {
-                                always {
+                        }
+                        stage('Docker Cleanup') {
+                            when {
+                                expression { (!!changes) == true }
+                            }
+                            steps {
+                                script {
                                     sh 'docker logout ghcr.io'
                                 }
                             }
