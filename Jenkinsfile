@@ -57,96 +57,92 @@ pipeline {
                         }
                     }
                 }
-                stage('Build and Publish Binaries') {
-                    parallel {
-                        stage('Linux') {
-                            agent {
-                                docker {
-                                    image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
-                                    args '-u root'
-                                }
-                            }
-                            stages {
-                                stage('Install conan') {
-                                    steps {
-                                        script {
-                                            sh '''#!/bin/bash
-                                                make clean
-                                                make conan_ci
-                                            '''
-                                        }
-                                    }
-                                }
-                                stage('Install deps') {
-                                    steps {
-                                        script {
-                                            sh '''#!/bin/bash
-                                                source rtype_venv/bin/activate
-                                                make deps
-                                            '''
-                                        }
-                                    }
-                                }
-                                stage('Build binaries') {
-                                    steps {
-                                        script {
-                                            sh '''#!/bin/bash
-                                                make
-                                            '''
-                                        }
-                                    }
-                                }
-                                stage('Archive artifacts') {
-                                    steps {
-                                        archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
-                                        archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
-                                    }
+                stage('Linux Build') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            args '-u root'
+                        }
+                    }
+                    stages {
+                        stage('Install conan') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
+                                        make clean
+                                        make conan_ci
+                                    '''
                                 }
                             }
                         }
-                        stage('Windows') {
-                            agent {
-                                docker {
-                                    image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps-win'
-                                    args '-u root'
+                        stage('Install deps') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
+                                        source rtype_venv/bin/activate
+                                        make deps
+                                    '''
                                 }
                             }
-                            stages {
-                                stage('Install conan') {
-                                    steps {
-                                        script {
-                                            sh '''#!/bin/bash
-                                                make clean
-                                                make conan_ci
-                                            '''
-                                        }
-                                    }
+                        }
+                        stage('Build binaries') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
+                                        make
+                                    '''
                                 }
-                                stage('Install deps') {
-                                    steps {
-                                        script {
-                                            sh '''#!/bin/bash
-                                                source rtype_venv/bin/activate
-                                                make deps_windows_release
-                                            '''
-                                        }
-                                    }
+                            }
+                        }
+                        stage('Archive artifacts') {
+                            steps {
+                                archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
+                                archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
+                            }
+                        }
+                    }
+                }
+                stage('Windows Build') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps-win'
+                            args '-u root'
+                        }
+                    }
+                    stages {
+                        stage('Install conan') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
+                                        make clean
+                                        make conan_ci
+                                    '''
                                 }
-                                stage('Build exe') {
-                                    steps {
-                                        script {
-                                            sh '''#!/bin/bash
-                                                make
-                                            '''
-                                        }
-                                    }
+                            }
+                        }
+                        stage('Install deps') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
+                                        source rtype_venv/bin/activate
+                                        make deps_windows_release
+                                    '''
                                 }
-                                stage('Archive artifacts') {
-                                    steps {
-                                        archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
-                                        archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
-                                    }
+                            }
+                        }
+                        stage('Build exe') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
+                                        make
+                                    '''
                                 }
+                            }
+                        }
+                        stage('Archive artifacts') {
+                            steps {
+                                archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
+                                archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
                             }
                         }
                     }
