@@ -125,6 +125,7 @@ pipeline {
                         docker {
                             image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
                             args '-u root'
+                            alwaysPull true
                         }
                     }
                     stages {
