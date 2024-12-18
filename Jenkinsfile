@@ -11,6 +11,9 @@ pipeline {
             failFast false
             parallel {
                 stage('Documentation') {
+                    when {
+                        branch 'main'
+                    }
                     stages {
                         stage('Check Changes') {
                             steps {
