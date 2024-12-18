@@ -78,7 +78,7 @@ pipeline {
                 stage('Linux') {
                     agent {
                         docker {
-                            image 'ghcr.io/a9ex/epitech-devcontainer@sha256:3222291beff662c9570eff60887c0d8e0cf02e4e26f8f4f58f91cd7120095fa4'
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
                             args '-u root'
                         }
                     }
@@ -123,7 +123,7 @@ pipeline {
                 stage('Windows') {
                     agent {
                         docker {
-                            image 'ghcr.io/a9ex/ubuntu-24-mingw:latest'
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
                             args '-u root'
                         }
                     }
