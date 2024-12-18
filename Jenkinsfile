@@ -19,7 +19,7 @@ pipeline {
                             steps {
                                 script {
                                     changes = sh(
-                                        script: "git diff-tree --no-commit-id --name-only -r HEAD | grep -E '^documentation/docusaurus/|^Jenkinsfile\\$' || true",
+                                        script: 'git diff-tree --no-commit-id --name-only -r HEAD | grep -E "^documentation/docusaurus/|^Jenkinsfile$" || true',
                                         returnStdout: true
                                     ).trim()
                                     if (!changes) {
