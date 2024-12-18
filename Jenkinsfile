@@ -10,10 +10,7 @@ pipeline {
         stage('Parallel Builds') {
             failFast false
             parallel {
-                stage('Documentation Pipeline') {
-                    when {
-                        branch 'main'
-                    }
+                stage('Documentation') {
                     stages {
                         stage('Check Changes') {
                             steps {
