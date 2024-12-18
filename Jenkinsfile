@@ -124,9 +124,8 @@ pipeline {
                 stage('Windows') {
                     agent {
                         docker {
-                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps-win'
                             args '-u root'
-                            alwaysPull true
                         }
                     }
                     stages {

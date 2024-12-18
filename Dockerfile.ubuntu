@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     pkg-config \
     mingw-w64 \
+    libasound2-dev \
     && apt-get clean
 
 RUN (type -p wget >/dev/null || (apt update && apt-get install wget -y)) \
@@ -25,6 +26,8 @@ RUN (type -p wget >/dev/null || (apt update && apt-get install wget -y)) \
 
 COPY conanfile.txt .
 
+# COPY profiles/windows .
+
 RUN python3 -m venv .venv
 
 RUN .venv/bin/pip3 install conan
@@ -32,3 +35,5 @@ RUN .venv/bin/pip3 install conan
 RUN .venv/bin/conan profile detect --force
 
 RUN .venv/bin/conan install . --build=missing -c tools.system.package_manager:mode=install
+
+# RUN .venv/bin/conan install . --build=missing -c tools.system.package_manager:mode=install --profile windows
