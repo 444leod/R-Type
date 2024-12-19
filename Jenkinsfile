@@ -188,11 +188,14 @@ pipeline {
                 }
             }
             steps {
-                unstash 'artifacts'
+                copyArtifacts(
+                    projectName: env.JOB_NAME,
+                    selector: specific(env.BUILD_NUMBER)
+                )
                 sh """
                     chmod +x ./create_github_release.sh
-                    GITHUB_TOKEN=$GITHUB_GHCR_PAT ./create_github_release.sh
-                """
+                        GITHUB_TOKEN=$GITHUB_GHCR_PAT ./create_github_release.sh
+                    """
             }
         }
     }
