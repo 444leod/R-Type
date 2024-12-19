@@ -1,46 +1,42 @@
 #!/bin/bash
 
-# Extract version from CMakeLists.txt
 version=$(sed -n 's/project(rtype VERSION \([^)]*\))/\1/p' CMakeLists.txt)
 if [ -z "$version" ]; then
     echo "Error: Could not extract version from CMakeLists.txt"
     exit 1
 fi
 
-# Set tag based on version
+increment_version() {
+    local version=$1
+    IFS='.' read -r major minor patch <<< "$version"
+    patch=$((patch + 1))
+    echo "$major.$minor.$patch"
+}
+
 tag="v${version}"
 repo="444leod/R-Type"
 
-RELEASE_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-                                "https://api.github.com/repos/$repo/releases/tags/$tag" | \
-                                grep -o '"id": [0-9]\\+' | head -n1 | cut -d' ' -f2 || echo '')
+while gh release view "$tag" --repo "$repo" &> /dev/null; do
+    echo "Release $tag already exists. Incrementing version..."
+    version=$(increment_version "$version")
+    tag="v${version}"
+done
 
-if [ ! -z "$RELEASE_ID" ]; then
-    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-        "https://api.github.com/repos/$repo/releases/$RELEASE_ID"
-    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
-        "https://api.github.com/repos/$repo/git/refs/tags/$tag"
+echo "$GITHUB_TOKEN" | gh auth login --with-token
+
+artifacts=$(find ./build -name "r-type_*" -type f)
+if [ -z "$artifacts" ]; then
+    echo "Error: No artifacts found matching r-type_*"
+    exit 1
 fi
 
-RELEASE_RESPONSE=$(curl -X POST \
-    -H "Authorization: token $GITHUB_TOKEN" \
-    -H "Content-Type: application/json" \
-    "https://api.github.com/repos/$repo/releases" \
-    -d '{
-        "tag_name": "'$tag'",
-        "name": "R-Type '${version}'",
-        "body": "Release '${version}'",
-        "draft": false,
-        "prerelease": false
-    }')
+echo "Creating new release $tag..."
+gh release create "$tag" \
+    --repo "$repo" \
+    --generate-notes \
+    --title "R-Type ${version}" \
+    $artifacts
 
-UPLOAD_URL=$(echo "$RELEASE_RESPONSE" | grep -o '"upload_url": "[^"]*' | cut -d'"' -f4 | sed 's/{?name,label}//')
+gh auth logout
 
-for artifact in $(find ./build -name "r-type_*" -type f); do
-    filename=$(basename "$artifact")
-    curl -X POST \
-        -H "Authorization: token $GITHUB_TOKEN" \
-        -H "Content-Type: application/octet-stream" \
-        "$UPLOAD_URL?name=$filename" \
-        --data-binary @"$artifact"
-done
+echo "Release $tag created successfully!"

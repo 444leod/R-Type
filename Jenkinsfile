@@ -127,6 +127,7 @@ pipeline {
                             steps {
                                 archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
                                 archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
+                                stash name: 'artifacts', includes: 'build/client/r-type_*,build/server/r-type_*'
                             }
                         }
                     }
@@ -172,20 +173,25 @@ pipeline {
                             steps {
                                 archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
                                 archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
+                                stash name: 'artifacts', includes: 'build/client/r-type_*,build/server/r-type_*'
                             }
                         }
                     }
                 }
             }
         }
-        stage('Create Release') {
-            when {
-                branch 'main'
+        stage('Create GitHub Release') {
+            agent {
+                docker {
+                    image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                    args '-u root'
+                }
             }
             steps {
+                unstash 'artifacts'
                 sh """
                     chmod +x ./create_github_release.sh
-                    ./create_github_release.sh
+                    GITHUB_TOKEN=$GITHUB_GHCR_PAT ./create_github_release.sh
                 """
             }
         }
