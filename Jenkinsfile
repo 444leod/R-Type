@@ -28,6 +28,7 @@ pipeline {
                     )
                     releaseTag = commandOutput.split('\n').find { it.startsWith('TAG_START') }?.replaceAll('TAG_START(.*)TAG_END', '$1')
 
+                    echo commandOutput
                     echo "Created release draft with tag: ${releaseTag}"
                 }
             }
