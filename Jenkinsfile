@@ -174,6 +174,7 @@ pipeline {
                                 archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
                                 archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
                                 stash name: 'artifacts', includes: 'build/client/r-type_*,build/server/r-type_*'
+                                unstash 'artifacts'
                             }
                         }
                     }
@@ -188,10 +189,7 @@ pipeline {
                 }
             }
             steps {
-                copyArtifacts(
-                    projectName: env.JOB_NAME,
-                    selector: specific(env.BUILD_NUMBER)
-                )
+                unstash 'artifacts'
                 sh """
                     chmod +x ./create_github_release.sh
                         GITHUB_TOKEN=$GITHUB_GHCR_PAT ./create_github_release.sh
