@@ -24,19 +24,13 @@ done
 
 echo "$GITHUB_TOKEN" | gh auth login --with-token
 
-artifacts=$(find ./build -name "r-type_*" -type f)
-if [ -z "$artifacts" ]; then
-    echo "Error: No artifacts found matching r-type_*"
-    exit 1
-fi
-
-echo "Creating new release $tag..."
+echo "Creating new release draft $tag..."
 gh release create "$tag" \
     --repo "$repo" \
+    --draft \
     --generate-notes \
-    --title "R-Type ${version}" \
-    $artifacts
+    --title "R-Type ${version}"
 
 gh auth logout
 
-echo "Release $tag created successfully!"
+echo "$tag"

@@ -1,4 +1,5 @@
 def changes
+def releaseTag
 
 pipeline {
     agent any
@@ -7,6 +8,26 @@ pipeline {
         TOKEN_TA_NOTIFIER = credentials('my_ta_notifier_api')
     }
     stages {
+        stage('Create GitHub Release Draft') {
+            agent {
+                docker {
+                    image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                    args '-u root'
+                }
+            }
+            steps {
+                script {
+                    releaseTag = sh(
+                        script: """
+                            chmod +x ./create_github_release.sh
+                            GITHUB_TOKEN=$GITHUB_GHCR_PAT ./create_github_release.sh
+                        """,
+                        returnStdout: true
+                    ).trim()
+                    echo "Created release draft with tag: ${releaseTag}"
+                }
+            }
+        }
         stage('Parallel Builds') {
             failFast false
             parallel {
@@ -130,6 +151,19 @@ pipeline {
                                 stash name: 'artifacts', includes: 'build/client/r-type_*,build/server/r-type_*'
                             }
                         }
+                        stage('Upload Linux Artifacts') {
+                            when {
+                                expression { releaseTag != null }
+                            }
+                            steps {
+                                script {
+                                    sh """
+                                        chmod +x ./upload_artifacts.sh
+                                        GITHUB_TOKEN=$GITHUB_GHCR_PAT RELEASE_TAG='${releaseTag}' ./upload_artifacts.sh
+                                    """
+                                }
+                            }
+                        }
                     }
                 }
                 stage('Windows Build') {
@@ -178,23 +212,21 @@ pipeline {
                                 unstash 'artifacts'
                             }
                         }
+                        stage('Upload Windows Artifacts') {
+                            when {
+                                expression { releaseTag != null }
+                            }
+                            steps {
+                                script {
+                                    sh """
+                                        chmod +x ./upload_artifacts.sh
+                                        GITHUB_TOKEN=$GITHUB_GHCR_PAT RELEASE_TAG='${releaseTag}' ./upload_artifacts.sh
+                                    """
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        }
-        stage('Create GitHub Release') {
-            agent {
-                docker {
-                    image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
-                    args '-u root'
-                }
-            }
-            steps {
-                unstash 'artifacts'
-                sh """
-                    chmod +x ./create_github_release.sh
-                        GITHUB_TOKEN=$GITHUB_GHCR_PAT ./create_github_release.sh
-                    """
             }
         }
     }
