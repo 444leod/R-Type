@@ -25,6 +25,7 @@ pipeline {
                         """,
                         returnStdout: true
                     ).trim()
+                    cat output.txt
                     echo "Created release draft with tag: ${releaseTag}"
                 }
             }

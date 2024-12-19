@@ -2,7 +2,7 @@
 
 version=$(sed -n 's/project(rtype VERSION \([^)]*\))/\1/p' CMakeLists.txt)
 if [ -z "$version" ]; then
-    echo "Error: Could not extract version from CMakeLists.txt" >&2
+    echo "Error: Could not extract version from CMakeLists.txt" > output.txt
     exit 1
 fi
 
@@ -17,22 +17,21 @@ tag="v${version}"
 repo="444leod/R-Type"
 
 while gh release view "$tag" --repo "$repo" &> /dev/null; do
-    echo "Release $tag already exists. Incrementing version..." >&2
+    echo "Release $tag already exists. Incrementing version..." > output.txt
     version=$(increment_version "$version")
     tag="v${version}"
 done
 
 # Redirect gh command output to stderr
-echo "$GITHUB_TOKEN" | gh auth login --with-token 1>&2
+echo "$GITHUB_TOKEN" | gh auth login --with-token > output.txt
 
-echo "Creating new release draft $tag..." >&2
+echo "Creating new release draft $tag..." > output.txt
 gh release create "$tag" \
     --repo "$repo" \
     --draft \
     --generate-notes \
-    --title "R-Type ${version}" 1>&2
+    --title "R-Type ${version}" > output.txt
 
-gh auth logout 1>&2
+gh auth logout > output.txt
 
-# Only output that should be captured by Jenkins
 echo -n "$tag"
