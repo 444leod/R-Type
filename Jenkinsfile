@@ -1,5 +1,6 @@
 def changes
 def releaseTag
+def commandOutput
 
 pipeline {
     agent any
@@ -18,13 +19,15 @@ pipeline {
             }
             steps {
                 script {
-                    releaseTag = sh(
+                    commandOutput = sh(
                         script: """
                             chmod +x ./create_github_release.sh
                             ./create_github_release.sh
                         """,
                         returnStdout: true
-                    ).trim().split('\n').find { it.startsWith('TAG_START') }?.replaceAll('TAG_START(.*)TAG_END', '$1')
+                    )
+                    releaseTag = commandOutput.split('\n').find { it.startsWith('TAG_START') }?.replaceAll('TAG_START(.*)TAG_END', '$1')
+
                     echo "Created release draft with tag: ${releaseTag}"
                 }
             }
