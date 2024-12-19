@@ -171,6 +171,7 @@ pipeline {
                         }
                         stage('Archive artifacts') {
                             steps {
+                                sh 'chmod -R 777 .'
                                 archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
                                 archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
                                 stash name: 'artifacts', includes: 'build/client/r-type_*,build/server/r-type_*'
