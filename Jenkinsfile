@@ -6,6 +6,7 @@ pipeline {
     environment {
         GITHUB_GHCR_PAT = credentials('github_pat_packages')
         TOKEN_TA_NOTIFIER = credentials('my_ta_notifier_api')
+        GITHUB_RELEASE = credentials('github_pat_release')
     }
     stages {
         stage('Create GitHub Release Draft') {
@@ -20,7 +21,7 @@ pipeline {
                     releaseTag = sh(
                         script: """
                             chmod +x ./create_github_release.sh
-                            GITHUB_TOKEN=$GITHUB_GHCR_PAT ./create_github_release.sh
+                            GITHUB_TOKEN=$GITHUB_RELEASE ./create_github_release.sh
                         """,
                         returnStdout: true
                     ).trim()
@@ -159,7 +160,7 @@ pipeline {
                                 script {
                                     sh """
                                         chmod +x ./upload_artifacts.sh
-                                        GITHUB_TOKEN=$GITHUB_GHCR_PAT RELEASE_TAG='${releaseTag}' ./upload_artifacts.sh
+                                        GITHUB_TOKEN=$GITHUB_RELEASE RELEASE_TAG='${releaseTag}' ./upload_artifacts.sh
                                     """
                                 }
                             }
@@ -220,7 +221,7 @@ pipeline {
                                 script {
                                     sh """
                                         chmod +x ./upload_artifacts.sh
-                                        GITHUB_TOKEN=$GITHUB_GHCR_PAT RELEASE_TAG='${releaseTag}' ./upload_artifacts.sh
+                                        GITHUB_TOKEN=$GITHUB_RELEASE RELEASE_TAG='${releaseTag}' ./upload_artifacts.sh
                                     """
                                 }
                             }
