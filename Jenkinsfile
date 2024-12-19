@@ -21,11 +21,10 @@ pipeline {
                     releaseTag = sh(
                         script: """
                             chmod +x ./create_github_release.sh
-                            GITHUB_TOKEN=$GITHUB_RELEASE ./create_github_release.sh
+                            GITHUB_TOKEN=$GITHUB_RELEASE ./create_github_release.sh | grep -o 'TAG_START.*TAG_END' | sed 's/TAG_START\\(.*\\)TAG_END/\\1/'
                         """,
                         returnStdout: true
                     ).trim()
-                    cat output.txt
                     echo "Created release draft with tag: ${releaseTag}"
                 }
             }
