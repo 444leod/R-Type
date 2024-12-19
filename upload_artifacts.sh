@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "RELEASE_TAG: $RELEASE_TAG"
 if [ -z "$RELEASE_TAG" ]; then
     echo "Error: RELEASE_TAG environment variable is required"
     exit 1
