@@ -71,7 +71,7 @@ public:
         std::string _message; ///< The exception message.
     };
 
-    explicit SceneManager(asio::io_context& io_context, const int& port = 0) : NetworkAgent(io_context, port)
+    explicit SceneManager(const int& port = 0) : NetworkAgent(port)
     {
         _window.setKeyRepeatEnabled(false);
     }
