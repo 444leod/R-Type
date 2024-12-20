@@ -10,9 +10,8 @@
 #include <asio.hpp>
 #include <iostream>
 #include "UDPPacket.hpp"
-#include "Events.hpp"
 #include <cstdint>
-#include <SFML/Graphics.hpp>
+
 /**
  * @brief This enum will describe what the packet is for.
  *
@@ -56,11 +55,6 @@ struct ClientInformations {
     ClientInformations& operator=(const ClientInformations&) = default;
 };
 
-struct UserInput : public IEvent {
-    sf::Keyboard::Key key;
-    bool pressed;
-};
-
 /**
  * @brief Class representation of an object connected via socket, that can receive and send packets.
  */
@@ -80,6 +74,9 @@ public:
         std::cout << "NetworkAgent started, listening on port: " << this->_socket.local_endpoint().address().to_string() << ":" << this->_port << "..." << std::endl;
     }
     virtual ~NetworkAgent() = default;
+
+    virtual void run() = 0;
+    virtual void stop() = 0;
 
 protected:
     /**

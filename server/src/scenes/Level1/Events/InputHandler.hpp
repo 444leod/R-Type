@@ -9,6 +9,7 @@
 #define PLAYERMOVEMENT_HPP
 
 #include "../Components.hpp"
+#include "../../UserInput.hpp"
 #include "EventDispatcher.hpp"
 #include "Registry.hpp"
 #include "NetworkAgent.hpp"
@@ -18,7 +19,7 @@
 class InputHandler : public EventHandler<UserInput> {
 public:
     explicit InputHandler(Registry& registry) : _registry(registry) {}
-    ~InputHandler() override = default;
+    ~InputHandler() = default;
 
     void receive(const UserInput& event) override {
     }

@@ -9,14 +9,12 @@
 #include <cmath>
 #include <config.h>
 #include <iostream>
-#include <ranges>
-#include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include "Level1.hpp"
 #include "Registry.hpp"
-#include "NetworkAgent.hpp"
 #include "Global.hpp"
+#include "../UserInput.hpp"
 
 void Level1::initialize() {}
 
@@ -71,11 +69,10 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
             if (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16)))
                 return;
 
-            UDPPacket packet;
+            /* UDPPacket packet;
             packet << PACKET_TYPE::MONSTER_KILLED << e_enemy.id << p_projectile.id;
             for (auto client: CLIENTS)
-                _manager.send(client.endpoint, packet);
-
+                _manager.send(client.endpoint, packet); */
             const auto explosion = _registry.create();
             auto explosionSprite = sf::Sprite(_explosionTex);
             explosionSprite.setOrigin(16, 16);
@@ -201,7 +198,7 @@ void Level1::onEnter(const AScene& lastScene)
         std::cout << "Client " << client.id << " connected" << std::endl;
         std::cout << "Endpoint: " << client.endpoint << std::endl;
 
-        _manager.send(client.endpoint, UDPPacket{} << PACKET_TYPE::MESSAGE << "Welcome to the game!");
+        //_manager.send(client.endpoint, UDPPacket{} << PACKET_TYPE::MESSAGE << "Welcome to the game!");
     }
 
     _registry.clear();
@@ -222,18 +219,18 @@ void Level1::onEnter(const AScene& lastScene)
         #endif
 
         {
-            UDPPacket packet;
+            /* UDPPacket packet;
             packet << PACKET_TYPE::NEW_SHIP << client.id;
             for (const auto& subclient : CLIENTS) {
                 if (subclient.id == client.id)
                     continue;
                 _manager.send(subclient.endpoint, packet);
-            }
+            } */
         }
 
         UDPPacket self_ship;
         self_ship << PACKET_TYPE::YOUR_SHIP << client.id;
-        _manager.send(client.endpoint, self_ship);
+        //_manager.send(client.endpoint, self_ship);
     }
 
     const auto background = _registry.create();
@@ -248,18 +245,19 @@ void Level1::onEnter(const AScene& lastScene)
 
 void Level1::onExit()
 {
-    UDPPacket packet;
+    /* UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 
     for (const auto& client : CLIENTS) {
         _manager.send(client.endpoint, packet);
-    }
+    } */
 }
 
 void Level1::onExit(const AScene& nextScene)
 {
 }
 
+/*
 void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
         auto type = PACKET_TYPE{};
         packet >> type;
@@ -279,6 +277,7 @@ void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& pac
 
         _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet, .source = *begin});
 }
+ */
 
 void Level1::addBug(const Transform& transform) {
 
@@ -297,9 +296,9 @@ void Level1::addBug(const Transform& transform) {
         _registry.addComponent(bug, Debug{});
     #endif
 
-    UDPPacket packet;
+    /* UDPPacket packet;
     packet << PACKET_TYPE::NEW_MONSTER << _enemyId << transform;
     for (auto client: CLIENTS)
-        _manager.send(client.endpoint,  packet);
+        _manager.send(client.endpoint,  packet); */
     _enemyId++;
 }

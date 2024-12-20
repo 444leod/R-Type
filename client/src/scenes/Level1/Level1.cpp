@@ -209,13 +209,14 @@ void Level1::onExit()
     UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 
-    _manager.send(this->_server, packet);
+    //_manager.send(this->_server, packet);
 }
 
 void Level1::onExit(const AScene& nextScene)
 {
 }
 
+/*
 void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
         auto type = PACKET_TYPE{};
         packet >> type;
@@ -225,7 +226,7 @@ void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& pac
 //    auto spaceshipSprite = sf::Sprite(_spaceshipTex);
 //    spaceshipSprite.setOrigin(0, 0);
 //    spaceshipSprite.setScale(SCALE, SCALE);
-}
+} */
 
 void Level1::addProjectile(const Transform& transform){
     const auto projectile = _registry.create();

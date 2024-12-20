@@ -222,7 +222,7 @@ struct UDPPacket {
     template<typename T>
     UDPPacket& operator<<(T const& data) noexcept
     {
-        const std::uint8_t size = sizeof(T);
+        const std::uint32_t size = sizeof(T);
 
         this->append(&data, size);
 
@@ -310,12 +310,12 @@ struct UDPPacket {
      * @param data The data to append.
      * @param size The size of the data.
      */
-    void append(const void *data, const std::uint8_t size) noexcept
+    void append(const void *data, const std::uint32_t size) noexcept
     {
         const auto *raw_len = reinterpret_cast<const std::byte *>(&size);
         const auto *raw_data = static_cast<const std::byte *>(data);
 
-        this->raw_append(raw_len, sizeof(std::uint8_t));
+        this->raw_append(raw_len, sizeof(std::uint32_t));
         this->raw_append(raw_data, size);
     }
 
