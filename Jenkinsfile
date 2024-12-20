@@ -22,17 +22,23 @@ pipeline {
             }
             steps {
                 script {
-                    commandOutput = sh(
-                        script: """
-                            chmod +x ./scripts/create_github_release.sh
-                            ./scripts/create_github_release.sh
-                        """,
-                        returnStdout: true
-                    )
-                    releaseTag = commandOutput.split('\n').find { it.startsWith('TAG_START') }?.replaceAll('TAG_START(.*)TAG_END', '$1')
+                    try {
+                        commandOutput = sh(
+                            script: """
+                                chmod +x ./scripts/create_github_release.sh
+                                ./scripts/create_github_release.sh
+                            """,
+                            returnStdout: true
+                        )
+                        releaseTag = commandOutput.split('\n').find { it.startsWith('TAG_START') }?.replaceAll('TAG_START(.*)TAG_END', '$1')
 
-                    echo commandOutput
-                    echo "Created release draft with tag: ${releaseTag}"
+                        echo commandOutput
+                        echo "Created release draft with tag: ${releaseTag}"
+                    } catch (Exception e) {
+                        echo "Failed to create release draft"
+                        releaseTag = null
+                        currentBuild.result = 'UNSTABLE'
+                    }
                 }
             }
         }
