@@ -43,7 +43,7 @@ namespace scene {
  * @class SceneManager
  * @brief Manages the scenes in the application.
  */
-class SceneManager: public ISceneManager {
+class SceneManager final : public ISceneManager {
 public:
     /**
      * @class Exception
