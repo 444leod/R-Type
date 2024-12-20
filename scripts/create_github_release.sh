@@ -24,6 +24,7 @@ while gh release view "$tag" --repo "$repo" &> /dev/null; do
     tag="v${version}"
 done
 
+echo "Logging into GitHub..."
 echo "$GITHUB_TOKEN" | gh auth login --with-token
 
 echo "Creating new release draft $tag..."
@@ -33,9 +34,10 @@ gh release create "$tag" \
     --generate-notes \
     --title "R-Type ${version}"
 
+echo "Logging out of GitHub..."
 gh auth logout
 
 echo "Release draft created successfully!"
 
-# Print the tag alone on the last line for Jenkins to capture
+# Print the tag on its own line for Jenkins
 echo "TAG_START${tag}TAG_END"

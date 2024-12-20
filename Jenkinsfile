@@ -24,8 +24,8 @@ pipeline {
                 script {
                     commandOutput = sh(
                         script: """
-                            chmod +x ./create_github_release.sh
-                            ./create_github_release.sh
+                            chmod +x ./scripts/create_github_release.sh
+                            ./scripts/create_github_release.sh
                         """,
                         returnStdout: true
                     )
@@ -165,8 +165,8 @@ pipeline {
                             steps {
                                 script {
                                     sh """
-                                        chmod +x ./upload_artifacts.sh
-                                        RELEASE_TAG='${releaseTag}' ./upload_artifacts.sh
+                                        chmod +x ./scripts/upload_artifacts.sh
+                                        RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
                                     """
                                 }
                             }
@@ -223,8 +223,8 @@ pipeline {
                             steps {
                                 script {
                                     sh """
-                                        chmod +x ./upload_artifacts.sh
-                                        RELEASE_TAG='${releaseTag}' ./upload_artifacts.sh
+                                        chmod +x ./scripts/upload_artifacts.sh
+                                        RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
                                     """
                                 }
                             }
