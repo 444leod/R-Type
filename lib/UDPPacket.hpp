@@ -66,7 +66,7 @@ struct UDPPacket {
     uint32_t ack_number = 0; ///< Acknowledgment number of the packet.
     uint16_t payload_length = 0; ///< Length of the payload.
     uint16_t checksum = 0; ///< Checksum of the packet.
-    std::vector<std::byte> payload; ///< Payload of the packet.
+    std::vector<std::byte> payload = {}; ///< Payload of the packet.
 
     /**
      * @brief Exception class for UDPPacket errors.
@@ -222,7 +222,7 @@ struct UDPPacket {
     template<typename T>
     UDPPacket& operator<<(T const& data) noexcept
     {
-        const std::uint32_t size = sizeof(T);
+        const std::uint8_t size = sizeof(T);
 
         this->append(&data, size);
 
@@ -310,12 +310,13 @@ struct UDPPacket {
      * @param data The data to append.
      * @param size The size of the data.
      */
-    void append(const void *data, const std::uint32_t size) noexcept
+    void append(const void *data, std::uint8_t size) noexcept
     {
         const auto *raw_len = reinterpret_cast<const std::byte *>(&size);
         const auto *raw_data = static_cast<const std::byte *>(data);
 
-        this->raw_append(raw_len, sizeof(std::uint32_t));
+        this->payload.reserve(this->payload.size() + size + 1);
+        this->raw_append(raw_len, sizeof(std::uint8_t));
         this->raw_append(raw_data, size);
     }
 
@@ -379,7 +380,7 @@ private:
      * @param data The raw data.
      * @param size The size of the raw data.
      */
-    void raw_append(const std::byte *data, const std::uint8_t& size)
+    void raw_append(const std::byte *data, std::uint8_t size)
     {
         this->payload.insert(_end, data, data + size);
         this->payload_length += size;
@@ -393,7 +394,7 @@ private:
      * @param data The raw data.
      * @param size The size of the raw data.
      */
-    void raw_append(const void *data, const std::uint8_t& size)
+    void raw_append(const void *data, std::uint8_t size)
     {
         const auto *raw = static_cast<const std::byte *>(data);
         this->raw_append(raw, size);
