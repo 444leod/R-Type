@@ -11,8 +11,6 @@
 #include <cmath>
 #include <config.h>
 #include <iostream>
-#include <ranges>
-#include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include "Global.hpp"
@@ -75,7 +73,7 @@ void WaitingRoom::render(sf::RenderWindow& window)
         button.shape.setPosition(pos.x, pos.y);
         window.draw(button.shape);
 
-        sf::Text buttonText(button.label, font, 20);
+        sf::Text buttonText(button.label, _font, 20);
         buttonText.setPosition(pos.x + 10, pos.y + 10);
         buttonText.setFillColor(sf::Color::White);
         window.draw(buttonText);
@@ -127,7 +125,7 @@ void WaitingRoom::onEnter()
     for (const auto& client : CLIENTS) {
         auto entity = _registry.create();
         _registry.addComponent<Position>(entity, {50.0f, y});
-        sf::Text clientText("Client " + std::to_string(client.id), font, 20);
+        sf::Text clientText("Client " + std::to_string(client.id), _font, 20);
         clientText.setFillColor(sf::Color::White);
         _registry.addComponent<Renderable>(entity, {clientText});
         y += 30.0f;
@@ -155,14 +153,14 @@ void WaitingRoom::onExit()
     UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 
-    this->_broadcast(packet);
+    //this->_broadcast(packet);
 }
 
 void WaitingRoom::onExit(const AScene& nextScene)
 {
 }
 
-void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet)
+/* void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet)
 {
 
     const auto payload = packet.payload;
@@ -193,15 +191,15 @@ void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket
 
     if (_packet_handlers.contains(packet_type))
         _packet_handlers.at(packet_type)(*it, packet);
-}
+} */
 
-void WaitingRoom::_broadcast(const UDPPacket& packet)
+/* void WaitingRoom::_broadcast(const UDPPacket& packet)
 {
     for (auto&[endpoint, type, name, id] : CLIENTS)
     {
         _manager.send(endpoint, packet);
     }
-}
+} */
 
 void WaitingRoom::_onConnect(const ClientInformations& src, UDPPacket& packet)
 {
@@ -209,15 +207,15 @@ void WaitingRoom::_onConnect(const ClientInformations& src, UDPPacket& packet)
     packet >> name;
     std::cout << "Client connected: " << name << std::endl;
 
-    UDPPacket response;
+    /* UDPPacket response;
     response << PACKET_TYPE::CONNECT;
     response << src.id;
 
-    _manager.send(src.endpoint, response);
+    _manager.send(src.endpoint, response); */
 
     auto entity = _registry.create();
     _registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * CLIENTS.size()});
-    sf::Text clientText("Client " + std::to_string(src.id), font, 20);
+    sf::Text clientText("Client " + std::to_string(src.id), _font, 20);
     clientText.setFillColor(sf::Color::White);
     _registry.addComponent<Renderable>(entity, {clientText});
 }
@@ -243,7 +241,7 @@ void WaitingRoom::_onExit(const std::vector<std::string>& args)
     std::cout << "Exiting..." << std::endl;
     _manager.stop();
 
-    this->_broadcast(UDPPacket{} << PACKET_TYPE::DISCONNECT);
+    //this->_broadcast(UDPPacket{} << PACKET_TYPE::DISCONNECT);
 }
 
 void WaitingRoom::_onStart(const std::vector<std::string>& args)
@@ -256,6 +254,6 @@ void WaitingRoom::_onStart(const std::vector<std::string>& args)
         return;
     }
 
-    this->_broadcast(UDPPacket{} << PACKET_TYPE::START);
+    //this->_broadcast(UDPPacket{} << PACKET_TYPE::START);
     _manager.load("Level1");
 }

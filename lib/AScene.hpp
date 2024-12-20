@@ -11,14 +11,14 @@
 class SceneManager;
 
 #include <SFML/Graphics.hpp>
-#include "UDPPacket.hpp"
 #include "ISceneManager.hpp"
 #include "Registry.hpp"
 
 class AScene {
 public:
-    AScene(ISceneManager& manager, const std::string& name) :
-        _manager(manager), _name(name) {}
+    AScene(ISceneManager& manager, Registry& registry, const std::string& name) :
+        _manager(manager), _registry(registry), _name(name) {}
+
     virtual~AScene() = default;
 
     /**
@@ -73,16 +73,9 @@ public:
      */
     virtual void onExit(const AScene& nextScene) = 0;
 
-    virtual void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) = 0;
-
-    void flush()
-    {
-        this->_registry.flush();
-    }
-
 protected:
+    Registry& _registry;
     ISceneManager& _manager;
-    Registry _registry;
 
 private:
     const std::string& _name = "";

@@ -28,7 +28,7 @@ void WaitingRoom::render(sf::RenderWindow& window)
 {
     if (this->_id.has_value()) {
         sf::Text text;
-        text.setFont(font);
+        text.setFont(_font);
         text.setCharacterSize(30);
         text.setFillColor(sf::Color::White);
         text.setString("Connected to the server");
@@ -36,7 +36,7 @@ void WaitingRoom::render(sf::RenderWindow& window)
         window.draw(text);
     } else {
         sf::Text text;
-        text.setFont(font);
+        text.setFont(_font);
         text.setCharacterSize(30);
         text.setFillColor(sf::Color::White);
         text.setString("Connecting to the server...");
@@ -94,13 +94,13 @@ void WaitingRoom::onEnter() {
         port = std::stoi(port_str);
 
     const auto addr = asio::ip::address::from_string(ip);
-    SERVER = asio::ip::udp::endpoint(addr, port);
+    //SERVER = asio::ip::udp::endpoint(addr, port); //dead code
 
     UDPPacket packet;
     packet << PACKET_TYPE::CONNECT;
     packet << "ClientName";
 
-    _manager.send(SERVER, packet);
+    //_manager.send(SERVER, packet); //dead code
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene)
@@ -115,6 +115,7 @@ void WaitingRoom::onExit(const AScene& nextScene)
 {
 }
 
+/*
 void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet)
 {
     const auto payload = packet.payload;
@@ -126,14 +127,16 @@ void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket
     packet >> packet_type;
     if (_packet_handlers.contains(packet_type))
         _packet_handlers.at(packet_type)(packet);
-}
+} */
 
+/*
 void WaitingRoom::send(const UDPPacket& packet)
 {
     _manager.send(SERVER, packet);
 }
+ */
 
-void WaitingRoom::_onConnect(UDPPacket& packet)
+/* void WaitingRoom::_onConnect(UDPPacket& packet)
 {
 
     std::uint32_t id;
@@ -160,4 +163,4 @@ void WaitingRoom::_onStart(UDPPacket& packet)
 {
     std::cout << "Game starting..." << std::endl;
     _manager.load("Level1");
-}
+} */

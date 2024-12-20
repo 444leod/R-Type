@@ -12,20 +12,14 @@
 #include "Registry.hpp"
 #include "EventDispatcher.hpp"
 #include "Components.hpp"
-#include "NetworkedScene.hpp"
 #include <chrono>
 #include <functional>
 
-inline sf::Font get_default_font() {
-    sf::Font font;
-    font.loadFromFile("assets/arial.ttf");
-    return font;
-}
-
 class WaitingRoom final : public AScene {
 public:
-    WaitingRoom(ISceneManager& m, const std::string& n) : AScene(m, n)
+    WaitingRoom(ISceneManager& m, Registry& r, const std::string& n) : AScene(m, r, n)
     {
+        this->_font.loadFromFile("assets/arial.ttf");
     }
 
     void initialize() override;
@@ -44,7 +38,6 @@ public:
 
     void onExit(const AScene& nextScene) override;
 
-    void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
 private:
 
     void _onConnect(const ClientInformations& src, UDPPacket& packet);
@@ -54,7 +47,7 @@ private:
     void _onExit(const std::vector<std::string>& args);
     void _onStart(const std::vector<std::string>& args);
 
-    void _broadcast(const UDPPacket& packet);
+    //void _broadcast(const UDPPacket& packet);
 
 
 public:
@@ -62,13 +55,13 @@ private:
     Registry _registry;
     EventDispatcher _eventDispatcher;
 
-    sf::Font font = get_default_font();
+    sf::Font _font;
 
-    std::map<PACKET_TYPE, std::function<void(const ClientInformations& client, UDPPacket& packet)>> _packet_handlers = {
+    /* std::map<PACKET_TYPE, std::function<void(const ClientInformations& client, UDPPacket& packet)>> _packet_handlers = {
         {PACKET_TYPE::CONNECT,      [this](const ClientInformations& src, UDPPacket& packet)   { this->_onConnect(src, packet); }},
         {PACKET_TYPE::DISCONNECT,   [this](const ClientInformations& src, UDPPacket& packet)   { this->_onDisconnect(src, packet); }},
         {PACKET_TYPE::MESSAGE,      [this](const ClientInformations& src, UDPPacket& packet)   { this->_onMessage(src, packet); }}
-    };
+    }; */
 
     std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
         {"exit",    [this](const std::vector<std::string>& args) { this->_onExit(args); }},

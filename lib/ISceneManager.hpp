@@ -10,7 +10,6 @@
 
 #include <string>
 #include <asio.hpp>
-#include "UDPPacket.hpp"
 #include "NetworkAgent.hpp"
 
 /**
@@ -32,8 +31,6 @@ public:
      * @param name The name of the scene to load.
      */
     virtual void load(const std::string& name) = 0;
-
-    virtual void send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet) = 0;
 };
 
 #endif //ISCENEMANAGER_HPP

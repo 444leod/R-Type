@@ -9,6 +9,7 @@
 #define PLAYERMOVEMENT_HPP
 
 #include "../Components.hpp"
+#include "../../UserInput.hpp"
 #include "EventDispatcher.hpp"
 #include "Registry.hpp"
 
@@ -27,7 +28,7 @@ public:
         {
             UDPPacket packet;
             packet << PACKET_TYPE::USER_INPUT << event;
-            _manager.send(SERVER, packet);
+            //_manager.send(SERVER, packet);
             return;
         }
         switch (event.key)
@@ -39,7 +40,7 @@ public:
             {
                 UDPPacket packet;
                 packet << PACKET_TYPE::USER_INPUT << event;
-                _manager.send(SERVER, packet);
+                //_manager.send(SERVER, packet);
             }
             default:
                 break;

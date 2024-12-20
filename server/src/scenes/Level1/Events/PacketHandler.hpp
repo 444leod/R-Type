@@ -9,6 +9,7 @@
 #define PACKETHANDLER_HPP
 
 #include "../Components.hpp"
+#include "../../UserInput.hpp"
 #include "EventDispatcher.hpp"
 #include "Registry.hpp"
 #include "UDPPacket.hpp"
@@ -69,12 +70,12 @@ public:
                         break;
                     }
 
-                    UDPPacket packet;
+                    /* UDPPacket packet;
                     packet << PACKET_TYPE::SHIP_MOVEMENT << event.source.id << vel << pos;
                     for (const auto &client : CLIENTS)
                     {
                         _manager.send(client.endpoint, packet);
-                    }
+                    } */
                 }
             }
             else if (input.key == sf::Keyboard::Space)
@@ -97,11 +98,12 @@ public:
                     _registry.addComponent(projectile, shootTransform);
                     _registry.addComponent(projectile, Projectile{ .id = projectileId });
                     _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
-                    UDPPacket packet;
+
+                    /* UDPPacket packet;
                     packet << PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId;
                     for (const auto &client : CLIENTS)
                         _manager.send(client.endpoint, packet);
-                    projectileId++;
+                    projectileId++; */
                 }
             }
         }
