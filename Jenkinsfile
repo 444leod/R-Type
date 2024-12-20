@@ -11,9 +11,6 @@ pipeline {
     }
     stages {
         stage('Create GitHub Release Draft') {
-            when {
-                branch 'main'
-            }
             agent {
                 docker {
                     image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
@@ -164,6 +161,19 @@ pipeline {
                                 archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
                             }
                         }
+                        stage('Prepare Linux Release') {
+                            when {
+                                expression { releaseTag != null }
+                            }
+                            steps {
+                                script {
+                                    sh """
+                                        chmod +x ./scripts/prepare_release_artifacts.sh
+                                        ./scripts/prepare_release_artifacts.sh linux
+                                    """
+                                }
+                            }
+                        }
                         stage('Upload Linux Artifacts') {
                             when {
                                 expression { releaseTag != null }
@@ -220,6 +230,19 @@ pipeline {
                             steps {
                                 archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
                                 archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
+                            }
+                        }
+                        stage('Prepare Windows Release') {
+                            when {
+                                expression { releaseTag != null }
+                            }
+                            steps {
+                                script {
+                                    sh """
+                                        chmod +x ./scripts/prepare_release_artifacts.sh
+                                        ./scripts/prepare_release_artifacts.sh windows
+                                    """
+                                }
                             }
                         }
                         stage('Upload Windows Artifacts') {
