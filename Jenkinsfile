@@ -155,12 +155,6 @@ pipeline {
                                 }
                             }
                         }
-                        stage('Archive artifacts') {
-                            steps {
-                                archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
-                                archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
-                            }
-                        }
                         stage('Prepare Linux Release') {
                             when {
                                 expression { releaseTag != null }
@@ -184,6 +178,7 @@ pipeline {
                                         chmod +x ./scripts/upload_artifacts.sh
                                         RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
                                     """
+                                    archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
                                 }
                             }
                         }
@@ -226,12 +221,6 @@ pipeline {
                                 }
                             }
                         }
-                        stage('Archive artifacts') {
-                            steps {
-                                archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
-                                archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
-                            }
-                        }
                         stage('Prepare Windows Release') {
                             when {
                                 expression { releaseTag != null }
@@ -255,6 +244,7 @@ pipeline {
                                         chmod +x ./scripts/upload_artifacts.sh
                                         RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
                                     """
+                                    archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
                                 }
                             }
                         }
