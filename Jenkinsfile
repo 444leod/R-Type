@@ -7,75 +7,86 @@ pipeline {
         TOKEN_TA_NOTIFIER = credentials('my_ta_notifier_api')
     }
     stages {
-        stage('Build, Publish, Deploy Docusaurus') {
-            when {
-                branch 'main'
-            }
-            stages {
-                stage('Check Changes') {
-                    steps {
-                        script {
-                            changes = sh(
-                                script: "git diff-tree --no-commit-id --name-only -r HEAD | grep '^documentation/docusaurus/' || true",
-                                returnStdout: true
-                            ).trim()
-                            if (!changes) {
-                                echo "No changes detected in /documentation/docusaurus, ignoring Docker build."
-                            } else {
-                                echo "Changes detected in /documentation/docusaurus :"
-                                echo changes
-                            }
-                        }
-                    }
-                }
-                stage('Docker Build and Publish') {
+        stage('Parallel Builds') {
+            failFast false
+            parallel {
+                stage('Documentation') {
                     when {
-                        expression { (!!changes) == true }
+                        branch 'main'
                     }
                     stages {
-                        stage('Build Docker Image') {
+                        stage('Check Changes') {
                             steps {
                                 script {
-                                    sh '''
-                                        cd documentation/docusaurus
-                                        docker build -t rtype-documentation:latest .
-                                    '''
+                                    changes = sh(
+                                        script: 'git diff-tree --no-commit-id --name-only -r HEAD | grep -E "^documentation/docusaurus/|^Jenkinsfile$" || true',
+                                        returnStdout: true
+                                    ).trim()
+                                    if (!changes) {
+                                        echo "No changes detected in /documentation/docusaurus or Jenkinsfile, ignoring Docker build."
+                                    } else {
+                                        echo "Changes detected in /documentation/docusaurus or Jenkinsfile:"
+                                        echo changes
+                                    }
                                 }
                             }
                         }
-                        stage('Push Docker Image') {
+                        stage('Docker Build') {
+                            when {
+                                expression { (!!changes) == true }
+                            }
                             steps {
                                 script {
-                                    sh 'echo $GITHUB_GHCR_PAT | docker login ghcr.io -u a9ex --password-stdin'
-                                    sh 'docker tag rtype-documentation:latest ghcr.io/epitechpromo2027/rtype-documentation:latest'
-                                    sh 'docker push ghcr.io/epitechpromo2027/rtype-documentation:latest'
+                                    env.DOCKER_BUILD_SUCCESS = 'false'
+                                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                                        sh '''
+                                            cd documentation/docusaurus
+                                            docker build -t rtype-documentation:latest .
+                                        '''
+                                        env.DOCKER_BUILD_SUCCESS = 'true'
+                                    }
+                                }
+                            }
+                        }
+                        stage('Docker Publish') {
+                            when {
+                                expression { (!!changes) == true && env.DOCKER_BUILD_SUCCESS == 'true' }
+                            }
+                            steps {
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                                    script {
+                                        sh 'echo $GITHUB_GHCR_PAT | docker login ghcr.io -u a9ex --password-stdin'
+                                        sh 'docker tag rtype-documentation:latest ghcr.io/epitechpromo2027/rtype-documentation:latest'
+                                        sh 'docker push ghcr.io/epitechpromo2027/rtype-documentation:latest'
+                                    }
+                                }
+                            }
+                        }
+                        stage('Notify Server') {
+                            when {
+                                expression { (!!changes) == true && env.DOCKER_BUILD_SUCCESS == 'true' }
+                            }
+                            steps {
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                                    script {
+                                        sh 'curl --fail-with-body --header "Authorization: Bearer $TOKEN_TA_NOTIFIER" https://mytanotifier.a1ex.fr/api/build-rtype-docs'
+                                    }
+                                }
+                            }
+                        }
+                        stage('Docker Cleanup') {
+                            when {
+                                expression { (!!changes) == true }
+                            }
+                            steps {
+                                script {
+                                    sh 'docker logout ghcr.io'
                                 }
                             }
                         }
                     }
                 }
-                stage('Notify Server - Deploy docs') {
-                    when {
-                        expression { (!!changes) == true }
-                    }
-                    steps {
-                        script {
-                            sh 'curl --fail-with-body --header "Authorization: Bearer $TOKEN_TA_NOTIFIER" https://mytanotifier.a1ex.fr/api/build-rtype-docs'
-                        }
-                    }
-                }
-                stage('Docker logout') {
-                    steps {
-                        script {
-                            sh 'docker logout ghcr.io'
-                        }
-                    }
-                }
-            }
-        }
-        stage('Build and Publish Binaries') {
-            parallel {
-                stage('Linux') {
+                stage('Linux Build') {
                     agent {
                         docker {
                             image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
@@ -120,7 +131,7 @@ pipeline {
                         }
                     }
                 }
-                stage('Windows') {
+                stage('Windows Build') {
                     agent {
                         docker {
                             image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps-win'
