@@ -10,25 +10,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <cstdint>
-
-struct Transform {
-    float x, y, z;
-    float rotation;
-};
-
-struct Velocity {
-    float x, y;
-};
-
-struct Self {};
-
-struct Hitbox {};
-
-struct Projectile {
-    uint32_t id;
-};
-
-struct Parallax {};
+#include "BaseComponents.hpp"
 
 struct Animation {
     sf::Clock clock = sf::Clock();

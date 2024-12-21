@@ -27,6 +27,9 @@ struct Projectile {
     std::uint32_t id;
 };
 
-struct Parallax {};
+struct Parallax {
+    int offsetMultiplier;
+    float offset = 0;
+};
 
 #endif /* !BASECOMPONENTS_HPP_ */

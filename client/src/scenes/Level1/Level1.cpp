@@ -25,7 +25,7 @@ void Level1::initialize()
 }
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
-    _sysParalax.execute(deltaTime);
+    _sysParalax.execute(deltaTime, window);
 
     auto view = _registry.view<Transform, Velocity>();
 
@@ -186,7 +186,7 @@ void Level1::onEnter() {
 
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
-    _registry.addComponent(background, Parallax{});
+    _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 }
 
 void Level1::onEnter(const AScene& lastScene)
@@ -199,7 +199,7 @@ void Level1::onEnter(const AScene& lastScene)
 
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
-    _registry.addComponent(background, Parallax{});
+    _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 }
 
 void Level1::onExit()

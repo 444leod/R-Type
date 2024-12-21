@@ -12,6 +12,8 @@
 #include "Registry.hpp"
 #include "EventDispatcher.hpp"
 #include "Components.hpp"
+#include "BaseComponents.hpp"
+#include "Systems/ParalaxSystem.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
 #include <chrono>
@@ -53,7 +55,6 @@ public:
 private:
     float _bugTimer = 0.f;
     std::uint32_t _enemyId = 0;
-    float _parallaxOffset = 0;
     EventDispatcher _eventDispatcher;
 
     InputHandler _inputHandler{_registry};
@@ -65,6 +66,9 @@ private:
     sf::Texture _backgroundTex;
     sf::Texture _bugTex;
     sf::Texture _explosionTex;
+
+    // systems used
+    ParallaxSystem _sysParalax{_registry}; 
 };
 
 

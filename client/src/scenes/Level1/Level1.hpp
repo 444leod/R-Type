@@ -14,7 +14,7 @@
 #include "Components.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
-#include "Systems/SysParalax.hpp"
+#include "Systems/ParalaxSystem.hpp"
 #include <chrono>
 
 class Level1 final : public AScene {
@@ -55,7 +55,6 @@ private:
 
 public:
 private:
-    float _parallaxOffset = 0;
     EventDispatcher _eventDispatcher;
 
     asio::ip::udp::endpoint _server{};
@@ -73,7 +72,7 @@ private:
     sf::Texture _explosionTex;
 
     // systems used
-    SysParalax _sysParalax{_registry, 25}; 
+    ParallaxSystem _sysParalax{_registry}; 
 };
 
 
