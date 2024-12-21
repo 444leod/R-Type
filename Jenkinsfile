@@ -188,7 +188,6 @@ pipeline {
                     }
                     post {
                         always {
-                            sh 'sudo chmod -R 777 .'
                             cleanWs()
                         }
                     }
@@ -260,7 +259,6 @@ pipeline {
                     }
                     post {
                         always {
-                            sh 'sudo chmod -R 777 .'
                             cleanWs()
                         }
                     }
