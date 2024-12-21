@@ -23,11 +23,7 @@ void Level1::initialize()
 }
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
-    _parallaxOffset += static_cast<float>(deltaTime * 25);
-
-    _registry.view<Parallax, Transform>().each([&](const Parallax&, Transform& transform) {
-        transform.x = -_parallaxOffset;
-    });
+    _sysParalax.execute(deltaTime);
 
     auto view = _registry.view<Transform, Velocity>();
 
