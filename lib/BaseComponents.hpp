@@ -9,6 +9,8 @@
 #define BASECOMPONENTS_HPP_
 
 #include <cstdint>
+#include <SFML/Graphics.hpp>
+#include <functional>
 
 struct Transform {
     float x, y, z;
@@ -30,6 +32,20 @@ struct Projectile {
 struct Parallax {
     int offsetMultiplier;
     float offset = 0;
+};
+
+struct Position {
+    float x, y;
+};
+
+struct Text {
+    sf::Text text;
+};
+
+struct RectangleButton {
+    sf::RectangleShape shape;
+    std::string label;
+    std::function<void()> onClick;
 };
 
 #endif /* !BASECOMPONENTS_HPP_ */

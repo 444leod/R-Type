@@ -14,12 +14,7 @@
 class ParallaxSystem final : public AUpdateSystem
 {
 public:
-    /** 
-     * @brief Construct a new ParallaxSystem object
-     * @param registry The registry to use
-     * @param parallaxOffsetMultiplier The parallax offset multiplier, 
-     */
-    ParallaxSystem(Registry &registry, const int parallaxOffsetMultiplier = 1) : AUpdateSystem(registry), _parallaxOffsetMultiplier(parallaxOffsetMultiplier) {}
+    ParallaxSystem(Registry &registry) : AUpdateSystem(registry) {}
 
     void execute(const double deltaTime, const sf::RenderWindow &window) override {
         _registry.view<Parallax, Transform>().each([&](Parallax& parallax, Transform& transform) {
@@ -30,8 +25,6 @@ public:
 
 private:
     const std::string _name = "ParallaxSystem";
-    const int _parallaxOffsetMultiplier;
-    float _parallaxOffset = 0;
 };
 
 #endif /* !PARALLAXSYSTEM_HPP_ */

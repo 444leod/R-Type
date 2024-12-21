@@ -11,7 +11,8 @@
 #include "AScene.hpp"
 #include "Registry.hpp"
 #include "EventDispatcher.hpp"
-#include "Components.hpp"
+#include "BaseComponents.hpp"
+#include "Systems/OnLeftClickSystem.hpp"
 #include "NetworkedScene.hpp"
 #include <chrono>
 #include <functional>
@@ -78,6 +79,8 @@ private:
 
     // PlayerMovement _playerMovement{_registry};
 
+    // systems used
+    OnLeftClickSystem _onLeftClickSystem {_registry};
 };
 
 
