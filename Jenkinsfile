@@ -186,6 +186,12 @@ pipeline {
                             }
                         }
                     }
+                    post {
+                        always {
+                            sh 'sudo chmod -R 777 .'
+                            cleanWs()
+                        }
+                    }
                 }
                 stage('Windows Build') {
                     agent {
@@ -250,6 +256,12 @@ pipeline {
                                     archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
                                 }
                             }
+                        }
+                    }
+                    post {
+                        always {
+                            sh 'sudo chmod -R 777 .'
+                            cleanWs()
                         }
                     }
                 }
