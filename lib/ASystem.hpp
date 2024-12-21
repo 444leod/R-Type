@@ -16,7 +16,7 @@ public:
     virtual~ASystem() = default;
 
     /**
-     * @brief Stops the scene manager.
+     * @brief Execute the system's logic
      */
     virtual void execute() = 0;
 
