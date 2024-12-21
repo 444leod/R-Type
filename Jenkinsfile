@@ -1,12 +1,47 @@
 def changes
+def releaseTag
+def commandOutput
 
 pipeline {
     agent any
     environment {
         GITHUB_GHCR_PAT = credentials('github_pat_packages')
         TOKEN_TA_NOTIFIER = credentials('my_ta_notifier_api')
+        GITHUB_TOKEN = credentials('github_pat_release')
     }
     stages {
+        stage('Create GitHub Release Draft') {
+            when {
+                branch 'main'
+            }
+            agent {
+                docker {
+                    image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                    args '-u root'
+                }
+            }
+            steps {
+                script {
+                    try {
+                        commandOutput = sh(
+                            script: """
+                                chmod +x ./scripts/create_github_release.sh
+                                ./scripts/create_github_release.sh
+                            """,
+                            returnStdout: true
+                        )
+                        releaseTag = commandOutput.split('\n').find { it.startsWith('TAG_START') }?.replaceAll('TAG_START(.*)TAG_END', '$1')
+
+                        echo commandOutput
+                        echo "Created release draft with tag: ${releaseTag}"
+                    } catch (Exception e) {
+                        echo "Failed to create release draft"
+                        releaseTag = null
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
+            }
+        }
         stage('Parallel Builds') {
             failFast false
             parallel {
@@ -123,10 +158,31 @@ pipeline {
                                 }
                             }
                         }
-                        stage('Archive artifacts') {
+                        stage('Prepare Linux Release') {
+                            when {
+                                expression { releaseTag != null }
+                            }
                             steps {
-                                archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
-                                archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
+                                script {
+                                    sh """
+                                        chmod +x ./scripts/prepare_release_artifacts.sh
+                                        ./scripts/prepare_release_artifacts.sh linux
+                                    """
+                                }
+                            }
+                        }
+                        stage('Upload Linux Artifacts') {
+                            when {
+                                expression { releaseTag != null }
+                            }
+                            steps {
+                                script {
+                                    sh """
+                                        chmod +x ./scripts/upload_artifacts.sh
+                                        RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
+                                    """
+                                    archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
+                                }
                             }
                         }
                     }
@@ -168,25 +224,35 @@ pipeline {
                                 }
                             }
                         }
-                        stage('Archive artifacts') {
+                        stage('Prepare Windows Release') {
+                            when {
+                                expression { releaseTag != null }
+                            }
                             steps {
-                                archiveArtifacts artifacts: 'build/client/r-type_*', fingerprint: true
-                                archiveArtifacts artifacts: 'build/server/r-type_*', fingerprint: true
+                                script {
+                                    sh """
+                                        chmod +x ./scripts/prepare_release_artifacts.sh
+                                        ./scripts/prepare_release_artifacts.sh windows
+                                    """
+                                }
+                            }
+                        }
+                        stage('Upload Windows Artifacts') {
+                            when {
+                                expression { releaseTag != null }
+                            }
+                            steps {
+                                script {
+                                    sh """
+                                        chmod +x ./scripts/upload_artifacts.sh
+                                        RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
+                                    """
+                                    archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
+                                }
                             }
                         }
                     }
                 }
-            }
-        }
-        stage('Create Release') {
-            when {
-                branch 'main'
-            }
-            steps {
-                sh """
-                    chmod +x ./create_github_release.sh
-                    ./create_github_release.sh
-                """
             }
         }
     }
