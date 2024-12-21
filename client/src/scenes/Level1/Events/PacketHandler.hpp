@@ -15,6 +15,7 @@
 #include "NetworkAgent.hpp"
 #include "config.h"
 #include "ISceneManager.hpp"
+#include "BaseComponents.hpp"
 
 struct PacketInformations : public IEvent
 {

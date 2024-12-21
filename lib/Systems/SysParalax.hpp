@@ -15,12 +15,16 @@ class SysParalax final: public ASystem {
 public:
     SysParalax(Registry &registry, const int parallaxOffsetMultiplier) : ASystem(registry), _parallaxOffsetMultiplier(parallaxOffsetMultiplier) {}
 
+    void execute() override {
+        throw std::runtime_error("Not implemented, must use the deltaTime version");
+    }
+
     void execute(const double deltaTime) {
         _parallaxOffset += static_cast<float>(deltaTime * _parallaxOffsetMultiplier);
 
         _registry.view<Parallax, Transform>().each([&](const Parallax&, Transform& transform) {
-        transform.x = -_parallaxOffset;
-    });
+            transform.x = -_parallaxOffset;
+        });
     }
 
 private:

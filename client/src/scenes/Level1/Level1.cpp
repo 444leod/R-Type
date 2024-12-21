@@ -17,6 +17,8 @@
 #include "Registry.hpp"
 #include "NetworkAgent.hpp"
 #include "../WaitingRoom/WaitingRoom.hpp"
+#include "Components.hpp"
+#include "BaseComponents.hpp"
 
 void Level1::initialize()
 {
