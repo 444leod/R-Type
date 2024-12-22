@@ -46,7 +46,6 @@ public:
         this->_updateSystems.push_back(std::make_unique<BugsMovementSystem>(_registry));
         // render systems
         this->_renderSystems.push_back(std::make_unique<DrawSpritesSystem>(_registry));
-        // onEvent systems
     }
 
     void initialize() override;
@@ -85,20 +84,6 @@ private:
     sf::Texture _backgroundTex;
     sf::Texture _bugTex;
     sf::Texture _explosionTex;
-
-    /// systems used
-
-    // update systems
-    ParallaxSystem _parallaxSystem{_registry};
-    MovementSystem _movementSystem{_registry};
-    RemoveOutOfBoundProjectilesSystem _removeOutOfBoundProjectilesSystem{_registry};
-    AnimateSystem _animateSystem{_registry};
-    BugsMovementSystem _bugsMovementSystem{_registry};
-
-    // render systems
-    DrawSpritesSystem _drawSpritesSystem{_registry};
-
-    // onEvent systems
 };
 
 

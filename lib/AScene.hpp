@@ -16,7 +16,6 @@ class SceneManager;
 #include "Registry.hpp"
 #include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "BaseSystems/Abstracts/ARenderSystem.hpp"
-#include "BaseSystems/Abstracts/AOnEventSystem.hpp"
 #include <vector>
 #include <memory>
 
@@ -104,12 +103,6 @@ public:
                 return true;
             }
         }
-        for (auto& system : this->_onEventSystems) {
-            if (system->name() == systemName) {
-                system->enable();
-                return true;
-            }
-        }
         return false;
     }
 
@@ -127,12 +120,6 @@ public:
             }
         }
         for (auto& system : this->_renderSystems) {
-            if (system->name() == systemName) {
-                system->disable();
-                return true;
-            }
-        }
-        for (auto& system : this->_onEventSystems) {
             if (system->name() == systemName) {
                 system->disable();
                 return true;
@@ -170,25 +157,11 @@ protected:
         }
     }
 
-    /**
-     * @brief Executes all the onEvent systems in the scene
-     * @param event The event to be taken care of
-     */
-    void _executeOnEventSystems(sf::Event& event)
-    {
-        for (auto& system : this->_onEventSystems) {
-            if (system->isEnabled()) {
-                system->execute(event);
-            }
-        }
-    }
-
     ISceneManager& _manager;
     Registry _registry;
 
     std::vector<std::unique_ptr<AUpdateSystem>> _updateSystems;
     std::vector<std::unique_ptr<ARenderSystem>> _renderSystems;
-    std::vector<std::unique_ptr<AOnEventSystem>> _onEventSystems;
 
 private:
     const std::string& _name = "";

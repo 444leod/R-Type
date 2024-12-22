@@ -94,8 +94,6 @@ void Level1::render(sf::RenderWindow& window) {
 }
 
 void Level1::onEvent(sf::Event &event) {
-    _executeOnEventSystems(event);
-
     switch (event.type) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {

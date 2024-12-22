@@ -71,7 +71,15 @@ void WaitingRoom::render(sf::RenderWindow& window)
 
 void WaitingRoom::onEvent(sf::Event &event)
 {
-    _executeOnEventSystems(event);
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+        sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+        _registry.view<Position, RectangleButton>().each([&](const auto& entity, auto& pos, auto& button) {
+            if (button.shape.getGlobalBounds().contains(mousePos)) {
+                button.onClick();
+                return;
+            }
+        });
+    }
 
     switch (event.type) {
         case sf::Event::KeyPressed:
