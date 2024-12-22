@@ -111,7 +111,7 @@ public:
      * @param component The Component information to attach
      */
     template <typename T>
-    void addComponent(Entity entity, const T &component)
+    T& addComponent(Entity entity, const T &component)
     {
         const auto id = type<T>::id();
         SparseSet<T> *set = nullptr;
@@ -124,6 +124,7 @@ public:
         else
             set = dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id));
         set->set(entity, component);
+        return set->get(entity);
     }
 
     /**
