@@ -14,6 +14,11 @@ class SceneManager;
 #include "UDPPacket.hpp"
 #include "ISceneManager.hpp"
 #include "Registry.hpp"
+#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
+#include "BaseSystems/Abstracts/ARenderSystem.hpp"
+#include "BaseSystems/Abstracts/AOnEventSystem.hpp"
+#include <vector>
+#include <memory>
 
 class AScene {
 public:
@@ -80,9 +85,110 @@ public:
         this->_registry.flush();
     }
 
+    /**
+     * @brief Enables a system
+     * @param systemName The name of the system to enable
+     * @return true if the system was found and enabled, false otherwise
+     */
+    bool enableSystem(const std::string systemName)
+    {
+        for (auto& system : this->_updateSystems) {
+            if (system->name() == systemName) {
+                system->enable();
+                return true;
+            }
+        }
+        for (auto& system : this->_renderSystems) {
+            if (system->name() == systemName) {
+                system->enable();
+                return true;
+            }
+        }
+        for (auto& system : this->_onEventSystems) {
+            if (system->name() == systemName) {
+                system->enable();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @brief Disables an update system
+     * @param systemName The name of the system to disable
+     * @return true if the system was found and disabled, false otherwise
+     */
+    bool disableSystem(const std::string systemName)
+    {
+        for (auto& system : this->_updateSystems) {
+            if (system->name() == systemName) {
+                system->disable();
+                return true;
+            }
+        }
+        for (auto& system : this->_renderSystems) {
+            if (system->name() == systemName) {
+                system->disable();
+                return true;
+            }
+        }
+        for (auto& system : this->_onEventSystems) {
+            if (system->name() == systemName) {
+                system->disable();
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 protected:
+    /**
+     * @brief Executes all the update systems in the scene
+     * @param deltaTime The time between this frame and the last
+     * @param window The window used as a reference for the system for logic, not for rendering
+     */
+    void _executeUpdateSystems(double deltaTime, const sf::RenderWindow &window)
+    {
+        for (auto& system : this->_updateSystems) {
+            if (system->isEnabled()) {
+                system->execute(deltaTime, window);
+            }
+        }
+    }
+
+    /**
+     * @brief Executes all the render systems in the scene
+     * @param window The window to render to
+     */
+    void _executeRenderSystems(sf::RenderWindow& window)
+    {
+        for (auto& system : this->_renderSystems) {
+            if (system->isEnabled()) {
+                system->execute(window);
+            }
+        }
+    }
+
+    /**
+     * @brief Executes all the onEvent systems in the scene
+     * @param event The event to be taken care of
+     */
+    void _executeOnEventSystems(sf::Event& event)
+    {
+        for (auto& system : this->_onEventSystems) {
+            if (system->isEnabled()) {
+                system->execute(event);
+            }
+        }
+    }
+
     ISceneManager& _manager;
     Registry _registry;
+
+    std::vector<std::unique_ptr<AUpdateSystem>> _updateSystems;
+    std::vector<std::unique_ptr<ARenderSystem>> _renderSystems;
+    std::vector<std::unique_ptr<AOnEventSystem>> _onEventSystems;
 
 private:
     const std::string& _name = "";

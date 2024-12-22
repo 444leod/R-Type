@@ -22,11 +22,12 @@ void Level1::initialize()
 }
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
-    _parallaxSystem.execute(deltaTime, window);
-    _movementSystem.execute(deltaTime, window);
-    _removeOutOfBoundProjectilesSystem.execute(deltaTime, window);
-    _animateSystem.execute(deltaTime, window);
-    _bugsMovementSystem.execute(deltaTime, window);
+    _executeUpdateSystems(deltaTime, window);
+    // _parallaxSystem.execute(deltaTime, window);
+    // _movementSystem.execute(deltaTime, window);
+    // _removeOutOfBoundProjectilesSystem.execute(deltaTime, window);
+    // _animateSystem.execute(deltaTime, window);
+    // _bugsMovementSystem.execute(deltaTime, window);
 
 /*
     _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
@@ -57,7 +58,8 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
 }
 
 void Level1::render(sf::RenderWindow& window) {
-    _drawSpritesSystem.execute(window);
+    _executeRenderSystems(window);
+
 
     // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sprite) {
     //     auto bounds = sprite.getGlobalBounds();
@@ -85,6 +87,8 @@ void Level1::render(sf::RenderWindow& window) {
 }
 
 void Level1::onEvent(sf::Event &event) {
+    _executeOnEventSystems(event);
+
     switch (event.type) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {

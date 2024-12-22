@@ -21,14 +21,11 @@
 void Level1::initialize() {}
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
-    _parallaxSystem.execute(deltaTime, window);
-    _movementSystem.execute(deltaTime, window);
-    _removeOutOfBoundProjectilesSystem.execute(deltaTime, window);
-    _animateSystem.execute(deltaTime, window);
-    _bugsMovementSystem.execute(deltaTime, window);
+    _executeRenderSystems(window);
 
     // HandleEnemyProjectileCollisionSystem
     // RTYPE SPECIFIC
+    //! USES _manager but manager should not be passed to systems
     _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&e_enemy, const sf::Sprite& sprite, const Transform& transform)  {
         _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&p_projectile, const Transform& projectile_transform) {
             if (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16)))
@@ -69,7 +66,7 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
 }
 
 void Level1::render(sf::RenderWindow& window) {
-    _drawSpritesSystem.execute(window);
+    _executeRenderSystems(window);
 
     // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sprite) {
     //     auto bounds = sprite.getGlobalBounds();
@@ -97,6 +94,8 @@ void Level1::render(sf::RenderWindow& window) {
 }
 
 void Level1::onEvent(sf::Event &event) {
+    _executeOnEventSystems(event);
+
     switch (event.type) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {

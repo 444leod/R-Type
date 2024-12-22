@@ -36,7 +36,7 @@ public:
      * @brief Returns the system's name
      * @return The system's name
      */
-    std::string getName() const { return _name; }
+    std::string name() const { return _name; }
 
 protected:
     Registry& _registry;

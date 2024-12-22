@@ -37,6 +37,16 @@ public:
         _explosionTex.loadFromFile("assets/r-typesheet44.gif", sf::IntRect(131, 0, 192, 32));
 //        _eventDispatcher.link<movement_event>(&_playerMovement);
         _eventDispatcher.link<PacketInformations>(&_packetHandler);
+        // systems
+        // update systems
+        this->_updateSystems.push_back(std::make_unique<ParallaxSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<MovementSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<AnimateSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<BugsMovementSystem>(_registry));
+        // render systems
+        this->_renderSystems.push_back(std::make_unique<DrawSpritesSystem>(_registry));
+        // onEvent systems
     }
 
     void initialize() override;
