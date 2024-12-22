@@ -91,13 +91,14 @@ public:
 
     /**
      * @brief Clears all the components of a given type
+     *
      * @tparam Component The type of component to clear
      * @tparam  OtherComponents Additional types of components to clear
      */
     template <typename Component, typename... OtherComponents>
     void clear()
     {
-        for (const auto vec = { type<Component>::id(), type<OtherComponents>::id()... }; auto id : vec)
+        for (const auto types = { type<Component>::id(), type<OtherComponents>::id()... }; auto id : types)
         {
             if (_sparse_sets.contains(id))
                 _sparse_sets.at(id)->clear();
@@ -152,6 +153,52 @@ public:
         std::cout << "There is a sparse array for the following components: " << std::endl;
         for (auto const &[id, sparse] : _sparse_sets)
             std::cout << id << std::endl;
+    }
+
+    /**
+     * @brief Checks if an Entity has a component
+     *
+     * @tparam Component The type of component to check
+     * @tparam OtherComponents Additional types of components to check
+     *
+     * @param entity The Entity to check
+     *
+     * @return True if the Entity has the component, false otherwise
+     */
+    template <typename Component, typename... OtherComponents>
+    bool has_all_of(const Entity& entity)
+    {
+
+        for (const auto types = { type<Component>::id(), type<OtherComponents>::id()... };auto id : types)
+        {
+            if (!_sparse_sets.contains(id))
+                return false;
+            if (!_sparse_sets.at(id)->contains(entity))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * @brief Checks if an Entity has any of the components
+     *
+     * @tparam Component The type of component to check
+     * @tparam OtherComponents Additional types of components to check
+     *
+     * @param entity The Entity to check
+     *
+     * @return True if the Entity has any of the components, false otherwise
+     */
+    template <typename Component, typename... OtherComponents>
+    bool has_any_of(const Entity& entity)
+    {
+
+        for (const auto types = { type<Component>::id(), type<OtherComponents>::id()... };auto id : types)
+        {
+            if (_sparse_sets.contains(id) && _sparse_sets.at(id)->contains(entity))
+                return true;
+        }
+        return false;
     }
 
 private:
