@@ -201,6 +201,27 @@ public:
         return false;
     }
 
+    /**
+     * @brief Gets a component from an Entity
+     *
+     * @tparam T The type of component to get
+     *
+     * @param entity The Entity to get the component from
+     *
+     * @return The component
+     */
+    template <typename T>
+    T& get(const Entity entity)
+    {
+        const auto id = type<T>::id();
+
+        if (!this->_sparse_sets.contains(id))
+        {
+            throw std::out_of_range(entity + " does not have the component " + type<T>::name());
+        }
+        return dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id))->get(entity);
+    }
+
 private:
     /**
      * @brief Gets a new available Entity ID
