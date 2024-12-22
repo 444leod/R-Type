@@ -23,11 +23,6 @@ void Level1::initialize()
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
     _executeUpdateSystems(deltaTime, window);
-    // _parallaxSystem.execute(deltaTime, window);
-    // _movementSystem.execute(deltaTime, window);
-    // _removeOutOfBoundProjectilesSystem.execute(deltaTime, window);
-    // _animateSystem.execute(deltaTime, window);
-    // _bugsMovementSystem.execute(deltaTime, window);
 
 /*
     _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
