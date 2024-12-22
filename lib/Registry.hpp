@@ -90,10 +90,25 @@ public:
     }
 
     /**
+     * @brief Clears all the components of a given type
+     * @tparam Component The type of component to clear
+     * @tparam  OtherComponents Additional types of components to clear
+     */
+    template <typename Component, typename... OtherComponents>
+    void clear()
+    {
+        for (const auto vec = { type<Component>::id(), type<OtherComponents>::id()... }; auto id : vec)
+        {
+            if (_sparse_sets.contains(id))
+                _sparse_sets.at(id)->clear();
+        }
+    }
+
+    /**
      * @brief Attaches a Component to an Entity
      * @tparam T The type of component to attach. Can be deduced by the parameter
      * @param entity The Entity to attach to
-     * @param component The Component informations to attach
+     * @param component The Component information to attach
      */
     template <typename T>
     void addComponent(Entity entity, const T &component)
