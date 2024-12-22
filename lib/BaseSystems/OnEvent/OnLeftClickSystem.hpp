@@ -8,7 +8,7 @@
 #ifndef ONLEFTCLICKSYSTEM_HPP_
 #define ONLEFTCLICKSYSTEM_HPP_
 
-#include "Abstracts/AOnEventSystem.hpp"
+#include "BaseSystems/Abstracts/AOnEventSystem.hpp"
 #include "BaseComponents.hpp"
 #include <SFML/Graphics.hpp>
 

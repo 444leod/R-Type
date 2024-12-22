@@ -13,7 +13,7 @@
 #include "EventDispatcher.hpp"
 #include "Components.hpp"
 #include "BaseComponents.hpp"
-#include "Systems/Update/ParalaxSystem.hpp"
+#include "BaseSystems/Update/ParalaxSystem.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
 #include <chrono>
@@ -68,7 +68,7 @@ private:
     sf::Texture _explosionTex;
 
     // systems used
-    ParallaxSystem _sysParalax{_registry}; 
+    ParallaxSystem _parallaxSystem{_registry}; 
 };
 
 

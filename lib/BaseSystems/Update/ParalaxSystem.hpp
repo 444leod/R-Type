@@ -8,8 +8,8 @@
 #ifndef PARALLAXSYSTEM_HPP_
 #define PARALLAXSYSTEM_HPP_
 
-#include "Abstracts/AUpdateSystem.hpp"
-#include "../BaseComponents.hpp"
+#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
+#include "BaseComponents.hpp"
 
 class ParallaxSystem final : public AUpdateSystem
 {

@@ -14,7 +14,8 @@
 #include "Components.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
-#include "Systems/Update/ParalaxSystem.hpp"
+#include "BaseSystems/Update/ParalaxSystem.hpp"
+#include "BaseSystems/Render/DrawSpritesSystem.hpp"
 #include <chrono>
 
 class Level1 final : public AScene {
@@ -72,7 +73,8 @@ private:
     sf::Texture _explosionTex;
 
     // systems used
-    ParallaxSystem _sysParalax{_registry}; 
+    ParallaxSystem _parallaxSystem{_registry};
+    DrawSpritesSystem _drawSpritesSystem{_registry};
 };
 
 

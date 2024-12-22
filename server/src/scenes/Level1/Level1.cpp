@@ -21,7 +21,7 @@
 void Level1::initialize() {}
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
-    _sysParalax.execute(deltaTime, window);
+    _parallaxSystem.execute(deltaTime, window);
 
     auto view = _registry.view<Transform, Velocity>();
 
