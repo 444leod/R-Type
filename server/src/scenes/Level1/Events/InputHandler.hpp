@@ -10,15 +10,15 @@
 
 #include "../Components.hpp"
 #include "../../UserInput.hpp"
-#include "EventDispatcher.hpp"
-#include "Registry.hpp"
-#include "NetworkAgent.hpp"
+#include "ecs/EventDispatcher.hpp"
+#include "ecs/Registry.hpp"
+#include "network/NetworkAgent.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
 
-class InputHandler : public EventHandler<UserInput> {
+class InputHandler : public ecs::EventHandler<UserInput> {
 public:
-    explicit InputHandler(Registry& registry) : _registry(registry) {}
+    explicit InputHandler(ecs::Registry& registry) : _registry(registry) {}
     ~InputHandler() = default;
 
     void receive(const UserInput& event) override {
@@ -26,7 +26,7 @@ public:
 
 
 private:
-    Registry& _registry;
+    ecs::Registry& _registry;
 };
 
 

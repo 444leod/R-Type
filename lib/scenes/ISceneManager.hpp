@@ -10,7 +10,6 @@
 
 #include <string>
 #include <asio.hpp>
-#include "NetworkAgent.hpp"
 
 /**
  * @class ISceneManager

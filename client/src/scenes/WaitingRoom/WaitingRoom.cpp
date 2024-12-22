@@ -6,7 +6,7 @@
 */
 
 #include "WaitingRoom.hpp"
-#include "Registry.hpp"
+#include "ecs/Registry.hpp"
 #include <algorithm>
 #include <cmath>
 #include <config.h>
@@ -15,6 +15,7 @@
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include "network/NetworkAgent.hpp"
 
 void WaitingRoom::initialize()
 {
@@ -96,8 +97,8 @@ void WaitingRoom::onEnter() {
     const auto addr = asio::ip::address::from_string(ip);
     //SERVER = asio::ip::udp::endpoint(addr, port); //dead code
 
-    UDPPacket packet;
-    packet << PACKET_TYPE::CONNECT;
+    ntw::UDPPacket packet;
+    packet << ntw::PACKET_TYPE::CONNECT;
     packet << "ClientName";
 
     //_manager.send(SERVER, packet); //dead code
@@ -116,27 +117,27 @@ void WaitingRoom::onExit(const AScene& nextScene)
 }
 
 /*
-void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet)
+void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
 {
     const auto payload = packet.payload;
 
     // std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
     //           << ", ack: " << packet.ack_number << ")" << std::endl;
 
-    PACKET_TYPE packet_type{};
+    ntw::PACKET_TYPE packet_type{};
     packet >> packet_type;
     if (_packet_handlers.contains(packet_type))
         _packet_handlers.at(packet_type)(packet);
 } */
 
 /*
-void WaitingRoom::send(const UDPPacket& packet)
+void WaitingRoom::send(const ntw::UDPPacket& packet)
 {
     _manager.send(SERVER, packet);
 }
  */
 
-/* void WaitingRoom::_onConnect(UDPPacket& packet)
+/* void WaitingRoom::_onConnect(ntw::UDPPacket& packet)
 {
 
     std::uint32_t id;
@@ -146,20 +147,20 @@ void WaitingRoom::send(const UDPPacket& packet)
     std::cout << "Connected to the server" << std::endl;
 }
 
-void WaitingRoom::_onDisconnect(UDPPacket& packet)
+void WaitingRoom::_onDisconnect(ntw::UDPPacket& packet)
 {
     std::cout << "Disconnection from the server" << std::endl;
     _manager.stop();
 }
 
-void WaitingRoom::_onMessage(UDPPacket& packet)
+void WaitingRoom::_onMessage(ntw::UDPPacket& packet)
 {
     std::string message;
     packet >> message;
     std::cout << "Message from " << SERVER << ": " << message << std::endl;
 }
 
-void WaitingRoom::_onStart(UDPPacket& packet)
+void WaitingRoom::_onStart(ntw::UDPPacket& packet)
 {
     std::cout << "Game starting..." << std::endl;
     _manager.load("Level1");

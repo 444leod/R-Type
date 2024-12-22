@@ -10,21 +10,21 @@
 #include <functional>
 #include <map>
 #include <optional>
-#include "NetworkAgent.hpp"
+#include "network/NetworkAgent.hpp"
 
 #pragma once
 
 /**
  * @brief Client representation of a network Client, receives updates from a Server and sends it some
  */
-class Client: public NetworkAgent
+class Client: public ntw::NetworkAgent
 {
 public:
     /**
      * @brief Constructor for the Client class
      * @param ctx The io_context to add the client's work to
      */
-    Client(asio::io_context& ctx): NetworkAgent(ctx) {}
+    Client(asio::io_context& ctx): ntw::NetworkAgent(ctx) {}
     ~Client() override = default;
 
     /**
@@ -38,8 +38,8 @@ public:
         const auto addr = asio::ip::address::from_string(host);
         this->_server = asio::ip::udp::endpoint(addr, port);
 
-        UDPPacket packet;
-        packet << PACKET_TYPE::CONNECT;
+        ntw::UDPPacket packet;
+        packet << ntw::PACKET_TYPE::CONNECT;
         packet << "CONNECT";
         this->_send(this->_server, packet);
 
@@ -74,8 +74,8 @@ public:
      */
     void sendMessage(const std::string& msg)
     {
-        UDPPacket packet;
-        packet << PACKET_TYPE::MESSAGE;
+        ntw::UDPPacket packet;
+        packet << ntw::PACKET_TYPE::MESSAGE;
         packet << msg;
         this->_send(this->_server, packet);
     }
@@ -84,13 +84,13 @@ public:
      * @brief Send a UDP Packet to the server
      * @param packet The packet to send
      */
-    void send(const UDPPacket& packet)
+    void send(const ntw::UDPPacket& packet)
     {
         this->_send(this->_server, packet);
     }
 
 private:
-     void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override
+     void _onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) override
     {
         std::cout << "Received packet from " << src.address().to_string() << ":" << src.port() << std::endl;
         const auto payload = packet.payload;
@@ -98,7 +98,7 @@ private:
         std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
                   << ", ack: " << packet.ack_number << ")" << std::endl;
 
-        PACKET_TYPE packet_type{};
+        ntw::PACKET_TYPE packet_type{};
         packet >> packet_type;
         if (_packet_handlers.contains(packet_type))
             _packet_handlers.at(packet_type)(packet);
@@ -110,9 +110,9 @@ private:
     asio::ip::udp::endpoint _server;
     bool _running = false;
     sf::RenderWindow _window;
-    std::map<PACKET_TYPE, std::function<void(UDPPacket&)>> _packet_handlers = {
+    std::map<ntw::PACKET_TYPE, std::function<void(ntw::UDPPacket&)>> _packet_handlers = {
         {
-            PACKET_TYPE::CONNECT, [&](UDPPacket& packet)
+            ntw::PACKET_TYPE::CONNECT, [&](ntw::UDPPacket& packet)
             {
                 std::cout << "Received CONNECT packet." << std::endl;
                 std::uint32_t client_id;
@@ -122,14 +122,14 @@ private:
             }
         },
         {
-            PACKET_TYPE::DISCONNECT, [&](UDPPacket& packet)
+            ntw::PACKET_TYPE::DISCONNECT, [&](ntw::UDPPacket& packet)
             {
                 std::cout << "Received DISCONNECT packet." << std::endl;
                 this->_running = false;
             }
         },
         {
-            PACKET_TYPE::MESSAGE, [&](UDPPacket& packet)
+            ntw::PACKET_TYPE::MESSAGE, [&](ntw::UDPPacket& packet)
             {
                 std::string msg;
                 packet >> msg;
@@ -137,7 +137,7 @@ private:
             }
         },
         {
-            PACKET_TYPE::START, [&](UDPPacket& packet)
+            ntw::PACKET_TYPE::START, [&](ntw::UDPPacket& packet)
             {
                 std::cout << "Received START packet." << std::endl;
             }

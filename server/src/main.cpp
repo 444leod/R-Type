@@ -7,7 +7,7 @@
 
 #include <thread>
 // #include "Server.hpp"
-#include "SceneManager.hpp"
+#include "scenes/SceneManager.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
 #include "scenes/Level1/Level1.hpp"
 

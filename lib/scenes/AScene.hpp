@@ -12,11 +12,11 @@ class SceneManager;
 
 #include <SFML/Graphics.hpp>
 #include "ISceneManager.hpp"
-#include "Registry.hpp"
+#include "ecs/Registry.hpp"
 
 class AScene {
 public:
-    AScene(ISceneManager& manager, Registry& registry, const std::string& name) :
+    AScene(ISceneManager& manager, ecs::Registry& registry, const std::string& name) :
         _manager(manager), _registry(registry), _name(name) {}
 
     virtual~AScene() = default;
@@ -74,7 +74,7 @@ public:
     virtual void onExit(const AScene& nextScene) = 0;
 
 protected:
-    Registry& _registry;
+    ecs::Registry& _registry;
     ISceneManager& _manager;
 
 private:

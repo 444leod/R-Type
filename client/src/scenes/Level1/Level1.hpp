@@ -8,18 +8,17 @@
 #ifndef LEVEL_1_HPP
 #define LEVEL_1_HPP
 
-#include "AScene.hpp"
-#include "Registry.hpp"
-#include "EventDispatcher.hpp"
+#include "scenes/AScene.hpp"
+#include "ecs/Registry.hpp"
+#include "ecs/EventDispatcher.hpp"
 #include "Components.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
 #include "../UserInput.hpp"
-#include <chrono>
 
 class Level1 final : public AScene {
 public:
-    Level1(ISceneManager& m, Registry& r, const std::string& n) : AScene(m, r, n) {
+    Level1(ISceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n) {
         _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
         _backgroundTex.loadFromFile("assets/rtype-background.png", sf::IntRect(0, 243, 3072, 205));
@@ -52,14 +51,14 @@ private:
 public:
 private:
     float _parallaxOffset = 0;
-    EventDispatcher _eventDispatcher;
+    ecs::EventDispatcher _eventDispatcher;
 
     asio::ip::udp::endpoint _server{};
 
     InputHandler _inputHandler{_registry, _manager};
     PacketHandler _packetHandler{_registry, _manager};
 
-    std::vector<ClientInformations> _clients;
+    std::vector<ntw::ClientInformations> _clients;
 
     //this is temporary, if this texture get deleted, then the sprite will not be able to render
     sf::Texture _spaceshipTex;

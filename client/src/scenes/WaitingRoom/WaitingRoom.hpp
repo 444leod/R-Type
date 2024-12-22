@@ -8,10 +8,10 @@
 #ifndef WAITING_ROOM_HPP
 #define WAITING_ROOM_HPP
 
-#include "Registry.hpp"
-#include "EventDispatcher.hpp"
+#include "ecs/Registry.hpp"
+#include "ecs/EventDispatcher.hpp"
 #include "Components.hpp"
-#include "AScene.hpp"
+#include "scenes/AScene.hpp"
 #include <chrono>
 #include <functional>
 #include <optional>
@@ -25,7 +25,7 @@ inline sf::Font get_default_font() {
 
 class WaitingRoom final : public AScene {
 public:
-    WaitingRoom(ISceneManager& m, Registry& r, const std::string& n) : AScene(m, r, n)
+    WaitingRoom(ISceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
     {
     }
 
@@ -59,8 +59,8 @@ private:
 
     std::optional<std::uint32_t> _id = std::nullopt;
 
-    Registry _registry;
-    EventDispatcher _eventDispatcher;
+    ecs::Registry _registry;
+    ecs::EventDispatcher _eventDispatcher;
 
 //    std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
 //        {"exit",    [this](const std::vector<std::string>& args) { this->_onExit(args); }},
@@ -74,4 +74,4 @@ private:
 
 
 
-#endif //GAME_HPP
+#endif //WAITING_ROOM_HPP

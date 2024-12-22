@@ -10,9 +10,9 @@
 #include <config.h>
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Keyboard.hpp>
 #include "Level1.hpp"
-#include "Registry.hpp"
+#include "network/NetworkAgent.hpp"
+#include "ecs/Registry.hpp"
 #include "Global.hpp"
 #include "../UserInput.hpp"
 
@@ -228,8 +228,8 @@ void Level1::onEnter(const AScene& lastScene)
             } */
         }
 
-        UDPPacket self_ship;
-        self_ship << PACKET_TYPE::YOUR_SHIP << client.id;
+        ntw::UDPPacket self_ship;
+        self_ship << ntw::PACKET_TYPE::YOUR_SHIP << client.id;
         //_manager.send(client.endpoint, self_ship);
     }
 
