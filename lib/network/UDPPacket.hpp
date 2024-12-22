@@ -68,7 +68,7 @@ namespace ntw {
         uint32_t ack_number = 0; ///< Acknowledgment number of the packet.
         uint16_t payload_length = 0; ///< Length of the payload.
         uint16_t checksum = 0; ///< Checksum of the packet.
-        std::vector<std::byte> payload; ///< Payload of the packet.
+        std::vector<std::byte> payload = {}; ///< Payload of the packet.
 
         /**
          * @brief Exception class for UDPPacket errors.
@@ -84,7 +84,7 @@ namespace ntw {
              */
             explicit Exception(const std::string  &message,
                         const char* function = __builtin_FUNCTION(),
-                        int line = __builtin_LINE()) : _message(message + " in function: " + function + " at line: " + std::to_string(line)) {}
+                        const int line = __builtin_LINE()) : _message(message + " in function: " + function + " at line: " + std::to_string(line)) {}
             /**
              * @brief Get the error message.
              *
@@ -224,7 +224,7 @@ namespace ntw {
         template<typename T>
         UDPPacket& operator<<(T const& data) noexcept
         {
-            const std::uint32_t size = sizeof(T);
+            const std::uint8_t size = sizeof(T);
 
             this->append(&data, size);
 
@@ -312,12 +312,13 @@ namespace ntw {
          * @param data The data to append.
          * @param size The size of the data.
          */
-        void append(const void *data, const std::uint32_t size) noexcept
+        void append(const void *data, const std::uint8_t size) noexcept
         {
             const auto *raw_len = reinterpret_cast<const std::byte *>(&size);
             const auto *raw_data = static_cast<const std::byte *>(data);
 
-            this->raw_append(raw_len, sizeof(std::uint32_t));
+            this->payload.reserve(this->payload.size() + size + 1);
+            this->raw_append(raw_len, sizeof(std::uint8_t));
             this->raw_append(raw_data, size);
         }
 
@@ -518,3 +519,4 @@ namespace ntw {
     };
 
 }
+
