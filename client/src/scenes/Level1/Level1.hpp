@@ -14,7 +14,7 @@
 #include "Components.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
-#include "Systems/ParalaxSystem.hpp"
+#include "Systems/Update/ParalaxSystem.hpp"
 #include <chrono>
 
 class Level1 final : public AScene {

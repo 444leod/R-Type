@@ -13,7 +13,7 @@
 #include "EventDispatcher.hpp"
 #include "Components.hpp"
 #include "BaseComponents.hpp"
-#include "Systems/ParalaxSystem.hpp"
+#include "Systems/Update/ParalaxSystem.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
 #include <chrono>

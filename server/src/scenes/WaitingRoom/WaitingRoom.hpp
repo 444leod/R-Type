@@ -12,7 +12,7 @@
 #include "Registry.hpp"
 #include "EventDispatcher.hpp"
 #include "BaseComponents.hpp"
-#include "Systems/OnLeftClickSystem.hpp"
+#include "Systems/OnEvent/OnLeftClickSystem.hpp"
 #include "NetworkedScene.hpp"
 #include <chrono>
 #include <functional>
