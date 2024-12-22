@@ -8,15 +8,23 @@
 #ifndef LEVEL_1_HPP
 #define LEVEL_1_HPP
 
+// From Game Engine
 #include "AScene.hpp"
 #include "Registry.hpp"
 #include "EventDispatcher.hpp"
-#include "Components.hpp"
 #include "BaseComponents.hpp"
 #include "BaseSystems/Update/ParalaxSystem.hpp"
+#include "BaseSystems/Update/MovementSystem.hpp"
+#include "BaseSystems/Update/AnimateSystem.hpp"
 #include "BaseSystems/Render/DrawSpritesSystem.hpp"
+
+// Level1 specific
+#include "Components.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
+#include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
+#include "Systems/BugsMovementSystem.hpp"
+
 #include <chrono>
 
 class Level1 final : public AScene {
@@ -68,9 +76,19 @@ private:
     sf::Texture _bugTex;
     sf::Texture _explosionTex;
 
-    // systems used
+    /// systems used
+
+    // update systems
     ParallaxSystem _parallaxSystem{_registry};
+    MovementSystem _movementSystem{_registry};
+    RemoveOutOfBoundProjectilesSystem _removeOutOfBoundProjectilesSystem{_registry};
+    AnimateSystem _animateSystem{_registry};
+    BugsMovementSystem _bugsMovementSystem{_registry};
+
+    // render systems
     DrawSpritesSystem _drawSpritesSystem{_registry};
+
+    // onEvent systems
 };
 
 

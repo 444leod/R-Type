@@ -12,6 +12,8 @@
 #include <SFML/Graphics.hpp>
 #include <functional>
 
+// TODO: Decide how to organize the components in the lib
+
 struct Transform {
     float x, y, z;
     float rotation;
@@ -37,6 +39,23 @@ struct Parallax {
 struct Position {
     float x, y;
 };
+
+struct Animation {
+    sf::Clock clock = sf::Clock();
+    std::pair<int, int> frameSize{};
+    float speed{};
+    unsigned int currentFrame = 1;
+    unsigned int frameCount{};
+    bool loop{};
+    // TODO: Refacto to not have nested components
+    Velocity velocity{};
+};
+
+struct Enemy {
+    std::uint32_t id;
+};
+
+// UI Components
 
 struct Text {
     sf::Text text;

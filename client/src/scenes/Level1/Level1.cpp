@@ -6,8 +6,6 @@
 */
 
 #include <algorithm>
-#include <cmath>
-#include <config.h>
 #include <iostream>
 #include <thread>
 #include <SFML/Graphics.hpp>
@@ -25,45 +23,10 @@ void Level1::initialize()
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
     _parallaxSystem.execute(deltaTime, window);
-
-    auto view = _registry.view<Transform, Velocity>();
-
-    view.each([&](const Entity& entity, Transform& transform, const Velocity& velocity) {
-        transform.x += static_cast<float>((velocity.x * SCALE) * deltaTime);
-        transform.y += static_cast<float>((velocity.y * SCALE) * deltaTime);
-    });
-
-    _registry.view<Projectile, Transform>().each([&](const Entity& entity, const Projectile&, const Transform& transform) {
-        if (transform.x > window.getSize().x) {
-            _registry.remove(entity);
-        }
-    });
-
-    _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation & animation, sf::Sprite &sprite) {
-        if (animation.currentFrame == animation.frameCount) {
-            if (animation.loop) {
-                animation.currentFrame = 0;
-            } else {
-                if (animation.velocity.x != 0 || animation.velocity.y != 0)
-                    _registry.addComponent(entity, animation.velocity);
-                else
-                    _registry.remove(entity);
-                _registry.removeComponent<Animation>(entity);
-            }
-        }
-        if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
-            sprite.setTextureRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
-            animation.currentFrame++;
-            animation.clock.restart();
-        }
-    });
-
-    _registry.view<Bug, sf::Sprite, Transform>().each([&](const Entity& entity, Bug& bug, sf::Sprite& sprite, Transform& transform) {
-        const auto movementFactor = std::sin(bug.clock.getElapsedTime().asSeconds() / .2);
-        transform.y += movementFactor * 8;
-        transform.rotation = 90 - 45 * movementFactor;
-    });
-
+    _movementSystem.execute(deltaTime, window);
+    _removeOutOfBoundProjectilesSystem.execute(deltaTime, window);
+    _animateSystem.execute(deltaTime, window);
+    _bugsMovementSystem.execute(deltaTime, window);
 
 /*
     _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
