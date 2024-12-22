@@ -17,7 +17,7 @@ class MovementSystem final : public AUpdateSystem
 public:
     MovementSystem(Registry &registry) : AUpdateSystem(registry) {}
 
-    void execute(const double deltaTime, const sf::RenderWindow &window) override {
+    void execute(const double deltaTime) override {
         _registry.view<Transform, Velocity>().each([&](const Entity& entity, Transform& transform, const Velocity& velocity) {
             transform.x += static_cast<float>((velocity.x * SCALE) * deltaTime);
             transform.y += static_cast<float>((velocity.y * SCALE) * deltaTime);

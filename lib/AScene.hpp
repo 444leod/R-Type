@@ -135,11 +135,11 @@ protected:
      * @param deltaTime The time between this frame and the last
      * @param window The window used as a reference for the system for logic, not for rendering
      */
-    void _executeUpdateSystems(double deltaTime, const sf::RenderWindow &window)
+    void _executeUpdateSystems(double deltaTime)
     {
         for (auto& system : this->_updateSystems) {
             if (system->isEnabled()) {
-                system->execute(deltaTime, window);
+                system->execute(deltaTime);
             }
         }
     }

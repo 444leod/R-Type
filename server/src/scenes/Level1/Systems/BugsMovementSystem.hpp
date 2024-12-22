@@ -18,7 +18,7 @@ class BugsMovementSystem final : public AUpdateSystem
 public:
     BugsMovementSystem(Registry &registry) : AUpdateSystem(registry) {}
 
-    void execute(const double deltaTime, const sf::RenderWindow &window) override {
+    void execute(const double deltaTime) override {
         _registry.view<Bug, sf::Sprite, Transform>().each([&](const Entity& entity, Bug& bug, sf::Sprite& sprite, Transform& transform) {
             const auto movementFactor = std::sin(bug.clock.getElapsedTime().asSeconds() / .2);
             transform.y += movementFactor * 8;

@@ -22,7 +22,7 @@ void Level1::initialize()
 }
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
-    _executeUpdateSystems(deltaTime, window);
+    _executeUpdateSystems(deltaTime);
 
 /*
     _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {

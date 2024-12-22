@@ -19,9 +19,8 @@ public:
     /**
      * @brief Execute a 'update' system's logic
      * @param deltaTime The time between the last frame and the current one
-     * @param window The window used as a reference for the system for logic, not for rendering
      */
-    virtual void execute(const double _deltaTime, const sf::RenderWindow &window) = 0;
+    virtual void execute(const double _deltaTime) = 0;
 };
 
 #endif /* !AUPDATESYSTEM_HPP_ */

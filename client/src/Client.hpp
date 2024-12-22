@@ -43,7 +43,7 @@ public:
         packet << "CONNECT";
         this->_send(this->_server, packet);
 
-        this->_window.create(sf::VideoMode::getDesktopMode(), "R-Type");
+        this->_window.create(sf::VideoMode::getDesktopMode(), "R-Type Client");
         this->_window.setFramerateLimit(60);
     }
 

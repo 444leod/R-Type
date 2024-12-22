@@ -19,7 +19,7 @@ class AnimateSystem final : public AUpdateSystem
 public:
     AnimateSystem(Registry &registry) : AUpdateSystem(registry) {}
 
-    void execute(const double deltaTime, const sf::RenderWindow &window) override {
+    void execute(const double deltaTime) override {
         _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation & animation, sf::Sprite &sprite) {
             if (animation.currentFrame == animation.frameCount) {
                 if (animation.loop) {
