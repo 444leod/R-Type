@@ -18,7 +18,7 @@
 class DrawSpritesSystem final : public ARenderSystem
 {
 public:
-    DrawSpritesSystem(Registry &registry) : ARenderSystem(registry) {}
+    DrawSpritesSystem(Registry &registry, const std::string name = "DrawSpritesSystem") : ARenderSystem(registry, name) {}
 
     void execute(sf::RenderWindow &window) override {
         auto vec = std::vector<std::tuple<Entity, sf::Sprite, Transform>>{};
@@ -37,9 +37,6 @@ public:
             window.draw(sprite);
         }
     }
-
-private:
-    const std::string _name = "DrawSpritesSystem";
 };
 
 #endif /* !DRAWSPRITESSYSTEM_HPP_ */

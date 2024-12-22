@@ -16,7 +16,7 @@
 class BugsMovementSystem final : public AUpdateSystem
 {
 public:
-    BugsMovementSystem(Registry &registry) : AUpdateSystem(registry) {}
+    BugsMovementSystem(Registry &registry, const std::string name = "BugsMovementSystem") : AUpdateSystem(registry, name) {}
 
     void execute(const double deltaTime) override {
         _registry.view<Bug, sf::Sprite, Transform>().each([&](const Entity& entity, Bug& bug, sf::Sprite& sprite, Transform& transform) {
@@ -25,9 +25,6 @@ public:
             transform.rotation = 90 - 45 * movementFactor;
         });
     }
-
-private:
-    const std::string _name = "BugsMovementSystem";
 };
 
 #endif /* !MOVEMENTBUGSSYSTEM_HPP_ */

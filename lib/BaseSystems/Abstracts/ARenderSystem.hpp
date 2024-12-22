@@ -10,11 +10,12 @@
 
 #include "ASystem.hpp"
 #include <SFML/Graphics.hpp>
+#include <string>
 
 class ARenderSystem : public ASystem
 {
 public:
-    ARenderSystem(Registry &registry) : ASystem(registry) {}
+    ARenderSystem(Registry &registry, const std::string name) : ASystem(registry, name) {}
 
     /**
      * @brief Execute a 'render' system's logic

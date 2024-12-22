@@ -14,7 +14,7 @@
 class ParallaxSystem final : public AUpdateSystem
 {
 public:
-    ParallaxSystem(Registry &registry) : AUpdateSystem(registry) {}
+    ParallaxSystem(Registry &registry, const std::string name = "ParallaxSystem") : AUpdateSystem(registry, name) {}
 
     void execute(const double deltaTime) override {
         _registry.view<Parallax, Transform>().each([&](Parallax& parallax, Transform& transform) {
@@ -22,9 +22,6 @@ public:
             transform.x = -parallax.offset;
         });
     }
-
-private:
-    const std::string _name = "ParallaxSystem";
 };
 
 #endif /* !PARALLAXSYSTEM_HPP_ */

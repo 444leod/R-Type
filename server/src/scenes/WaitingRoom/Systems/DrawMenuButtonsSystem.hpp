@@ -16,7 +16,7 @@
 class DrawMenuButtonsSystem final : public ARenderSystem
 {
 public:
-    DrawMenuButtonsSystem(Registry &registry) : ARenderSystem(registry) {}
+    DrawMenuButtonsSystem(Registry &registry, const std::string name = "DrawMenuButtonsSystem") : ARenderSystem(registry, name) {}
 
     void execute(sf::RenderWindow &window) override {
         sf::Font font;
@@ -32,9 +32,6 @@ public:
             window.draw(buttonText);
         });
     }
-
-private:
-    const std::string _name = "DrawMenuButtonsSystem";
 };
 
 #endif /* !DRAWMENUBUTTONSSYSTEM_HPP_ */

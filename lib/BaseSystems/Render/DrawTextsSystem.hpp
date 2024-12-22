@@ -16,7 +16,7 @@
 class DrawTextsSystem final : public ARenderSystem
 {
 public:
-    DrawTextsSystem(Registry &registry) : ARenderSystem(registry) {}
+    DrawTextsSystem(Registry &registry, const std::string name = "DrawTextsSystem") : ARenderSystem(registry, name) {}
 
     void execute(sf::RenderWindow &window) override {
         _registry.view<Position, Text>().each([&](const auto& entity, auto& pos, auto& renderable) {
@@ -24,9 +24,6 @@ public:
             window.draw(renderable.text);
         });
     }
-
-private:
-    const std::string _name = "DrawTextsSystem";
 };
 
 #endif /* !DRAWTEXTSSYSTEM_HPP_ */

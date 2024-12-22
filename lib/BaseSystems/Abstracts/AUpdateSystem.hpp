@@ -10,11 +10,12 @@
 
 #include "ASystem.hpp"
 #include <SFML/Graphics.hpp>
+#include <string>
 
 class AUpdateSystem : public ASystem
 {
 public:
-    AUpdateSystem(Registry &registry) : ASystem(registry) {}
+    AUpdateSystem(Registry &registry, const std::string name) : ASystem(registry, name) {}
 
     /**
      * @brief Execute a 'update' system's logic

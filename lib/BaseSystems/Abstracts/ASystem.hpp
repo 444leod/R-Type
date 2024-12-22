@@ -13,7 +13,7 @@
 
 class ASystem {
 public:
-    ASystem(Registry& registry) : _registry(registry) {}
+    ASystem(Registry& registry, const std::string name) : _registry(registry), _name(name) {}
     virtual~ASystem() = default;
 
     /**
@@ -36,12 +36,12 @@ public:
      * @brief Returns the system's name
      * @return The system's name
      */
-    std::string name() const { return _name; }
+    const std::string name() const { return _name; }
 
 protected:
     Registry& _registry;
     bool _enabled = true;
-    std::string _name;
+    const std::string _name;
 };
 
 #endif //ASYSTEM_HPP

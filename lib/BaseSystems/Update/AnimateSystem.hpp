@@ -17,7 +17,7 @@
 class AnimateSystem final : public AUpdateSystem
 {
 public:
-    AnimateSystem(Registry &registry) : AUpdateSystem(registry) {}
+    AnimateSystem(Registry &registry, const std::string name = "AnimateSystem") : AUpdateSystem(registry, name) {}
 
     void execute(const double deltaTime) override {
         _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation & animation, sf::Sprite &sprite) {
@@ -39,9 +39,6 @@ public:
             }
         });
     }
-
-private:
-    const std::string _name = "AnimateSystem";
 };
 
 #endif /* !ANIMATESYSTEM_HPP_ */
