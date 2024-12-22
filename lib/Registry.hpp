@@ -125,7 +125,7 @@ public:
         else
             set = dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id));
         set->set(entity, component);
-        return set->get(entity);
+        return set->at(entity);
     }
 
     /**
