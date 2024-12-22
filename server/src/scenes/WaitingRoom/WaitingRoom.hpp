@@ -13,9 +13,14 @@
 #include "EventDispatcher.hpp"
 #include "BaseComponents.hpp"
 #include "BaseSystems/OnEvent/OnLeftClickSystem.hpp"
+#include "BaseSystems/Render/DrawTextsSystem.hpp"
 #include "NetworkedScene.hpp"
+
+#include "Systems/DrawMenuButtonsSystem.hpp"
+
 #include <chrono>
 #include <functional>
+#include <memory>
 
 inline sf::Font get_default_font() {
     sf::Font font;
@@ -27,6 +32,9 @@ class WaitingRoom final : public AScene {
 public:
     WaitingRoom(ISceneManager& m, const std::string& n) : AScene(m, n)
     {
+        this->_onEventSystems.push_back(std::make_unique<OnLeftClickSystem>(_registry));
+        this->_renderSystems.push_back(std::make_unique<DrawTextsSystem>(_registry));
+        this->_renderSystems.push_back(std::make_unique<DrawMenuButtonsSystem>(_registry));
     }
 
     void initialize() override;
@@ -78,9 +86,6 @@ private:
     };
 
     // PlayerMovement _playerMovement{_registry};
-
-    // systems used
-    OnLeftClickSystem _onLeftClickSystem {_registry};
 };
 
 

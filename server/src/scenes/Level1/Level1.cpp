@@ -21,7 +21,7 @@
 void Level1::initialize() {}
 
 void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
-    _executeRenderSystems(window);
+    _executeUpdateSystems(deltaTime, window);
 
     // HandleEnemyProjectileCollisionSystem
     // RTYPE SPECIFIC

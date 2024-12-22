@@ -66,25 +66,13 @@ void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
 
 void WaitingRoom::render(sf::RenderWindow& window)
 {
-    _registry.view<Position, Text>().each([&](const auto& entity, auto& pos, auto& renderable) {
-        renderable.text.setPosition(pos.x, pos.y);
-        window.draw(renderable.text);
-    });
-
-    _registry.view<Position, RectangleButton>().each([&](const auto& entity, auto& pos, auto& button) {
-        button.shape.setPosition(pos.x, pos.y);
-        window.draw(button.shape);
-
-        sf::Text buttonText(button.label, font, 20);
-        buttonText.setPosition(pos.x + 10, pos.y + 10);
-        buttonText.setFillColor(sf::Color::White);
-        window.draw(buttonText);
-    });
+    _executeRenderSystems(window);
 }
 
 void WaitingRoom::onEvent(sf::Event &event)
 {
-    _onLeftClickSystem.execute(event);
+    _executeOnEventSystems(event);
+
     switch (event.type) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {
