@@ -12,6 +12,6 @@
 
 #include <asio.hpp>
 
-inline std::vector<ClientInformations> CLIENTS{};
+inline std::vector<ntw::ClientInformations> CLIENTS{};
 
 #endif //GLOBAL_HPP

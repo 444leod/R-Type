@@ -14,9 +14,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include "Level1.hpp"
-#include "Registry.hpp"
-#include "NetworkAgent.hpp"
-#include "../WaitingRoom/WaitingRoom.hpp"
+#include "ecs/Registry.hpp"
+#include "network/NetworkAgent.hpp"
 
 void Level1::initialize()
 {
@@ -206,8 +205,8 @@ void Level1::onEnter(const AScene& lastScene)
 
 void Level1::onExit()
 {
-    UDPPacket packet;
-    packet << PACKET_TYPE::DISCONNECT;
+    ntw::UDPPacket packet;
+    packet << ntw::PACKET_TYPE::DISCONNECT;
 
     //_manager.send(this->_server, packet);
 }

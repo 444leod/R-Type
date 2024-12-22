@@ -5,10 +5,6 @@
 ** main
 */
 
-#include <thread>
-#include <memory>
-#include <SFML/Graphics.hpp>
-
 #include "Game.hpp"
 #include "scenes/Level1/Level1.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"

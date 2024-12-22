@@ -5,13 +5,13 @@
 ** main
 */
 
-#include "EventDispatcher.hpp"
+#include "ecs/EventDispatcher.hpp"
 #include "Foo.hpp"
 
 int main(void)
 {
     Foo *foo = new Foo();
-    EventDispatcher dispatcher;
+    ecs::EventDispatcher dispatcher;
     dispatcher.link<foo_message>(foo);
     dispatcher.broadcast<foo_message>({ .message = "Hello world!" });
     dispatcher.unlink<foo_message>(foo);

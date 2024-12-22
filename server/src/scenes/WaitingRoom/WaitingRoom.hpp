@@ -8,16 +8,17 @@
 #ifndef WAITING_ROOM_HPP
 #define WAITING_ROOM_HPP
 
-#include "AScene.hpp"
-#include "Registry.hpp"
-#include "EventDispatcher.hpp"
+#include "scenes/AScene.hpp"
+#include "ecs/Registry.hpp"
+#include "ecs/EventDispatcher.hpp"
+#include "network/NetworkAgent.hpp"
 #include "Components.hpp"
 #include <chrono>
 #include <functional>
 
 class WaitingRoom final : public AScene {
 public:
-    WaitingRoom(ISceneManager& m, Registry& r, const std::string& n) : AScene(m, r, n)
+    WaitingRoom(ISceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
     {
         this->_font.loadFromFile("assets/arial.ttf");
     }
@@ -40,9 +41,9 @@ public:
 
 private:
 
-    void _onConnect(const ClientInformations& src, UDPPacket& packet);
-    void _onDisconnect(const ClientInformations& src, UDPPacket& packet);
-    void _onMessage(const ClientInformations& src, UDPPacket& packet);
+    void _onConnect(const ntw::ClientInformations& src, ntw::UDPPacket& packet);
+    void _onDisconnect(const ntw::ClientInformations& src, ntw::UDPPacket& packet);
+    void _onMessage(const ntw::ClientInformations& src, ntw::UDPPacket& packet);
 
     void _onExit(const std::vector<std::string>& args);
     void _onStart(const std::vector<std::string>& args);
@@ -52,8 +53,8 @@ private:
 
 public:
 private:
-    Registry _registry;
-    EventDispatcher _eventDispatcher;
+    ecs::Registry _registry;
+    ecs::EventDispatcher _eventDispatcher;
 
     sf::Font _font;
 
