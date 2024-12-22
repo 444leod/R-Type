@@ -20,7 +20,7 @@ class DrawSpritesSystem final : public ARenderSystem
 public:
     DrawSpritesSystem(Registry &registry) : ARenderSystem(registry) {}
 
-    void execute(const sf::RenderWindow &window) override {
+    void execute(sf::RenderWindow &window) override {
         auto vec = std::vector<std::tuple<Entity, sf::Sprite, Transform>>{};
 
         _registry.view<sf::Sprite, Transform>().each([&](const Entity& entity, sf::Sprite &sprite, Transform &transform) {

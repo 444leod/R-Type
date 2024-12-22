@@ -28,8 +28,6 @@ public:
         _explosionTex.loadFromFile("assets/r-typesheet44.gif", sf::IntRect(131, 0, 192, 32));
         _eventDispatcher.link<UserInput>(&_inputHandler);
         _eventDispatcher.link<PacketInformations>(&_packetHandler);
-
-
     }
 
     void initialize() override;

@@ -89,6 +89,7 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
         });
     });
 
+    this->_bugTimer -= deltaTime;
     if (this->_bugTimer < 0)
     {
         this->_bugTimer = 5.f;
@@ -100,21 +101,7 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
 }
 
 void Level1::render(sf::RenderWindow& window) {
-    auto vec = std::vector<std::tuple<Entity, sf::Sprite, Transform>>{};
-
-    _registry.view<sf::Sprite, Transform>().each([&](const Entity& entity, sf::Sprite &sprite, Transform &transform) {
-        vec.emplace_back(entity, sprite, transform);
-        sprite.setPosition(transform.x, transform.y);
-        sprite.setRotation(transform.rotation);
-    });
-
-    std::ranges::sort(vec, [](const auto& a, const auto& b) {
-        return std::get<2>(a).z < std::get<2>(b).z;
-    });
-
-    for (const auto& [entity, sprite, _] : vec) {
-        window.draw(sprite);
-    }
+    _drawSpritesSystem.execute(window);
 
     // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sprite) {
     //     auto bounds = sprite.getGlobalBounds();

@@ -20,7 +20,7 @@ public:
      * @brief Execute the system's logic
      * @param window The window to render to
      */
-    virtual void execute(const sf::RenderWindow &window) = 0;
+    virtual void execute(sf::RenderWindow &window) = 0;
 };
 
 #endif /* !ARENDERSYSTEM_HPP_ */

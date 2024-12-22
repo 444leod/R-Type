@@ -14,6 +14,7 @@
 #include "Components.hpp"
 #include "BaseComponents.hpp"
 #include "BaseSystems/Update/ParalaxSystem.hpp"
+#include "BaseSystems/Render/DrawSpritesSystem.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
 #include <chrono>
@@ -68,7 +69,8 @@ private:
     sf::Texture _explosionTex;
 
     // systems used
-    ParallaxSystem _parallaxSystem{_registry}; 
+    ParallaxSystem _parallaxSystem{_registry};
+    DrawSpritesSystem _drawSpritesSystem{_registry};
 };
 
 
