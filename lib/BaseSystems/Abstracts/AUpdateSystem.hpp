@@ -17,9 +17,9 @@ public:
     AUpdateSystem(Registry &registry) : ASystem(registry) {}
 
     /**
-     * @brief Execute the system's logic
+     * @brief Execute a 'update' system's logic
      * @param deltaTime The time between the last frame and the current one
-     * @param window The window to render to
+     * @param window The window used as a reference for the system for logic, not for rendering
      */
     virtual void execute(const double _deltaTime, const sf::RenderWindow &window) = 0;
 };

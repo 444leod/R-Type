@@ -17,7 +17,7 @@ public:
     ARenderSystem(Registry &registry) : ASystem(registry) {}
 
     /**
-     * @brief Execute the system's logic
+     * @brief Execute a 'render' system's logic
      * @param window The window to render to
      */
     virtual void execute(sf::RenderWindow &window) = 0;

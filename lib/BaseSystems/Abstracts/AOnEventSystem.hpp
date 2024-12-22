@@ -17,7 +17,7 @@ public:
     AOnEventSystem(Registry &registry) : ASystem(registry) {}
 
     /**
-     * @brief Execute the system's logic
+     * @brief Execute a 'event' system's logic
      * @param event The sfml event to handle
      */
     virtual void execute(sf::Event &event) = 0;
