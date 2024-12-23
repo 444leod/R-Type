@@ -11,7 +11,7 @@
 #include "ecs/Registry.hpp"
 #include "ecs/EventDispatcher.hpp"
 #include "Components.hpp"
-#include "scenes/AScene.hpp"
+#include "engine/AScene.hpp"
 #include <chrono>
 #include <functional>
 #include <optional>
@@ -31,11 +31,7 @@ public:
 
     void initialize() override;
 
-    void update(double deltaTime, const sf::RenderWindow &window) override;
-
-    void render(sf::RenderWindow &window) override;
-
-    void onEvent(sf::Event &event) override;
+    void update(double deltaTime) override;
 
     void onEnter() override;
 

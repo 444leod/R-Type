@@ -10,16 +10,22 @@
 
 class SceneManager;
 
-#include <SFML/Graphics.hpp>
+#include <map>
 #include "ISceneManager.hpp"
 #include "ecs/Registry.hpp"
+#include "ecs/Family.hpp"
+#include "modules/ISceneModule.hpp"
 
 class AScene {
 public:
     AScene(ISceneManager& manager, ecs::Registry& registry, const std::string& name) :
         _manager(manager), _registry(registry), _name(name) {}
 
-    virtual~AScene() = default;
+    virtual~AScene()
+    {
+        for (auto [_, module]: this->_modules)
+            delete module;
+    }
 
     /**
      * @brief Called once at the start of the program
@@ -31,25 +37,22 @@ public:
      * @param deltaTime The time between this frame and the last
      * @param window The window to render to
      */
-    virtual void update(double deltaTime, const sf::RenderWindow &window) = 0;
+    virtual void update(double deltaTime) = 0;
 
-    /**
-     * @brief Used to render the elements in a scene
-     * @param window The  window to render to
-     */
-    virtual void render(sf::RenderWindow &window) = 0;
+    template<typename T>
+    T *getModule()
+    {
+        auto id = ecs::Family<T>::id();
+        if (this->_modules.contains(id))
+            return dynamic_cast<T *>(this->_modules.at(id));
+        return nullptr;
+    }
 
     /**
      * @brief Gets the name of the scene
      * @return The name of the scene
      */
     virtual const std::string& name() const noexcept { return this->_name; }
-
-    /**
-     * @brief Called for every window event.
-     * @param event The event to be taken care of
-     */
-    virtual void onEvent(sf::Event &event) = 0;
 
     /**
      * @brief Called when the Scene starts without a predecessor
@@ -74,10 +77,19 @@ public:
     virtual void onExit(const AScene& nextScene) = 0;
 
 protected:
+    template<typename T>
+    void _addModule()
+    {
+        auto id = ecs::Family<T>::id();
+        this->_modules[id] = new T();
+    }
+
+protected:
     ecs::Registry& _registry;
     ISceneManager& _manager;
 
 private:
+    std::map<std::uint32_t, ISceneModule *> _modules = {};
     const std::string& _name = "";
 };
 

@@ -5,15 +5,17 @@
 ** main
 */
 
-#include "Game.hpp"
+#include "engine/Game.hpp"
 #include "scenes/Level1/Level1.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
+#include "engine/modules/GameRenderingModule.hpp"
 
 int main(void) {
     auto game = Game();
 
-    game.scenes().registerScene<WaitingRoom>("main");
-    game.scenes().registerScene<Level1>("game");
+    game.addModule<GameRenderingModule>(800, 600, "R-Type");
+    game.registerScene<WaitingRoom>("main");
+    game.registerScene<Level1>("game");
     game.run();
     return 0;
 }

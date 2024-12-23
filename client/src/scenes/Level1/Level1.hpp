@@ -8,7 +8,7 @@
 #ifndef LEVEL_1_HPP
 #define LEVEL_1_HPP
 
-#include "scenes/AScene.hpp"
+#include "engine/AScene.hpp"
 #include "ecs/Registry.hpp"
 #include "ecs/EventDispatcher.hpp"
 #include "Components.hpp"
@@ -30,11 +30,7 @@ public:
 
     void initialize() override;
 
-    void update(double deltaTime, const sf::RenderWindow &window) override;
-
-    void render(sf::RenderWindow &window) override;
-
-    void onEvent(sf::Event &event) override;
+    void update(double deltaTime) override;
 
     void onEnter() override;
 

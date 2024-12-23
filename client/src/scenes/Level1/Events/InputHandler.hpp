@@ -16,7 +16,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include "Global.hpp"
 #include "network/NetworkAgent.hpp"
-#include "scenes/ISceneManager.hpp"
+#include "engine/ISceneManager.hpp"
 
 class InputHandler : public ecs::EventHandler<UserInput> {
 public:

@@ -21,10 +21,11 @@ void WaitingRoom::initialize()
 {
 }
 
-void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
+void WaitingRoom::update(const double deltaTime)
 {
 }
 
+/*
 void WaitingRoom::render(sf::RenderWindow& window)
 {
     if (this->_id.has_value()) {
@@ -45,7 +46,9 @@ void WaitingRoom::render(sf::RenderWindow& window)
         window.draw(text);
     }
 }
+*/
 
+/*
 void WaitingRoom::onEvent(sf::Event &event)
 {
     switch (event.type) {
@@ -73,6 +76,7 @@ void WaitingRoom::onEvent(sf::Event &event)
         default:break;
     }
 }
+*/
 
 void WaitingRoom::onEnter() {
     _registry.clear();
