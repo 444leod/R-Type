@@ -10,6 +10,8 @@ fi
 
 echo "$GITHUB_TOKEN" | gh auth login --with-token
 
+git config --global --add safe.directory '*'
+
 commit_sha=$(git rev-parse HEAD)
 
 temp_dir="temp_comment_${commit_sha}"

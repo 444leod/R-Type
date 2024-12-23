@@ -159,9 +159,6 @@ pipeline {
                             }
                         }
                         stage('Prepare Linux Release') {
-                            when {
-                                expression { releaseTag != null }
-                            }
                             steps {
                                 script {
                                     sh """
@@ -235,9 +232,6 @@ pipeline {
                             }
                         }
                         stage('Prepare Windows Release') {
-                            when {
-                                expression { releaseTag != null }
-                            }
                             steps {
                                 script {
                                     sh """
