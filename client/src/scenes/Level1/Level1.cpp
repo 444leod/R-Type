@@ -21,7 +21,7 @@ void Level1::initialize()
 {
 }
 
-void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
+void Level1::update(const double deltaTime) {
     _parallaxOffset += static_cast<float>(deltaTime * 25);
 
     _registry.view<Parallax, Transform>().each([&](const Parallax&, Transform& transform) {
@@ -35,10 +35,10 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
         transform.y += static_cast<float>((velocity.y * SCALE) * deltaTime);
     });
 
-    _registry.view<Projectile, Transform>().each([&](const Entity& entity, const Projectile&, const Transform& transform) {
-        if (transform.x > window.getSize().x) {
+    _registry.view<Projectile, Velocity, Transform>().each([&](const Entity& entity, Projectile& projectile, const Velocity& velocity, const Transform& transform) {
+        projectile.range -= velocity.x * SCALE * deltaTime;
+        if (projectile.range < 0)
             _registry.remove(entity);
-        }
     });
 
     _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation & animation, sf::Sprite &sprite) {
@@ -95,6 +95,7 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
     // explosions.displaySets();
 }
 
+/*
 void Level1::render(sf::RenderWindow& window) {
     auto vec = std::vector<std::tuple<Entity, sf::Sprite, Transform>>{};
 
@@ -136,7 +137,9 @@ void Level1::render(sf::RenderWindow& window) {
     });
     #endif
 }
+*/
 
+/*
 void Level1::onEvent(sf::Event &event) {
     switch (event.type) {
         case sf::Event::KeyPressed:
@@ -162,6 +165,7 @@ void Level1::onEvent(sf::Event &event) {
         default:break;
     }
 }
+*/
 
 void Level1::onEnter() {
     _registry.clear();
@@ -205,9 +209,10 @@ void Level1::onEnter(const AScene& lastScene)
 
 void Level1::onExit()
 {
+    /*
     ntw::UDPPacket packet;
     packet << ntw::PACKET_TYPE::DISCONNECT;
-
+    */
     //_manager.send(this->_server, packet);
 }
 

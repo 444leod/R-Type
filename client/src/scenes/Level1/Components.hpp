@@ -25,6 +25,7 @@ struct Self {};
 struct Hitbox {};
 
 struct Projectile {
+    double range;
     std::uint32_t id;
 };
 

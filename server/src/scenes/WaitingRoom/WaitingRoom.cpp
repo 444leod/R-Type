@@ -31,7 +31,7 @@ void WaitingRoom::initialize()
     std::cout << "> " << std::flush;
 }
 
-void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
+void WaitingRoom::update(const double deltaTime)
 {
     if (isInputAvailable()) {
         std::string input;
@@ -62,6 +62,7 @@ void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
     }
 }
 
+/*
 void WaitingRoom::render(sf::RenderWindow& window)
 {
     _registry.view<Position, Renderable>().each([&](const auto& entity, auto& pos, auto& renderable) {
@@ -116,6 +117,7 @@ void WaitingRoom::onEvent(sf::Event &event)
         default:break;
     }
 }
+*/
 
 void WaitingRoom::onEnter()
 {

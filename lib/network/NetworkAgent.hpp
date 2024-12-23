@@ -9,11 +9,14 @@
 
 #include <asio.hpp>
 #include <iostream>
-#include "UDPPacket.hpp"
+#include <cstdint>
+#include <thread>
 #include <cstdint>
 
-namespace ntw {
+#include "UDPPacket.hpp"
 
+namespace ntw
+{
     /**
      * @brief This enum will describe what the packet is for.
      *
@@ -22,8 +25,9 @@ namespace ntw {
      *  - DISCONNECT: Disconnection packet
      *  - MESSAGE: Message packet (temporary
      *  - POSITION: Position packet (temporary)
-    */
-    enum class PACKET_TYPE {
+     */
+    enum class PACKET_TYPE
+    {
         NONE = 0,
         CONNECT,
         DISCONNECT,
@@ -39,7 +43,8 @@ namespace ntw {
         MONSTER_KILLED
     };
 
-    struct ClientInformations {
+    struct ClientInformations
+    {
         asio::ip::udp::endpoint endpoint;
         enum class Type {
             VIEWER,
@@ -48,13 +53,9 @@ namespace ntw {
         std::string name;
         std::uint32_t id = 0;
 
-        ClientInformations(asio::ip::udp::endpoint endpoint, Type type, std::uint32_t id, std::string name = "") :
-            endpoint(endpoint), type(type), id(id)
-        {}
-
-        ClientInformations(const ClientInformations&) = default;
-
-        ClientInformations& operator=(const ClientInformations&) = default;
+        ClientInformations(asio::ip::udp::endpoint endpoint, Type type, std::uint32_t id, std::string name = "") : endpoint(endpoint), type(type), id(id) {}
+        ClientInformations(const ClientInformations &) = default;
+        ClientInformations &operator=(const ClientInformations &) = default;
     };
 
     /**
@@ -68,14 +69,20 @@ namespace ntw {
          * @param ctx The io_context
          * @param port The port to create the agent at
          */
-        NetworkAgent(asio::io_context& ctx, std::uint32_t port = 0) :
-            _socket(ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
+        NetworkAgent(std::uint32_t port = 0) : _socket(this->_ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
         {
+
             this->_port = this->_socket.local_endpoint().port();
             this->_receivePacket();
+            this->_thread = std::thread([this]()
+                                        { this->_ctx.run(); });
             std::cout << "NetworkAgent started, listening on port: " << this->_socket.local_endpoint().address().to_string() << ":" << this->_port << "..." << std::endl;
         }
-        virtual ~NetworkAgent() = default;
+
+        virtual ~NetworkAgent()
+        {
+            this->_stop();
+        }
 
         virtual void run() = 0;
         virtual void stop() = 0;
@@ -86,14 +93,17 @@ namespace ntw {
          * @param src Where the packet was received from
          * @param packet The packet received
          */
-        virtual void _onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) = 0;
+        virtual void _onPacketReceived(const asio::ip::udp::endpoint &src, UDPPacket &packet) = 0;
 
         /**
          * @brief Stops any asio work from this agent
          */
         void _stop()
         {
-            this->_socket.close();
+            if (this->_socket.is_open())
+                this->_socket.close();
+            if (this->_thread.joinable())
+                this->_thread.join();
         }
 
         /**
@@ -101,7 +111,7 @@ namespace ntw {
          * @param dest The endpoint to send to
          * @param packet The packet to send
          */
-        void _send(const asio::ip::udp::endpoint& dest, const ntw::UDPPacket& packet)
+        void _send(const asio::ip::udp::endpoint &dest, const UDPPacket &packet)
         {
             auto serialized = packet.serialize();
             // std::cout << "Sending packet to " << dest << " (" << serialized.size() << " bytes)" << std::endl;
@@ -111,9 +121,7 @@ namespace ntw {
                 std::bind(
                     &NetworkAgent::_handleSend, this,
                     asio::placeholders::error,
-                    asio::placeholders::bytes_transferred
-                )
-            );
+                    asio::placeholders::bytes_transferred));
         }
 
     private:
@@ -127,9 +135,7 @@ namespace ntw {
                 std::bind(
                     &NetworkAgent::_handleReceive, this,
                     asio::placeholders::error,
-                    asio::placeholders::bytes_transferred
-                )
-            );
+                    asio::placeholders::bytes_transferred));
         }
 
         /**
@@ -137,17 +143,21 @@ namespace ntw {
          * @param e Error code linked to the reception
          * @param bytes The amount of bytes received
          */
-        void _handleReceive(const std::error_code& e, std::size_t bytes)
+        void _handleReceive(const std::error_code &e, std::size_t bytes)
         {
             if (e)
                 return;
 
-            if (bytes > 0) {
-                ntw::UDPPacket packet(this->_buffer.data(), bytes);
+            if (bytes > 0)
+            {
+                UDPPacket packet(this->_buffer.data(), bytes);
                 uint16_t calculated_checksum = packet.calculateChecksum();
-                if (calculated_checksum == packet.checksum) {
+                if (calculated_checksum == packet.checksum)
+                {
                     this->_onPacketReceived(this->_client, packet); // yipee
-                } else {
+                }
+                else
+                {
                     std::cerr << "got some corrupted packet :( (checksum mismatch: " << calculated_checksum << " != " << packet.checksum << ")" << std::endl;
                 }
             }
@@ -159,15 +169,18 @@ namespace ntw {
          * @param e Error code linked to the sending
          * @param bytes The amount of bytes sent
          */
-        void _handleSend(const std::error_code& e, std::size_t bytes)
-        {}
+        void _handleSend(const std::error_code &e, std::size_t bytes)
+        {
+        }
 
     protected:
         std::uint32_t _port = 0;
+
     private:
+        asio::io_context _ctx;
         asio::ip::udp::socket _socket;
         asio::ip::udp::endpoint _client;
         std::array<char, 1024> _buffer;
+        std::thread _thread;
     };
-
-} // namespace ntw
+}

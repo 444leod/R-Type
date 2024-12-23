@@ -14,7 +14,7 @@
 #include "network/UDPPacket.hpp"
 #include "network/NetworkAgent.hpp"
 #include "config.h"
-#include "scenes/ISceneManager.hpp"
+#include "engine/ISceneManager.hpp"
 
 struct PacketInformations : public ecs::IEvent
 {

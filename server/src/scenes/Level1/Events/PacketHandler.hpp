@@ -15,7 +15,7 @@
 #include "network/UDPPacket.hpp"
 #include "network/NetworkAgent.hpp"
 #include "Global.hpp"
-#include "scenes/ISceneManager.hpp"
+#include "engine/ISceneManager.hpp"
 #include <cstdint>
 #include <config.h>
 

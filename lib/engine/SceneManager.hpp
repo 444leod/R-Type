@@ -12,26 +12,22 @@
 #include <map>
 #include <chrono>
 
-#ifndef __RTYPE_NO_DISPLAY__
-#include <SFML/Graphics.hpp>
-#endif
-
 #include <utility>
 #include <exception>
 #include <thread>
 #include <asio.hpp>
-#include "ISceneManager.hpp"
-#include "AScene.hpp"
-#include "network/UDPPacket.hpp"
-#include "config.h"
-
 #include <iostream>
 
+#include "ISceneManager.hpp"
+#include "AScene.hpp"
+#include "config.h"
+
+namespace ecs {
+    class Registry;
+}
+
+
 namespace scene {
-
-    constexpr int TARGET_FPS = 60;
-    const std::chrono::milliseconds FRAME_DURATION(1000 / TARGET_FPS);
-
     /**
      * @brief Concept to ensure the type is derived from AScene.
      */
@@ -71,10 +67,7 @@ public:
         std::string _message; ///< The exception message.
     };
 
-    SceneManager(const int& port = 0)
-    {
-        _window.setKeyRepeatEnabled(false);
-    }
+    SceneManager() = default;
     ~SceneManager() override = default;
 
     /**
@@ -84,11 +77,11 @@ public:
      * @throws Exception if the scene name is empty.
      */
     template <scene::SceneType T>
-    void registerScene(const std::string &name)
+    void registerScene(const std::string &name, ecs::Registry& registry)
     {
         if (name.empty())
             throw Exception("Scene name cannot be empty");
-        std::shared_ptr<T> scene = std::make_shared<T>(*this, name);
+        std::shared_ptr<T> scene = std::make_shared<T>(*this, registry, name);
         scene->initialize();
         this->_scenes[name] = scene;
     }
@@ -115,39 +108,6 @@ public:
     }
 
     /**
-     * @brief Runs the scene manager.
-     * @throws Exception if no scenes are currently loaded.
-     */
-    void run()
-    {
-        auto before = std::chrono::high_resolution_clock::now();
-
-        if (this->_loadingName.empty())
-            throw Exception("No scenes currently loaded.");
-        while (_running) {
-            auto now = std::chrono::high_resolution_clock::now();
-            const double deltaTime = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - before).count() / 1000.0;
-            before = now;
-            this->_updateSceneState();
-
-            #ifndef __RTYPE_NO_DISPLAY__
-            this->_pollEvents();
-            #endif
-
-            this->_current->update(deltaTime, _window);
-
-            #ifndef __RTYPE_NO_DISPLAY__
-            this->_render();
-            const double elapsed = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(std::chrono::high_resolution_clock::now() - now).count() / 1000.0;
-            if (elapsed < scene::FRAME_DURATION.count())
-                std::this_thread::sleep_for(scene::FRAME_DURATION - std::chrono::milliseconds(static_cast<int>(elapsed)));
-            #endif
-
-//            this->_current->flush();
-        }
-    }
-
-    /**
      * @brief Stops the scene manager.
      */
     void stop() noexcept override
@@ -158,21 +118,19 @@ public:
     }
 
     /**
-     * @brief Sends a packet to a destination.
-     *
-     * @param dest The destination to send the packet to.
-     * @param packet The packet to send.
+     * @brief Gets the first loaded Scene in the registry, throws if there is none
+     * @return A const reference to the name of the first loaded Qcene
      */
-    void send(const asio::ip::udp::endpoint& dest, const ntw::UDPPacket& packet) override
-    {
-//        this->_send(dest, packet);
+    const std::string& firstRegistered() {
+        if (this->_scenes.empty())
+            throw Exception("No scenes currently registered.");
+        return this->_scenes.begin()->first;
     }
 
-private:
     /**
      * @brief Updates the state of the current scene.
      */
-    void _updateSceneState()
+    void update()
     {
         if (_loadingName.empty())
             return;
@@ -190,44 +148,16 @@ private:
         this->_loadingName = "";
     }
 
-    #ifndef __RTYPE_NO_DISPLAY__
-
     /**
-     * @brief Polls events from the window.
+     * @brief Gets the currently running scene
+     * @return A refernece to the currently running scene
      */
-    void _pollEvents()
+    AScene& current()
     {
-        sf::Event event{};
-        while (this->_window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                this->_window.close();
-                this->stop();
-                return;
-            }
-            this->_current->onEvent(event);
-        }
+        if (_current == nullptr)
+            throw Exception("No scenes currently running.");
+        return *this->_current;
     }
-
-    /**
-     * @brief Renders the current scene.
-     */
-    void _render()
-    {
-        this->_window.clear();
-        this->_current->render(_window);
-        this->_window.display();
-    }
-
-    #endif
-
-    void _onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) override
-    {
-//        if (this->_current != nullptr)
-//        {
-//            this->_current->onPacketReceived(src, packet);
-//        }
-    }
-
 
 private:
     bool _running = true;
@@ -235,10 +165,6 @@ private:
     std::map<std::string, std::shared_ptr<AScene>> _scenes = {};
     std::shared_ptr<AScene> _current = nullptr;
     std::string _loadingName;
-
-    #ifndef __RTYPE_NO_DISPLAY__
-    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(384 * SCALE, 256 * SCALE), "R-Type");
-    #endif
 };
 
 #endif //SCENEMANAGER_HPP
