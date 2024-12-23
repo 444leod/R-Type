@@ -1,0 +1,28 @@
+/*
+** EPITECH PROJECT, 2024
+** R-Type
+** File description:
+** ShipShootedSystem
+*/
+
+#ifndef SHIPSHOOTEDSYSTEM_HPP_
+#define SHIPSHOOTEDSYSTEM_HPP_
+
+
+#include "BaseSystems/Abstracts/ASystem.hpp"
+#include "ISceneManager.hpp"
+#include "../Events/PacketInformations.hpp"
+#include <SFML/Graphics.hpp>
+
+class ShipShootedSystem final : public ASystem
+{
+public:
+    ShipShootedSystem(Registry &registry, ISceneManager &_manager, const std::string name = "ShipShootedSystem") : ASystem(registry, name), _manager(_manager) {}
+
+    void execute(const PacketInformations event, sf::Texture _projectileTex);
+    
+private:
+    ISceneManager &_manager;
+};
+
+#endif /* !SHIPSHOOTEDSYSTEM_HPP_ */
