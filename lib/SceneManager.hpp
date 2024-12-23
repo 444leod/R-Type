@@ -142,6 +142,8 @@ public:
             if (elapsed < scene::FRAME_DURATION.count())
                 std::this_thread::sleep_for(scene::FRAME_DURATION - std::chrono::milliseconds(static_cast<int>(elapsed)));
             #endif
+
+            this->_current->flush();
         }
     }
 

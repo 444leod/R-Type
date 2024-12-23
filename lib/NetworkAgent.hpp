@@ -9,8 +9,12 @@
 
 #include <asio.hpp>
 #include <iostream>
-#include "UDPPacket.hpp"
 #include <cstdint>
+#include <thread>
+
+#include "UDPPacket.hpp"
+#include "Events.hpp"
+#include <SFML/Graphics.hpp>
 
 /**
  * @brief This enum will describe what the packet is for.
@@ -66,17 +70,20 @@ public:
      * @param ctx The io_context
      * @param port The port to create the agent at
      */
-    NetworkAgent(asio::io_context& ctx, std::uint32_t port = 0) :
-        _socket(ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
+    NetworkAgent(std::uint32_t port = 0) :
+        _socket(this->_ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
     {
+
         this->_port = this->_socket.local_endpoint().port();
         this->_receivePacket();
+        this->_thread = std::thread([this] () { this->_ctx.run(); });
         std::cout << "NetworkAgent started, listening on port: " << this->_socket.local_endpoint().address().to_string() << ":" << this->_port << "..." << std::endl;
     }
-    virtual ~NetworkAgent() = default;
 
-    virtual void run() = 0;
-    virtual void stop() = 0;
+    virtual ~NetworkAgent()
+    {
+        this->_stop();
+    }
 
 protected:
     /**
@@ -91,7 +98,10 @@ protected:
      */
     void _stop()
     {
-        this->_socket.close();
+        if (this->_socket.is_open())
+            this->_socket.close();
+        if (this->_thread.joinable())
+            this->_thread.join();
     }
 
     /**
@@ -163,7 +173,9 @@ private:
 protected:
     std::uint32_t _port = 0;
 private:
+    asio::io_context _ctx;
     asio::ip::udp::socket _socket;
     asio::ip::udp::endpoint _client;
     std::array<char, 1024> _buffer;
+    std::thread _thread;
 };

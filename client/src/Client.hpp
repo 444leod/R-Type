@@ -24,7 +24,7 @@ public:
      * @brief Constructor for the Client class
      * @param ctx The io_context to add the client's work to
      */
-    Client(asio::io_context& ctx): NetworkAgent(ctx) {}
+    Client() = default;
     ~Client() override = default;
 
     /**
