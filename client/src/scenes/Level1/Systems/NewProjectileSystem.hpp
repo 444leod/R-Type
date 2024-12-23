@@ -18,7 +18,7 @@
 class NewProjectileSystem final : public ASystem
 {
 public:
-    NewProjectileSystem(Registry &registry, const std::string name = "NewProjectileSystem") : ASystem(registry, name) {}
+    NewProjectileSystem(Registry &registry) : ASystem(registry, "NewProjectileSystem") {}
 
     void execute(const PacketInformations &event, const sf::Texture &projectileTex) {
         std::uint32_t projectileId; 

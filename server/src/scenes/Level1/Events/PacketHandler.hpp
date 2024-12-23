@@ -21,7 +21,11 @@
 class PacketHandler final : public EventHandler<PacketInformations>
 {
 public:
-    explicit PacketHandler(Registry &registry, ISceneManager &manager) : _registry(registry), _manager(manager)
+    explicit PacketHandler(Registry &registry, ISceneManager &manager) :
+        _registry(registry),
+        _manager(manager),
+        _shipMovedSystem(_registry, _manager),
+        _shipShootedSystem(_registry, _manager)
     {
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
     }
@@ -56,9 +60,8 @@ private:
     ISceneManager &_manager;
 
     sf::Texture _projectileTex;
-    ShipMovedSystem _shipMovedSystem{_registry, _manager};
-    ShipShootedSystem _shipShootedSystem{_registry, _manager};
-    // std::vector<std::shared_ptr<ASystem>> _systems = {_shipMovedSystem}; 
+    ShipMovedSystem _shipMovedSystem;
+    ShipShootedSystem _shipShootedSystem;
 };
 
 #endif // PACKETHANDLER_HPP

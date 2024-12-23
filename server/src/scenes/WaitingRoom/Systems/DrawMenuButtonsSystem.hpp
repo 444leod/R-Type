@@ -16,7 +16,7 @@
 class DrawMenuButtonsSystem final : public ARenderSystem
 {
 public:
-    DrawMenuButtonsSystem(Registry &registry, const std::string name = "DrawMenuButtonsSystem") : ARenderSystem(registry, name) {}
+    DrawMenuButtonsSystem(Registry &registry) : ARenderSystem(registry, "DrawMenuButtonsSystem") {}
 
     void execute(sf::RenderWindow &window) override {
         sf::Font font;

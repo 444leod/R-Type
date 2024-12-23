@@ -14,7 +14,7 @@
 #include "config.h"
 #include <SFML/Graphics.hpp>
 
-void ShipShootedSystem::execute(const PacketInformations event, sf::Texture _projectileTex) {
+void ShipShootedSystem::execute(const PacketInformations &event, const sf::Texture &_projectileTex) {
     for (auto [entity, ship, transform] : _registry.view<Ship, Transform>())
     {
         if (ship.id != event.source.id)

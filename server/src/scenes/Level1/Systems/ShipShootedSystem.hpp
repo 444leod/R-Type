@@ -17,9 +17,9 @@
 class ShipShootedSystem final : public ASystem
 {
 public:
-    ShipShootedSystem(Registry &registry, ISceneManager &_manager, const std::string name = "ShipShootedSystem") : ASystem(registry, name), _manager(_manager) {}
+    ShipShootedSystem(Registry &registry, ISceneManager &_manager) : ASystem(registry, "ShipShootedSystem"), _manager(_manager) {}
 
-    void execute(const PacketInformations event, sf::Texture _projectileTex);
+    void execute(const PacketInformations &event, const sf::Texture &_projectileTex);
     
 private:
     ISceneManager &_manager;

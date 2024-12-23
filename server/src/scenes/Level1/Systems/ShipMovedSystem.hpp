@@ -16,9 +16,9 @@
 class ShipMovedSystem final : public ASystem
 {
 public:
-    ShipMovedSystem(Registry &registry, ISceneManager &_manager, const std::string name = "ShipMovedSystem") : ASystem(registry, name), _manager(_manager) {}
+    ShipMovedSystem(Registry &registry, ISceneManager &_manager) : ASystem(registry, "ShipMovedSystem"), _manager(_manager) {}
 
-    void execute(const PacketInformations event, UserInput input);
+    void execute(const PacketInformations &event, const UserInput &input);
 
 private:
     ISceneManager &_manager;

@@ -15,7 +15,7 @@
 class RemoveOutOfBoundProjectilesSystem final : public AUpdateSystem
 {
 public:
-    RemoveOutOfBoundProjectilesSystem(Registry &registry, const std::string name = "RemoveOutOfBoundProjectilesSystem") : AUpdateSystem(registry, name) {}
+    RemoveOutOfBoundProjectilesSystem(Registry &registry) : AUpdateSystem(registry, "RemoveOutOfBoundProjectilesSystem") {}
 
     void execute(const double deltaTime) override {
         _registry.view<Projectile, Transform>().each([&](const Entity& entity, const Projectile&, const Transform& transform) {

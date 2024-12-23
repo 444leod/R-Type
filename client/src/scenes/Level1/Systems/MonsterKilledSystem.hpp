@@ -19,7 +19,7 @@
 class MonsterKilledSystem final : public ASystem
 {
 public:
-    MonsterKilledSystem(Registry &registry, const std::string name = "MonsterKilledSystem") : ASystem(registry, name) {}
+    MonsterKilledSystem(Registry &registry) : ASystem(registry, "MonsterKilledSystem") {}
 
     void execute(const PacketInformations &event, const sf::Texture &explosionTex) {
         uint32_t monster_id;

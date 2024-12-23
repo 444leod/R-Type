@@ -16,14 +16,19 @@
 #include "ISceneManager.hpp"
 #include "BaseComponents.hpp"
 #include "PacketInformations.hpp"
-#include "../Systems/ShipMouvementSystem.hpp"
+#include "../Systems/ShipMovementSystem.hpp"
 #include "../Systems/NewProjectileSystem.hpp"
 #include "../Systems/MonsterKilledSystem.hpp"
 
 class PacketHandler : public EventHandler<PacketInformations>
 {
 public:
-    explicit PacketHandler(Registry &registry, ISceneManager &manager) : _registry(registry), _manager(manager)
+    explicit PacketHandler(Registry &registry, ISceneManager &manager) :
+        _registry(registry),
+        _manager(manager),
+        _shipMovementSystem(_registry),
+        _newProjectileSystem(_registry),
+        _monsterKilledSystem(_registry)
     {
         _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
@@ -60,7 +65,7 @@ public:
         }
         case PACKET_TYPE::SHIP_MOVEMENT:
         {
-            _shipMouvementSystem.execute(event);
+            _shipMovementSystem.execute(event);
             return;
         }
         case PACKET_TYPE::NEW_PROJECTILE:
@@ -123,9 +128,9 @@ private:
     sf::Texture _bugTex;
     sf::Texture _explosionTex;
 
-    ShipMouvementSystem _shipMouvementSystem{_registry};
-    NewProjectileSystem _newProjectileSystem{_registry};
-    MonsterKilledSystem _monsterKilledSystem{_registry};
+    ShipMovementSystem _shipMovementSystem;
+    NewProjectileSystem _newProjectileSystem;
+    MonsterKilledSystem _monsterKilledSystem;
 };
 
 #endif // PACKETHANDLER_HPP

@@ -237,7 +237,7 @@ private:
     std::string _loadingName;
 
     #ifndef __RTYPE_NO_DISPLAY__
-    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE), "R-Type Server");
+    sf::RenderWindow _window = sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE), "R-Type");
     #endif
 };
 

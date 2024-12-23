@@ -13,7 +13,7 @@
 #include "Global.hpp"
 #include <SFML/Graphics.hpp>
 
-void ShipMovedSystem::execute(const PacketInformations event, UserInput input) {
+void ShipMovedSystem::execute(const PacketInformations &event, const UserInput &input) {
     for (auto [ship_id, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>())
     {
         if (ship.id != event.source.id)

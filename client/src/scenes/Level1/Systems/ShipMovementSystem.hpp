@@ -2,11 +2,11 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** ShipMouvementSystem
+** ShipMovementSystem
 */
 
-#ifndef SHIPMOUVEMENTSYSTEM_HPP_
-#define SHIPMOUVEMENTSYSTEM_HPP_
+#ifndef SHIPMOVEMENTSYSTEM_HPP_
+#define SHIPMOVEMENTSYSTEM_HPP_
 
 #include "BaseSystems/Abstracts/ASystem.hpp"
 #include "BaseComponents.hpp"
@@ -14,10 +14,10 @@
 #include <config.h>
 #include "../Events/PacketInformations.hpp"
 
-class ShipMouvementSystem final : public ASystem
+class ShipMovementSystem final : public ASystem
 {
 public:
-    ShipMouvementSystem(Registry &registry, const std::string name = "ShipMouvementSystem") : ASystem(registry, name) {}
+    ShipMovementSystem(Registry &registry) : ASystem(registry, "ShipMovementSystem") {}
 
     void execute(const PacketInformations &event) {
         std::uint32_t id;
@@ -35,4 +35,4 @@ public:
     }
 };
 
-#endif /* !SHIPMOUVEMENTSYSTEM_HPP_ */
+#endif /* !SHIPMOVEMENTSYSTEM_HPP_ */
