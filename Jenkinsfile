@@ -172,15 +172,19 @@ pipeline {
                             }
                         }
                         stage('Upload Linux Artifacts') {
-                            when {
-                                expression { releaseTag != null }
-                            }
                             steps {
                                 script {
-                                    sh """
-                                        chmod +x ./scripts/upload_artifacts.sh
-                                        RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
-                                    """
+                                    if (env.BRANCH_NAME == 'main' && releaseTag != null) {
+                                        sh """
+                                            chmod +x ./scripts/upload_artifacts.sh
+                                            RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
+                                        """
+                                    } else {
+                                        sh """
+                                            chmod +x ./scripts/comment_artifacts.sh
+                                            ./scripts/comment_artifacts.sh linux
+                                        """
+                                    }
                                     archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
                                 }
                             }
@@ -188,6 +192,7 @@ pipeline {
                     }
                     post {
                         always {
+                            sh 'chmod -R 777 .'
                             cleanWs()
                         }
                     }
@@ -243,15 +248,19 @@ pipeline {
                             }
                         }
                         stage('Upload Windows Artifacts') {
-                            when {
-                                expression { releaseTag != null }
-                            }
                             steps {
                                 script {
-                                    sh """
-                                        chmod +x ./scripts/upload_artifacts.sh
-                                        RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
-                                    """
+                                    if (env.BRANCH_NAME == 'main' && releaseTag != null) {
+                                        sh """
+                                            chmod +x ./scripts/upload_artifacts.sh
+                                            RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
+                                        """
+                                    } else {
+                                        sh """
+                                            chmod +x ./scripts/comment_artifacts.sh
+                                            ./scripts/comment_artifacts.sh windows
+                                        """
+                                    }
                                     archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
                                 }
                             }
@@ -259,6 +268,7 @@ pipeline {
                     }
                     post {
                         always {
+                            sh 'chmod -R 777 .'
                             cleanWs()
                         }
                     }
