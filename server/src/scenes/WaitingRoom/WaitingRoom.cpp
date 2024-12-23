@@ -71,6 +71,7 @@ void WaitingRoom::render(sf::RenderWindow& window)
 
 void WaitingRoom::onEvent(sf::Event &event)
 {
+    //! Will not refactor this part, not supposed to have a system here
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
         sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
         _registry.view<Position, RectangleButton>().each([&](const auto& entity, auto& pos, auto& button) {
