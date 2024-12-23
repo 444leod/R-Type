@@ -217,9 +217,16 @@ public:
 
         if (!this->_sparse_sets.contains(id))
         {
+            throw std::out_of_range("No such component in the registry:" + type<T>::name());
+        }
+
+        const auto set = dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id));
+
+        if (!set->contains(entity))
+        {
             throw std::out_of_range(entity + " does not have the component " + type<T>::name());
         }
-        return dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id))->get(entity);
+        return set->at(entity);
     }
 
 private:
