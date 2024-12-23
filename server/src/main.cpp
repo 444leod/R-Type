@@ -13,14 +13,9 @@
 
 int main(void)
 {
-    asio::io_context ctx;
-    std::unique_ptr<std::thread> t;
     try
     {
-        SceneManager sceneManager(ctx, 25565);
-        t = std::make_unique<std::thread>([&ctx](){
-            ctx.run();
-        });
+        SceneManager sceneManager(25565);
         sceneManager.registerScene<WaitingRoom>("WaitingRoom");
         sceneManager.registerScene<Level1>("Level1");
         sceneManager.load("WaitingRoom");
@@ -28,13 +23,7 @@ int main(void)
         std::cout << "Game ended..." << std::endl;
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
-        if (t && t->joinable()) {
-            t->join();
-        }
         return 1;
-    }
-    if (t && t->joinable()) {
-        t->join();
     }
     return 0;
 }
