@@ -10,24 +10,24 @@
 
 #include "../Components.hpp"
 #include "../../UserInput.hpp"
-#include "EventDispatcher.hpp"
-#include "Registry.hpp"
+#include "ecs/EventDispatcher.hpp"
+#include "ecs/Registry.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
 #include "Global.hpp"
-#include "NetworkAgent.hpp"
-#include "ISceneManager.hpp"
+#include "network/NetworkAgent.hpp"
+#include "scenes/ISceneManager.hpp"
 
-class InputHandler : public EventHandler<UserInput> {
+class InputHandler : public ecs::EventHandler<UserInput> {
 public:
-    explicit InputHandler(Registry& registry, ISceneManager& manager) : _registry(registry), _manager(manager) {}
+    explicit InputHandler(ecs::Registry& registry, ISceneManager& manager) : _registry(registry), _manager(manager) {}
     ~InputHandler() override = default;
 
     void receive(const UserInput& event) override {
         if (event.key == sf::Keyboard::Key::Space && event.pressed)
         {
-            UDPPacket packet;
-            packet << PACKET_TYPE::USER_INPUT << event;
+            ntw::UDPPacket packet;
+            packet << ntw::PACKET_TYPE::USER_INPUT << event;
             //_manager.send(SERVER, packet);
             return;
         }
@@ -38,8 +38,8 @@ public:
             case sf::Keyboard::Key::Left:
             case sf::Keyboard::Key::Right:
             {
-                UDPPacket packet;
-                packet << PACKET_TYPE::USER_INPUT << event;
+                ntw::UDPPacket packet;
+                packet << ntw::PACKET_TYPE::USER_INPUT << event;
                 //_manager.send(SERVER, packet);
             }
             default:
@@ -49,7 +49,7 @@ public:
 
 
 private:
-    Registry& _registry;
+    ecs::Registry& _registry;
     ISceneManager& _manager;
 };
 

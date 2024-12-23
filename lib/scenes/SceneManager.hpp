@@ -20,9 +20,9 @@
 #include <exception>
 #include <thread>
 #include <asio.hpp>
-#include "Registry.hpp"
 #include "ISceneManager.hpp"
 #include "AScene.hpp"
+#include "network/UDPPacket.hpp"
 #include "config.h"
 
 #include <iostream>
@@ -71,11 +71,11 @@ public:
         std::string _message; ///< The exception message.
     };
 
-    explicit SceneManager()
+    SceneManager(const int& port = 0)
     {
         _window.setKeyRepeatEnabled(false);
     }
-    ~SceneManager() = default;
+    ~SceneManager() override = default;
 
     /**
      * @brief Registers a scene with a given name.
@@ -88,7 +88,7 @@ public:
     {
         if (name.empty())
             throw Exception("Scene name cannot be empty");
-        std::shared_ptr<T> scene = std::make_shared<T>(*this, this->_registry, name);
+        std::shared_ptr<T> scene = std::make_shared<T>(*this, name);
         scene->initialize();
         this->_scenes[name] = scene;
     }
@@ -142,6 +142,8 @@ public:
             if (elapsed < scene::FRAME_DURATION.count())
                 std::this_thread::sleep_for(scene::FRAME_DURATION - std::chrono::milliseconds(static_cast<int>(elapsed)));
             #endif
+
+//            this->_current->flush();
         }
     }
 
@@ -155,11 +157,15 @@ public:
             this->_current->onExit();
     }
 
-    const std::string& defaultScene() const
+    /**
+     * @brief Sends a packet to a destination.
+     *
+     * @param dest The destination to send the packet to.
+     * @param packet The packet to send.
+     */
+    void send(const asio::ip::udp::endpoint& dest, const ntw::UDPPacket& packet) override
     {
-        if (this->_scenes.empty())
-            throw Exception("No scenes currently registered.");
-        return this->_scenes.begin()->first;
+//        this->_send(dest, packet);
     }
 
 private:
@@ -168,7 +174,7 @@ private:
      */
     void _updateSceneState()
     {
-        if (this->_loadingName.empty() || !this->_scenes.contains(this->_loadingName))
+        if (_loadingName.empty())
             return;
 
         /// Exit the current scene if there was one
@@ -214,10 +220,18 @@ private:
 
     #endif
 
-private:
-    bool _running = false;
+    void _onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) override
+    {
+//        if (this->_current != nullptr)
+//        {
+//            this->_current->onPacketReceived(src, packet);
+//        }
+    }
 
-    Registry _registry;
+
+private:
+    bool _running = true;
+
     std::map<std::string, std::shared_ptr<AScene>> _scenes = {};
     std::shared_ptr<AScene> _current = nullptr;
     std::string _loadingName;

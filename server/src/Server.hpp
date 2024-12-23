@@ -14,8 +14,7 @@
 #include <sstream>
 #include <functional>
 #include <map>
-#include "NetworkAgent.hpp"
-#include "Components.hpp"
+#include "network/NetworkAgent.hpp"
 
 #define TARGET_TICKRATE 30
 
@@ -32,7 +31,7 @@ bool isInputAvailable() {
 /**
  * @brief Class representation of a game server, receives packet and can broadcast
  */
-class Server: public NetworkAgent
+class Server: public ntw::NetworkAgent
 {
 public:
     /**
@@ -94,7 +93,7 @@ private:
      * @param src The source that sent the packet
      * @param packet The packet received
      */
-    void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override
+    void _onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) override
     {
         const auto payload = packet.payload;
 
@@ -104,10 +103,10 @@ private:
         /**
          * @brief This code is temporary!!!
         */
-        PACKET_TYPE packet_type{};
-        packet >> packet_type;
-         if (_packet_handlers.contains(packet_type))
-            _packet_handlers.at(packet_type)(src, packet);
+//        ntw::PACKET_TYPE packet_type{};
+//        packet >> packet_type;
+//         if (_packet_handlers.contains(packet_type))
+//            _packet_handlers.at(packet_type)(src, packet);
 
         auto it = std::find(this->_clients.begin(), this->_clients.end(), src);
         if (it == this->_clients.end())
@@ -120,14 +119,14 @@ private:
      */
     void _broadcast(const std::string& message)
     {
-        UDPPacket packet;
+        ntw::UDPPacket packet;
         packet << message;
         for (auto& client : this->_clients) {
             this->_send(client, packet);
         }
     }
 
-    void _broadcast(const UDPPacket& packet)
+    void _broadcast(const ntw::UDPPacket& packet)
     {
         for (auto& client : this->_clients)
         {
@@ -147,64 +146,17 @@ private:
     { "exit", [&]()
     {
         this->_running = false;
-        UDPPacket packet;
-        packet << PACKET_TYPE::DISCONNECT;
+        ntw::UDPPacket packet;
+        packet << ntw::PACKET_TYPE::DISCONNECT;
         this->_broadcast(packet);
         std::cout << "Exiting..." << std::endl;
     } },
     { "start", [&]()
     {
-        UDPPacket packet;
-        packet << PACKET_TYPE::START;
+        ntw::UDPPacket packet;
+        packet << ntw::PACKET_TYPE::START;
         this->_broadcast(packet);
         _command_handlers["start"] = []() {};
     } },
     };
-
-    std::map<PACKET_TYPE, std::function<void(const asio::ip::udp::endpoint& client, UDPPacket& packet)>> _packet_handlers = {
-        {
-            PACKET_TYPE::CONNECT, [&](const asio::ip::udp::endpoint& client, UDPPacket& packet)
-            {
-                std::cout << "Received CONNECT packet." << std::endl;
-                _client_ids[client] = _client_ids.size();
-                std::cout << "Client ID: " << _client_ids[client] << std::endl;
-
-                UDPPacket response;
-                response << PACKET_TYPE::CONNECT;
-                response << _client_ids[client];
-                this->_send(client, response);
-            }
-        },
-        {
-            PACKET_TYPE::DISCONNECT, [&](const asio::ip::udp::endpoint& client, UDPPacket& packet)
-            {
-                std::cout << "Received DISCONNECT packet." << std::endl;
-                this->_clients.erase(std::remove(this->_clients.begin(), this->_clients.end(), client), this->_clients.end());
-                this->_client_ids.erase(client);
-
-            }
-        },
-        {
-            PACKET_TYPE::MESSAGE, [&](const asio::ip::udp::endpoint& client, UDPPacket& packet)
-            {
-                std::cout << "Received MESSAGE packet." << std::endl;
-
-                std::string message;
-                packet >> message;
-                std::cout << "Message from client " << _client_ids[client] << ": " << message << std::endl;
-            }
-        },
-        {
-            PACKET_TYPE::POSITION, [&](const asio::ip::udp::endpoint& client, UDPPacket& packet)
-            {
-                std::cout << "Received POSITION packet." << std::endl;
-
-                Position pos{};
-                packet >> pos;
-                std::cout << "Position: (" << pos.x << ", " << pos.y << ")" << std::endl;
-            }
-        }
-    };
-
-
 };

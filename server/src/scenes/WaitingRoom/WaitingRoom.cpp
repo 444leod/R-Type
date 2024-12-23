@@ -6,7 +6,7 @@
 */
 
 #include "WaitingRoom.hpp"
-#include "Registry.hpp"
+#include "ecs/Registry.hpp"
 #include <algorithm>
 #include <cmath>
 #include <config.h>
@@ -150,8 +150,8 @@ void WaitingRoom::onEnter(const AScene& lastScene)
 
 void WaitingRoom::onExit()
 {
-    UDPPacket packet;
-    packet << PACKET_TYPE::DISCONNECT;
+    ntw::UDPPacket packet;
+    packet << ntw::PACKET_TYPE::DISCONNECT;
 
     //this->_broadcast(packet);
 }
@@ -160,7 +160,7 @@ void WaitingRoom::onExit(const AScene& nextScene)
 {
 }
 
-/* void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet)
+/* void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
 {
 
     const auto payload = packet.payload;
@@ -178,8 +178,8 @@ void WaitingRoom::onExit(const AScene& nextScene)
     {
         if (packet_type != PACKET_TYPE::CONNECT)
             return;
-        CLIENTS.push_back(ClientInformations(src,
-            (CLIENTS.size() > 4) ? ClientInformations::Type::VIEWER : ClientInformations::Type::PLAYER,
+        CLIENTS.push_back(ntw::ClientInformations(src,
+            (CLIENTS.size() > 4) ? ntw::ClientInformations::Type::VIEWER : ntw::ClientInformations::Type::PLAYER,
             CLIENTS.size()
         ));
 
@@ -193,7 +193,7 @@ void WaitingRoom::onExit(const AScene& nextScene)
         _packet_handlers.at(packet_type)(*it, packet);
 } */
 
-/* void WaitingRoom::_broadcast(const UDPPacket& packet)
+/* void WaitingRoom::_broadcast(const ntw::UDPPacket& packet)
 {
     for (auto&[endpoint, type, name, id] : CLIENTS)
     {
@@ -201,13 +201,13 @@ void WaitingRoom::onExit(const AScene& nextScene)
     }
 } */
 
-void WaitingRoom::_onConnect(const ClientInformations& src, UDPPacket& packet)
+void WaitingRoom::_onConnect(const ntw::ClientInformations& src, ntw::UDPPacket& packet)
 {
     std::string name;
     packet >> name;
     std::cout << "Client connected: " << name << std::endl;
 
-    /* UDPPacket response;
+    /* ntw::UDPPacket response;
     response << PACKET_TYPE::CONNECT;
     response << src.id;
 
@@ -220,7 +220,7 @@ void WaitingRoom::_onConnect(const ClientInformations& src, UDPPacket& packet)
     _registry.addComponent<Renderable>(entity, {clientText});
 }
 
-void WaitingRoom::_onDisconnect(const ClientInformations& src, UDPPacket& packet) {
+void WaitingRoom::_onDisconnect(const ntw::ClientInformations& src, ntw::UDPPacket& packet) {
     std::cout << "Client disconnected: " << src.endpoint << std::endl;
     std::erase_if(CLIENTS, [&src](const auto& client) {
         return client.endpoint == src.endpoint;
@@ -229,7 +229,7 @@ void WaitingRoom::_onDisconnect(const ClientInformations& src, UDPPacket& packet
     //send informations about players connected
 }
 
-void WaitingRoom::_onMessage(const ClientInformations& source, UDPPacket& packet)
+void WaitingRoom::_onMessage(const ntw::ClientInformations& source, ntw::UDPPacket& packet)
 {
     std::string message;
     packet >> message;
@@ -241,7 +241,7 @@ void WaitingRoom::_onExit(const std::vector<std::string>& args)
     std::cout << "Exiting..." << std::endl;
     _manager.stop();
 
-    //this->_broadcast(UDPPacket{} << PACKET_TYPE::DISCONNECT);
+    //this->_broadcast(ntw::UDPPacket{} << PACKET_TYPE::DISCONNECT);
 }
 
 void WaitingRoom::_onStart(const std::vector<std::string>& args)
@@ -254,6 +254,6 @@ void WaitingRoom::_onStart(const std::vector<std::string>& args)
         return;
     }
 
-    //this->_broadcast(UDPPacket{} << PACKET_TYPE::START);
+    //this->_broadcast(ntw::UDPPacket{} << PACKET_TYPE::START);
     _manager.load("Level1");
 }

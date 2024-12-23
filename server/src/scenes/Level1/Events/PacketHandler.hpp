@@ -10,26 +10,26 @@
 
 #include "../Components.hpp"
 #include "../../UserInput.hpp"
-#include "EventDispatcher.hpp"
-#include "Registry.hpp"
-#include "UDPPacket.hpp"
-#include "NetworkAgent.hpp"
+#include "ecs/EventDispatcher.hpp"
+#include "ecs/Registry.hpp"
+#include "network/UDPPacket.hpp"
+#include "network/NetworkAgent.hpp"
 #include "Global.hpp"
-#include "ISceneManager.hpp"
+#include "scenes/ISceneManager.hpp"
 #include <cstdint>
 #include <config.h>
 
-struct PacketInformations : public IEvent
+struct PacketInformations : public ecs::IEvent
 {
-    PACKET_TYPE type;
-    UDPPacket &packet;
-    ClientInformations &source;
+    ntw::PACKET_TYPE type;
+    ntw::UDPPacket &packet;
+    ntw::ClientInformations &source;
 };
 
-class PacketHandler final : public EventHandler<PacketInformations>
+class PacketHandler final : public ecs::EventHandler<PacketInformations>
 {
 public:
-    explicit PacketHandler(Registry &registry, ISceneManager &manager) : _registry(registry), _manager(manager)
+    explicit PacketHandler(ecs::Registry &registry, ISceneManager &manager) : _registry(registry), _manager(manager)
     {
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
     }
@@ -40,7 +40,7 @@ public:
     {
         switch (event.type)
         {
-        case PACKET_TYPE::USER_INPUT:
+        case ntw::PACKET_TYPE::USER_INPUT:
         {
             UserInput input{};
             event.packet >> input;
@@ -70,8 +70,8 @@ public:
                         break;
                     }
 
-                    /* UDPPacket packet;
-                    packet << PACKET_TYPE::SHIP_MOVEMENT << event.source.id << vel << pos;
+                    /* ntw::UDPPacket packet;
+                    packet << ntw::PACKET_TYPE::SHIP_MOVEMENT << event.source.id << vel << pos;
                     for (const auto &client : CLIENTS)
                     {
                         _manager.send(client.endpoint, packet);
@@ -99,8 +99,8 @@ public:
                     _registry.addComponent(projectile, Projectile{ .id = projectileId });
                     _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
 
-                    /* UDPPacket packet;
-                    packet << PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId;
+                    /* ntw::UDPPacket packet;
+                    packet << ntw::PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId;
                     for (const auto &client : CLIENTS)
                         _manager.send(client.endpoint, packet);
                     projectileId++; */
@@ -113,7 +113,7 @@ public:
     }
 
 private:
-    Registry &_registry;
+    ecs::Registry &_registry;
     ISceneManager &_manager;
 
     sf::Texture _projectileTex;

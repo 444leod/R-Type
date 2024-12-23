@@ -9,23 +9,23 @@
 #define PACKETHANDLER_HPP
 
 #include "../Components.hpp"
-#include "EventDispatcher.hpp"
-#include "Registry.hpp"
-#include "UDPPacket.hpp"
-#include "NetworkAgent.hpp"
+#include "ecs/EventDispatcher.hpp"
+#include "ecs/Registry.hpp"
+#include "network/UDPPacket.hpp"
+#include "network/NetworkAgent.hpp"
 #include "config.h"
-#include "ISceneManager.hpp"
+#include "scenes/ISceneManager.hpp"
 
-struct PacketInformations : public IEvent
+struct PacketInformations : public ecs::IEvent
 {
-    PACKET_TYPE type;
-    UDPPacket &packet;
+    ntw::PACKET_TYPE type;
+    ntw::UDPPacket &packet;
 };
 
-class PacketHandler : public EventHandler<PacketInformations>
+class PacketHandler : public ecs::EventHandler<PacketInformations>
 {
 public:
-    explicit PacketHandler(Registry &registry, ISceneManager &manager) : _registry(registry), _manager(manager)
+    explicit PacketHandler(ecs::Registry &registry, ISceneManager &manager) : _registry(registry), _manager(manager)
     {
         _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
@@ -38,7 +38,7 @@ public:
     {
         switch (event.type)
         {
-        case PACKET_TYPE::YOUR_SHIP:
+        case ntw::PACKET_TYPE::YOUR_SHIP:
         {
             std::uint32_t id;
             event.packet >> id;
@@ -47,7 +47,7 @@ public:
             _registry.addComponent(self_spaceship, Ship{.id = id});
             return;
         }
-        case PACKET_TYPE::NEW_SHIP:
+        case ntw::PACKET_TYPE::NEW_SHIP:
         {
             std::uint32_t id;
             event.packet >> id;
@@ -55,12 +55,12 @@ public:
             _registry.addComponent(ally_spaceship, Ship{.id = id});
             return;
         }
-        case PACKET_TYPE::DISCONNECT:
+        case ntw::PACKET_TYPE::DISCONNECT:
         {
             _manager.stop();
             return;
         }
-        case PACKET_TYPE::SHIP_MOVEMENT:
+        case ntw::PACKET_TYPE::SHIP_MOVEMENT:
         {
             std::uint32_t id;
             Velocity velocity{};
@@ -76,7 +76,7 @@ public:
             }
             return;
         }
-        case PACKET_TYPE::NEW_PROJECTILE:
+        case ntw::PACKET_TYPE::NEW_PROJECTILE:
         {
             std::uint32_t projectileId;
             std::uint32_t shipId;
@@ -100,7 +100,7 @@ public:
             }
             return;
         }
-        case PACKET_TYPE::NEW_MONSTER:
+        case ntw::PACKET_TYPE::NEW_MONSTER:
         {
             uint32_t id;
             Transform transform{};
@@ -118,7 +118,7 @@ public:
             _registry.addComponent(bug, Hitbox{});
             return;
         }
-        case PACKET_TYPE::MONSTER_KILLED:
+        case ntw::PACKET_TYPE::MONSTER_KILLED:
         {
             uint32_t monster_id;
             uint32_t projectile_id;
@@ -170,7 +170,7 @@ private:
         return spaceship;
     }
 
-    Registry &_registry;
+    ecs::Registry &_registry;
     ISceneManager &_manager;
     sf::Texture _spaceshipTex;
     sf::Texture _projectileTex;
