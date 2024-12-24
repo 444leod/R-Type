@@ -10,8 +10,8 @@
 
 #include "ecs/Registry.hpp"
 #include "ecs/EventDispatcher.hpp"
-#include "Components.hpp"
 #include "engine/AScene.hpp"
+#include "BaseComponents.hpp"
 #include <chrono>
 #include <functional>
 #include <optional>
@@ -31,7 +31,7 @@ public:
 
     void initialize() override;
 
-    void update(double deltaTime) override;
+    void update(const double& deltaTime) override;
 
     void onEnter() override;
 
@@ -42,10 +42,10 @@ public:
     void onExit(const AScene& nextScene) override;
 
 private:
-/*     void _onConnect(UDPPacket& packet);
-    void _onDisconnect(UDPPacket& packet);
-    void _onMessage(UDPPacket& packet);
-    void _onStart(UDPPacket& packet);
+/*     void _onConnect(ntw::UDPPacket& packet);
+    void _onDisconnect(ntw::UDPPacket& packet);
+    void _onMessage(ntw::UDPPacket& packet);
+    void _onStart(ntw::UDPPacket& packet);
 
     void send(const UDPPacket& packet); */
 

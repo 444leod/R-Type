@@ -21,7 +21,7 @@ void WaitingRoom::initialize()
 {
 }
 
-void WaitingRoom::update(const double deltaTime)
+void WaitingRoom::update(const double& deltaTime)
 {
 }
 

@@ -10,40 +10,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <cstdint>
-
-struct Transform {
-    float x, y, z;
-    float rotation;
-};
-
-struct Velocity {
-    float x, y;
-};
-
-struct Self {};
-
-struct Hitbox {};
-
-struct Projectile {
-    double range;
-    uint32_t id;
-};
-
-struct Parallax {};
-
-struct Animation {
-    sf::Clock clock = sf::Clock();
-    std::pair<int, int> frameSize{};
-    float speed{};
-    unsigned int currentFrame = 1;
-    unsigned int frameCount{};
-    bool loop{};
-    Velocity velocity{};
-};
-
-struct Enemy {
-    uint32_t id;
-};
+#include "BaseComponents.hpp"
 
 struct Bug {
     sf::Clock clock = sf::Clock();

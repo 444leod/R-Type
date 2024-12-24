@@ -12,20 +12,27 @@
 #include "ecs/Registry.hpp"
 #include "ecs/EventDispatcher.hpp"
 #include "network/NetworkAgent.hpp"
-#include "Components.hpp"
+#include "BaseComponents.hpp"
+#include "BaseSystems/Render/DrawTextsSystem.hpp"
+
+#include "Systems/DrawMenuButtonsSystem.hpp"
+
 #include <chrono>
 #include <functional>
+#include <memory>
 
 class WaitingRoom final : public AScene {
 public:
     WaitingRoom(ISceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
     {
         this->_font.loadFromFile("assets/arial.ttf");
+        this->_renderSystems.push_back(std::make_unique<DrawTextsSystem>(_registry));
+        this->_renderSystems.push_back(std::make_unique<DrawMenuButtonsSystem>(_registry));
     }
 
     void initialize() override;
 
-    void update(double deltaTime) override;
+    void update(const double& deltaTime) override;
 
     void onEnter() override;
 
@@ -54,10 +61,10 @@ private:
 
     sf::Font _font;
 
-    /* std::map<PACKET_TYPE, std::function<void(const ClientInformations& client, UDPPacket& packet)>> _packet_handlers = {
-        {PACKET_TYPE::CONNECT,      [this](const ClientInformations& src, UDPPacket& packet)   { this->_onConnect(src, packet); }},
-        {PACKET_TYPE::DISCONNECT,   [this](const ClientInformations& src, UDPPacket& packet)   { this->_onDisconnect(src, packet); }},
-        {PACKET_TYPE::MESSAGE,      [this](const ClientInformations& src, UDPPacket& packet)   { this->_onMessage(src, packet); }}
+    /* std::map<ntw::PACKET_TYPE, std::function<void(const ClientInformations& client, ntw::UDPPacket& packet)>> _packet_handlers = {
+        {ntw::PACKET_TYPE::CONNECT,      [this](const ClientInformations& src, ntw::UDPPacket& packet)   { this->_onConnect(src, packet); }},
+        {ntw::PACKET_TYPE::DISCONNECT,   [this](const ClientInformations& src, ntw::UDPPacket& packet)   { this->_onDisconnect(src, packet); }},
+        {ntw::PACKET_TYPE::MESSAGE,      [this](const ClientInformations& src, ntw::UDPPacket& packet)   { this->_onMessage(src, packet); }}
     }; */
 
     std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
@@ -67,7 +74,6 @@ private:
     };
 
     // PlayerMovement _playerMovement{_registry};
-
 };
 
 

@@ -12,6 +12,10 @@ class SceneManager;
 
 #include <map>
 #include "ISceneManager.hpp"
+#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
+#include "BaseSystems/Abstracts/ARenderSystem.hpp"
+#include <vector>
+#include <memory>
 #include "ecs/Registry.hpp"
 #include "ecs/Family.hpp"
 #include "modules/ISceneModule.hpp"
@@ -23,7 +27,7 @@ public:
 
     virtual~AScene()
     {
-        for (auto [_, module]: this->_modules)
+        for (const auto module: this->_modules | std::views::values)
             delete module;
     }
 
@@ -35,15 +39,13 @@ public:
     /**
      * @brief Called every frame
      * @param deltaTime The time between this frame and the last
-     * @param window The window to render to
      */
-    virtual void update(double deltaTime) = 0;
+    virtual void update(const double& deltaTime) = 0;
 
     template<typename T>
     T *getModule()
     {
-        auto id = ecs::Family<T>::id();
-        if (this->_modules.contains(id))
+        if (auto id = ecs::Family<T>::id();this->_modules.contains(id))
             return dynamic_cast<T *>(this->_modules.at(id));
         return nullptr;
     }
@@ -76,6 +78,56 @@ public:
      */
     virtual void onExit(const AScene& nextScene) = 0;
 
+    void flush() const
+    {
+        this->_registry.flush();
+    }
+
+    /**
+     * @brief Enables a system
+     * @param systemName The name of the system to enable
+     * @return true if the system was found and enabled, false otherwise
+     */
+    bool enableSystem(const std::string& systemName)
+    {
+        for (const auto& system : this->_updateSystems) {
+            if (system->name() == systemName) {
+                system->enable();
+                return true;
+            }
+        }
+        for (const auto& system : this->_renderSystems) {
+            if (system->name() == systemName) {
+                system->enable();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @brief Disables an update system
+     * @param systemName The name of the system to disable
+     * @return true if the system was found and disabled, false otherwise
+     */
+    bool disableSystem(const std::string& systemName)
+    {
+        for (const auto& system : this->_updateSystems) {
+            if (system->name() == systemName) {
+                system->disable();
+                return true;
+            }
+        }
+        for (const auto& system : this->_renderSystems) {
+            if (system->name() == systemName) {
+                system->disable();
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 protected:
     template<typename T>
     void _addModule()
@@ -87,6 +139,36 @@ protected:
 protected:
     ecs::Registry& _registry;
     ISceneManager& _manager;
+
+    std::vector<std::unique_ptr<AUpdateSystem>> _updateSystems;
+    std::vector<std::unique_ptr<ARenderSystem>> _renderSystems;
+
+    /**
+     * @brief Executes all the update systems in the scene
+     * @param deltaTime The time between this frame and the last
+     */
+    void _executeUpdateSystems(const double& deltaTime)
+    {
+        for (const auto& system : this->_updateSystems) {
+            if (system->isEnabled()) {
+                system->execute(deltaTime);
+            }
+        }
+    }
+
+    /**
+     * @brief Executes all the render systems in the scene
+     * @param window The window to render to
+     */
+    void _executeRenderSystems(sf::RenderWindow& window)
+    {
+        for (const auto& system : this->_renderSystems) {
+            if (system->isEnabled()) {
+                system->execute(window);
+            }
+        }
+    }
+
 
 private:
     std::map<std::uint32_t, ISceneModule *> _modules = {};

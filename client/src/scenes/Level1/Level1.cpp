@@ -6,14 +6,14 @@
 */
 
 #include <algorithm>
-#include <cmath>
-#include <config.h>
 #include <iostream>
-#include <ranges>
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include "Level1.hpp"
+#include "../WaitingRoom/WaitingRoom.hpp"
+#include "Components.hpp"
+#include "BaseComponents.hpp"
 #include "ecs/Registry.hpp"
 #include "network/NetworkAgent.hpp"
 
@@ -21,51 +21,8 @@ void Level1::initialize()
 {
 }
 
-void Level1::update(const double deltaTime) {
-    _parallaxOffset += static_cast<float>(deltaTime * 25);
-
-    _registry.view<Parallax, Transform>().each([&](const Parallax&, Transform& transform) {
-        transform.x = -_parallaxOffset;
-    });
-
-    auto view = _registry.view<Transform, Velocity>();
-
-    view.each([&](const Entity& entity, Transform& transform, const Velocity& velocity) {
-        transform.x += static_cast<float>((velocity.x * SCALE) * deltaTime);
-        transform.y += static_cast<float>((velocity.y * SCALE) * deltaTime);
-    });
-
-    _registry.view<Projectile, Velocity, Transform>().each([&](const Entity& entity, Projectile& projectile, const Velocity& velocity, const Transform& transform) {
-        projectile.range -= velocity.x * SCALE * deltaTime;
-        if (projectile.range < 0)
-            _registry.remove(entity);
-    });
-
-    _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation & animation, sf::Sprite &sprite) {
-        if (animation.currentFrame == animation.frameCount) {
-            if (animation.loop) {
-                animation.currentFrame = 0;
-            } else {
-                if (animation.velocity.x != 0 || animation.velocity.y != 0)
-                    _registry.addComponent(entity, animation.velocity);
-                else
-                    _registry.remove(entity);
-                _registry.removeComponent<Animation>(entity);
-            }
-        }
-        if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
-            sprite.setTextureRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
-            animation.currentFrame++;
-            animation.clock.restart();
-        }
-    });
-
-    _registry.view<Bug, sf::Sprite, Transform>().each([&](const Entity& entity, Bug& bug, sf::Sprite& sprite, Transform& transform) {
-        const auto movementFactor = std::sin(bug.clock.getElapsedTime().asSeconds() / .2);
-        transform.y += movementFactor * 8;
-        transform.rotation = 90 - 45 * movementFactor;
-    });
-
+void Level1::update(const double& deltaTime) {
+    _executeUpdateSystems(deltaTime);
 
 /*
     _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
@@ -97,33 +54,7 @@ void Level1::update(const double deltaTime) {
 
 /*
 void Level1::render(sf::RenderWindow& window) {
-    auto vec = std::vector<std::tuple<Entity, sf::Sprite, Transform>>{};
-
-    _registry.view<sf::Sprite, Transform>().each([&](const Entity& entity, sf::Sprite &sprite, Transform &transform) {
-        vec.emplace_back(entity, sprite, transform);
-        sprite.setPosition(transform.x, transform.y);
-        sprite.setRotation(transform.rotation);
-    });
-
-    std::ranges::sort(vec, [](const auto& a, const auto& b) {
-        return std::get<2>(a).z < std::get<2>(b).z;
-    });
-
-    for (const auto& [entity, sprite, _] : vec) {
-        window.draw(sprite);
-    }
-
-    // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sprite) {
-    //     auto bounds = sprite.getGlobalBounds();
-    //     sf::RectangleShape hitbox(sf::Vector2f(bounds.width, bounds.height));
-    //     hitbox.setPosition(sprite.getPosition());
-    //     hitbox.setRotation(sprite.getRotation());
-    //     hitbox.setOutlineColor(sf::Color::Red);
-    //     hitbox.setOutlineThickness(1);
-    //     // hitbox.setOrigin(sprite.getOrigin());
-    //     hitbox.setFillColor(sf::Color::Transparent);
-    //     window.draw(hitbox);
-    // });
+    _executeRenderSystems(window);
 
     #if DEBUG
     sf::Text text;
@@ -191,7 +122,7 @@ void Level1::onEnter() {
 
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
-    _registry.addComponent(background, Parallax{});
+    _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 }
 
 void Level1::onEnter(const AScene& lastScene)
@@ -204,7 +135,7 @@ void Level1::onEnter(const AScene& lastScene)
 
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
-    _registry.addComponent(background, Parallax{});
+    _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 }
 
 void Level1::onExit()

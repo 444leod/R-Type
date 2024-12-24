@@ -8,6 +8,8 @@ set(SRC_FILES
     scenes/Level1/Level1.cpp
     scenes/Level1/Events/PacketHandler.cpp
     scenes/Level1/Events/InputHandler.cpp
+    scenes/Level1/Systems/ShipMovedSystem.cpp
+    scenes/Level1/Systems/ShipShootedSystem.cpp
 )
 list(TRANSFORM SRC_FILES PREPEND "src/")
 add_executable(${PROJECT_NAME} ${SRC_FILES})

@@ -15,17 +15,21 @@
 #include "network/NetworkAgent.hpp"
 #include "config.h"
 #include "engine/ISceneManager.hpp"
-
-struct PacketInformations : public ecs::IEvent
-{
-    ntw::PACKET_TYPE type;
-    ntw::UDPPacket &packet;
-};
+#include "BaseComponents.hpp"
+#include "PacketInformations.hpp"
+#include "../Systems/ShipMovementSystem.hpp"
+#include "../Systems/NewProjectileSystem.hpp"
+#include "../Systems/MonsterKilledSystem.hpp"
 
 class PacketHandler : public ecs::EventHandler<PacketInformations>
 {
 public:
-    explicit PacketHandler(ecs::Registry &registry, ISceneManager &manager) : _registry(registry), _manager(manager)
+    explicit PacketHandler(ecs::Registry &registry, ISceneManager &manager) :
+        _registry(registry),
+        _manager(manager),
+        _shipMovementSystem(_registry),
+        _newProjectileSystem(_registry),
+        _monsterKilledSystem(_registry)
     {
         _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
@@ -62,42 +66,12 @@ public:
         }
         case ntw::PACKET_TYPE::SHIP_MOVEMENT:
         {
-            std::uint32_t id;
-            Velocity velocity{};
-            Transform position{};
-            event.packet >> id >> velocity >> position;
-            for (auto &[entity, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>().each())
-            {
-                if (ship.id != id)
-                    continue;
-                vel = velocity;
-                pos = position;
-                break;
-            }
+            _shipMovementSystem.execute(event);
             return;
         }
         case ntw::PACKET_TYPE::NEW_PROJECTILE:
         {
-            std::uint32_t projectileId;
-            std::uint32_t shipId;
-            event.packet >> shipId >> projectileId;
-            for (auto [entity, ship, transform] : _registry.view<Ship, Transform>().each())
-            {
-                if (ship.id != shipId)
-                    continue;
-                const auto projectile = _registry.create();
-                const auto shootTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
-                auto projectileSprite = sf::Sprite(_projectileTex);
-                projectileSprite.setOrigin(0, 0);
-                projectileSprite.setScale(SCALE, SCALE);
-                projectileSprite.setPosition(shootTransform.x, shootTransform.y);
-                projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
-                _registry.addComponent(projectile, Hitbox{});
-                _registry.addComponent(projectile, projectileSprite);
-                _registry.addComponent(projectile, shootTransform);
-                _registry.addComponent(projectile, Projectile{ .id = projectileId });
-                _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
-            }
+            _newProjectileSystem.execute(event, _projectileTex);
             return;
         }
         case ntw::PACKET_TYPE::NEW_MONSTER:
@@ -120,29 +94,7 @@ public:
         }
         case ntw::PACKET_TYPE::MONSTER_KILLED:
         {
-            uint32_t monster_id;
-            uint32_t projectile_id;
-            Transform transform;
-            event.packet >> monster_id >> projectile_id;
-
-            _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&e_enemy, const sf::Sprite& sprite, const Transform& transform)  {
-                _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&p_projectile, const Transform& projectile_transform) {
-                    if (e_enemy.id != monster_id || p_projectile.id != projectile_id)
-                        return;
-                    const auto explosion = _registry.create();
-                    auto explosionSprite = sf::Sprite(_explosionTex);
-                    explosionSprite.setOrigin(16, 16);
-                    explosionSprite.setScale(SCALE, SCALE);
-                    explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
-                    explosionSprite.setPosition(transform.x, transform.y);
-                    _registry.addComponent(explosion, explosionSprite);
-                    _registry.addComponent(explosion, Transform{.x = transform.x, .y = transform.y, .z = 1, .rotation = 0});
-                    _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
-                    _registry.remove(enemy);
-                    _registry.remove(projectile);
-                });
-            });
-
+            _monsterKilledSystem.execute(event, _explosionTex);
             return;
         }
         default:
@@ -176,6 +128,10 @@ private:
     sf::Texture _projectileTex;
     sf::Texture _bugTex;
     sf::Texture _explosionTex;
+
+    ShipMovementSystem _shipMovementSystem;
+    NewProjectileSystem _newProjectileSystem;
+    MonsterKilledSystem _monsterKilledSystem;
 };
 
 #endif // PACKETHANDLER_HPP
