@@ -33,7 +33,8 @@ void Level1::update(const double& deltaTime) {
             /* UDPPacket packet;
             packet << PACKET_TYPE::MONSTER_KILLED << e_enemy.id << p_projectile.id;
             for (auto client: CLIENTS)
-                _manager.send(client.endpoint, packet); */
+                _manager.send(client.endpoint, packet);
+            */
             const auto explosion = _registry.create();
             auto explosionSprite = sf::Sprite(_explosionTex);
             explosionSprite.setOrigin(16, 16);
