@@ -25,7 +25,7 @@ inline sf::Font get_default_font() {
 
 class WaitingRoom final : public AScene {
 public:
-    WaitingRoom(ISceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
+    WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
     {
     }
 

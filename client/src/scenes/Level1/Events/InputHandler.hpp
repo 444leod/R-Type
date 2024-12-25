@@ -16,11 +16,11 @@
 #include <SFML/Window/Keyboard.hpp>
 #include "Global.hpp"
 #include "network/NetworkAgent.hpp"
-#include "engine/ISceneManager.hpp"
+#include "engine/RestrictedSceneManager.hpp"
 
 class InputHandler : public ecs::EventHandler<UserInput> {
 public:
-    explicit InputHandler(ecs::Registry& registry, ISceneManager& manager) : _registry(registry), _manager(manager) {}
+    explicit InputHandler(ecs::Registry& registry, RestrictedSceneManager& manager) : _registry(registry), _manager(manager) {}
     ~InputHandler() override = default;
 
     void receive(const UserInput& event) override {
@@ -50,7 +50,7 @@ public:
 
 private:
     ecs::Registry& _registry;
-    ISceneManager& _manager;
+    RestrictedSceneManager& _manager;
 };
 
 

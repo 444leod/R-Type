@@ -11,18 +11,29 @@
 class SceneManager;
 
 #include <map>
-#include "ISceneManager.hpp"
-#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
-#include "BaseSystems/Abstracts/ARenderSystem.hpp"
 #include <vector>
 #include <memory>
+#include "RestrictedSceneManager.hpp"
+#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
+#include "BaseSystems/Abstracts/ARenderSystem.hpp"
 #include "ecs/Registry.hpp"
 #include "ecs/Family.hpp"
 #include "modules/ISceneModule.hpp"
 
+namespace engine
+{
+
+    template <typename T>
+    concept SceneModule = std::is_base_of_v<ISceneModule, T>;
+
+    template <typename T, typename... Params>
+    concept ConstructibleGameModule = std::constructible_from<T, Params...>;
+
+}
+
 class AScene {
 public:
-    AScene(ISceneManager& manager, ecs::Registry& registry, const std::string& name) :
+    AScene(RestrictedSceneManager& manager, ecs::Registry& registry, const std::string& name) :
         _manager(manager), _registry(registry), _name(name) {}
 
     virtual~AScene()
@@ -42,8 +53,8 @@ public:
      */
     virtual void update(const double& deltaTime) = 0;
 
-    template<typename T>
-    T *getModule()
+    template<engine::SceneModule T>
+    [[nodiscard]] T *getModule()
     {
         if (auto id = ecs::Family<T>::id();this->_modules.contains(id))
             return dynamic_cast<T *>(this->_modules.at(id));
@@ -54,7 +65,7 @@ public:
      * @brief Gets the name of the scene
      * @return The name of the scene
      */
-    virtual const std::string& name() const noexcept { return this->_name; }
+    [[nodiscard]] virtual const std::string& name() const noexcept { return this->_name; }
 
     /**
      * @brief Called when the Scene starts without a predecessor
@@ -127,18 +138,22 @@ public:
         return false;
     }
 
-
-protected:
-    template<typename T>
-    void _addModule()
+    template <engine::SceneModule T, typename... Params>
+        requires engine::ConstructibleGameModule<T, Params...>
+    T* addModule(Params&&... params)
     {
         auto id = ecs::Family<T>::id();
-        this->_modules[id] = new T();
+        auto module = new T(std::forward<Params>(params)...);
+        this->_modules[id] = module;
+        return module;
     }
+
+
+protected:
 
 protected:
     ecs::Registry& _registry;
-    ISceneManager& _manager;
+    RestrictedSceneManager& _manager;
 
     std::vector<std::unique_ptr<AUpdateSystem>> _updateSystems;
     std::vector<std::unique_ptr<ARenderSystem>> _renderSystems;

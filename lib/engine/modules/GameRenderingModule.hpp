@@ -8,6 +8,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <utility>
 #include <vector>
 #include <cstdint>
 
@@ -19,11 +20,11 @@ namespace ecs {
     class Registry;
 }
 
-class GameRenderingModule : public IGameModule
+class GameRenderingModule final : public IGameModule
 {
 public:
-    GameRenderingModule(std::uint32_t width, std::uint32_t height, const std::string& title) : _title(title), _mode(width, height) {}
-    ~GameRenderingModule() = default;
+    GameRenderingModule(const std::uint32_t& width, const std::uint32_t& height, std::string  title) : _title(std::move(title)), _mode(width, height) {}
+    ~GameRenderingModule() override = default;
 
     void start() override
     {
@@ -35,12 +36,12 @@ public:
         this->_window.close();
     }
 
-    virtual void update(Game &game) override
+    void update(game::RestrictedGame &game) override
     {
-        auto *target_module = game.scenes().current().getModule<SceneRenderingModule>();
+        const auto *target_module = game.scenes().current().getModule<SceneRenderingModule>();
 
         _window.clear();
-        sf::Event event;
+        sf::Event event{};
         while (this->_window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 game.stop();

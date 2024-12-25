@@ -14,13 +14,9 @@
 
 #include <utility>
 #include <exception>
-#include <thread>
-#include <asio.hpp>
-#include <iostream>
 
-#include "ISceneManager.hpp"
+#include "RestrictedSceneManager.hpp"
 #include "AScene.hpp"
-#include "config.h"
 
 namespace ecs {
     class Registry;
@@ -39,7 +35,7 @@ namespace scene {
  * @class SceneManager
  * @brief Manages the scenes in the application.
  */
-class SceneManager final : public ISceneManager {
+class SceneManager final : public RestrictedSceneManager {
 public:
     /**
      * @class Exception
@@ -73,17 +69,23 @@ public:
     /**
      * @brief Registers a scene with a given name.
      * @tparam T The type of the scene.
+     *
      * @param name The name of the scene.
+     * @param registry The registry to use.
+     *
      * @throws Exception if the scene name is empty.
      */
     template <scene::SceneType T>
-    void registerScene(const std::string &name, ecs::Registry& registry)
+    std::shared_ptr<T> registerScene(const std::string &name, ecs::Registry& registry)
     {
         if (name.empty())
             throw Exception("Scene name cannot be empty");
         std::shared_ptr<T> scene = std::make_shared<T>(*this, registry, name);
         scene->initialize();
         this->_scenes[name] = scene;
+        if (this->_loadingName.empty())
+            this->_loadingName = name;
+        return scene;
     }
 
     /**
@@ -118,16 +120,6 @@ public:
     }
 
     /**
-     * @brief Gets the first loaded Scene in the registry, throws if there is none
-     * @return A const reference to the name of the first loaded Qcene
-     */
-    const std::string& firstRegistered() {
-        if (this->_scenes.empty())
-            throw Exception("No scenes currently registered.");
-        return this->_scenes.begin()->first;
-    }
-
-    /**
      * @brief Updates the state of the current scene.
      */
     void update()
@@ -135,7 +127,7 @@ public:
         if (this->_loadingName.empty() || !this->_scenes.contains(this->_loadingName))
             return;
 
-        /// Exit the current scene if there was one
+        /// Exit the current scene if there was on e
         const auto next = this->_scenes[this->_loadingName];
         if (this->_current != nullptr)
             this->_current->onExit(*next);
@@ -150,13 +142,34 @@ public:
 
     /**
      * @brief Gets the currently running scene
-     * @return A refernece to the currently running scene
+     * @return A reference to the currently running scene
      */
-    AScene& current()
+    AScene& current() override
     {
         if (_current == nullptr)
             throw Exception("No scenes currently running.");
         return *this->_current;
+    }
+
+    /**
+     * @brief Gets a scene by name
+     *
+     * @param name The name of the scene to get
+     *
+     * @return A reference to the scene
+     *
+     * @exception Exception if the scene is not found
+     */
+    AScene& get(const std::string& name) override
+    {
+        if (!this->_scenes.contains(name))
+            throw Exception("Scene not found.");
+        return *this->_scenes[name];
+    }
+
+    [[nodiscard]] const std::string& loaded() const
+    {
+        return this->_loadingName;
     }
 
 private:

@@ -14,17 +14,17 @@
 #include "network/UDPPacket.hpp"
 #include "network/NetworkAgent.hpp"
 #include "config.h"
-#include "engine/ISceneManager.hpp"
+#include "engine/RestrictedSceneManager.hpp"
 #include "BaseComponents.hpp"
 #include "PacketInformations.hpp"
 #include "../Systems/ShipMovementSystem.hpp"
 #include "../Systems/NewProjectileSystem.hpp"
 #include "../Systems/MonsterKilledSystem.hpp"
 
-class PacketHandler : public ecs::EventHandler<PacketInformations>
+class PacketHandler final : public ecs::EventHandler<PacketInformations>
 {
 public:
-    explicit PacketHandler(ecs::Registry &registry, ISceneManager &manager) :
+    explicit PacketHandler(ecs::Registry &registry, RestrictedSceneManager &manager) :
         _registry(registry),
         _manager(manager),
         _shipMovementSystem(_registry),
@@ -123,7 +123,7 @@ private:
     }
 
     ecs::Registry &_registry;
-    ISceneManager &_manager;
+    RestrictedSceneManager &_manager;
     sf::Texture _spaceshipTex;
     sf::Texture _projectileTex;
     sf::Texture _bugTex;

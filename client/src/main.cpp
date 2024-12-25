@@ -11,11 +11,15 @@
 #include "engine/modules/GameRenderingModule.hpp"
 
 int main(void) {
-    auto game = Game();
+    auto game = game::Game();
 
     game.addModule<GameRenderingModule>(800, 600, "R-Type");
-    game.registerScene<WaitingRoom>("main");
-    game.registerScene<Level1>("game");
+
+    const auto main = game.registerScene<WaitingRoom>("main");
+
+    const auto level1 = game.registerScene<Level1>("game");
+    level1->addModule<SceneRenderingModule>();
+
     game.run();
     return 0;
 }

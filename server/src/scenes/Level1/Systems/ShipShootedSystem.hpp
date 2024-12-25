@@ -10,19 +10,19 @@
 
 
 #include "BaseSystems/Abstracts/ASystem.hpp"
-#include "engine/ISceneManager.hpp"
+#include "engine/RestrictedSceneManager.hpp"
 #include "../Events/PacketInformations.hpp"
 #include <SFML/Graphics.hpp>
 
 class ShipShootedSystem final : public ASystem
 {
 public:
-    ShipShootedSystem(ecs::Registry &registry, ISceneManager &_manager) : ASystem(registry, "ShipShootedSystem"), _manager(_manager) {}
+    ShipShootedSystem(ecs::Registry &registry, RestrictedSceneManager &_manager) : ASystem(registry, "ShipShootedSystem"), _manager(_manager) {}
 
     void execute(const PacketInformations &event, const sf::Texture &_projectileTex);
     
 private:
-    ISceneManager &_manager;
+    RestrictedSceneManager &_manager;
 };
 
 #endif /* !SHIPSHOOTEDSYSTEM_HPP_ */

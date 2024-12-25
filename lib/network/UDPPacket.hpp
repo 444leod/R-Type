@@ -318,6 +318,7 @@ namespace ntw {
             const auto *raw_data = static_cast<const std::byte *>(data);
 
             this->payload.reserve(this->payload.size() + size + 1);
+            this->_end = this->payload.end();
             this->raw_append(raw_len, sizeof(std::uint8_t));
             this->raw_append(raw_data, size);
         }

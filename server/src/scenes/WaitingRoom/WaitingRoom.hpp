@@ -23,7 +23,7 @@
 
 class WaitingRoom final : public AScene {
 public:
-    WaitingRoom(ISceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
+    WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
     {
         this->_font.loadFromFile("assets/arial.ttf");
         this->_renderSystems.push_back(std::make_unique<DrawTextsSystem>(_registry));

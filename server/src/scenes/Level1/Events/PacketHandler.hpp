@@ -13,14 +13,14 @@
 #include "ecs/Registry.hpp"
 #include "network/UDPPacket.hpp"
 #include "network/NetworkAgent.hpp"
-#include "engine/ISceneManager.hpp"
+#include "engine/RestrictedSceneManager.hpp"
 #include "../Systems/ShipMovedSystem.hpp"
 #include "../Systems/ShipShootedSystem.hpp"
 
 class PacketHandler final : public ecs::EventHandler<PacketInformations>
 {
 public:
-    explicit PacketHandler(ecs::Registry &registry, ISceneManager &manager) :
+    explicit PacketHandler(ecs::Registry &registry, RestrictedSceneManager &manager) :
         _registry(registry),
         _manager(manager),
         _shipMovedSystem(_registry, _manager),
@@ -56,7 +56,7 @@ public:
 
 private:
     ecs::Registry &_registry;
-    ISceneManager &_manager;
+    RestrictedSceneManager &_manager;
 
     sf::Texture _projectileTex;
     ShipMovedSystem _shipMovedSystem;

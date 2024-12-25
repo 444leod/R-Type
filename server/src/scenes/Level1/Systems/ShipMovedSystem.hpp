@@ -10,19 +10,19 @@
 
 #include "BaseSystems/Abstracts/ASystem.hpp"
 #include "network/NetworkAgent.hpp"
-#include "engine/ISceneManager.hpp"
+#include "engine/RestrictedSceneManager.hpp"
 #include "../Events/PacketInformations.hpp"
 #include "../../UserInput.hpp"
 
 class ShipMovedSystem final : public ASystem
 {
 public:
-    ShipMovedSystem(ecs::Registry &registry, ISceneManager &_manager) : ASystem(registry, "ShipMovedSystem"), _manager(_manager) {}
+    ShipMovedSystem(ecs::Registry &registry, RestrictedSceneManager &_manager) : ASystem(registry, "ShipMovedSystem"), _manager(_manager) {}
 
     void execute(const PacketInformations &event, const UserInput &input)const;
 
 private:
-    ISceneManager &_manager;
+    RestrictedSceneManager &_manager;
 };
 
 #endif /* !SHIPMOVEDSYSTEM_HPP_ */

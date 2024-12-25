@@ -12,7 +12,7 @@
 
 int main(void)
 {
-    auto game = Game();
+    auto game = game::Game();
 
     game.registerScene<WaitingRoom>("main");
     game.registerScene<Level1>("game");

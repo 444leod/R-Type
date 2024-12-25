@@ -15,9 +15,9 @@ class SceneRenderingModule final : public ISceneModule
 {
 public:
     SceneRenderingModule() = default;
-    ~SceneRenderingModule() = default;
+    ~SceneRenderingModule() override = default;
 
-    void registerEvent(sf::Event event)
+    void registerEvent(const sf::Event& event)
     {
         this->_events.push_back(event);
     }
