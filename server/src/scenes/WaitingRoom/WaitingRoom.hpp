@@ -16,6 +16,7 @@
 #include "BaseSystems/Render/DrawTextsSystem.hpp"
 
 #include "Systems/DrawMenuButtonsSystem.hpp"
+#include "PacketTypes.hpp"
 
 #include <chrono>
 #include <functional>
@@ -44,9 +45,9 @@ public:
 
 private:
 
-    void _onConnect(const ntw::ClientInformations& src, ntw::UDPPacket& packet);
-    void _onDisconnect(const ntw::ClientInformations& src, ntw::UDPPacket& packet);
-    void _onMessage(const ntw::ClientInformations& src, ntw::UDPPacket& packet);
+    void _onConnect(const ntw::ClientInformation& src, ntw::UDPPacket& packet);
+    void _onDisconnect(const ntw::ClientInformation& src, ntw::UDPPacket& packet);
+    void _onMessage(const ntw::ClientInformation& src, ntw::UDPPacket& packet);
 
     void _onExit(const std::vector<std::string>& args);
     void _onStart(const std::vector<std::string>& args);
@@ -61,10 +62,10 @@ private:
 
     sf::Font _font;
 
-    /* std::map<ntw::PACKET_TYPE, std::function<void(const ClientInformations& client, ntw::UDPPacket& packet)>> _packet_handlers = {
-        {ntw::PACKET_TYPE::CONNECT,      [this](const ClientInformations& src, ntw::UDPPacket& packet)   { this->_onConnect(src, packet); }},
-        {ntw::PACKET_TYPE::DISCONNECT,   [this](const ClientInformations& src, ntw::UDPPacket& packet)   { this->_onDisconnect(src, packet); }},
-        {ntw::PACKET_TYPE::MESSAGE,      [this](const ClientInformations& src, ntw::UDPPacket& packet)   { this->_onMessage(src, packet); }}
+    /* std::map<PACKET_TYPE, std::function<void(const ClientInformation& client, ntw::UDPPacket& packet)>> _packet_handlers = {
+        {PACKET_TYPE::CONNECT,      [this](const ClientInformation& src, ntw::UDPPacket& packet)   { this->_onConnect(src, packet); }},
+        {PACKET_TYPE::DISCONNECT,   [this](const ClientInformation& src, ntw::UDPPacket& packet)   { this->_onDisconnect(src, packet); }},
+        {PACKET_TYPE::MESSAGE,      [this](const ClientInformation& src, ntw::UDPPacket& packet)   { this->_onMessage(src, packet); }}
     }; */
 
     std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {

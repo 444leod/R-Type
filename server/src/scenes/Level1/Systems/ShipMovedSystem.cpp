@@ -10,10 +10,10 @@
 #include "../Components.hpp"
 
 #include "network/NetworkAgent.hpp"
-#include "Global.hpp"
 #include <SFML/Graphics.hpp>
+#include "PacketTypes.hpp"
 
-void ShipMovedSystem::execute(const PacketInformations &event, const UserInput &input) const
+void ShipMovedSystem::execute(const PacketInformation &event, const UserInput &input) const
 {
     for (auto [ship_id, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>())
     {
@@ -39,10 +39,10 @@ void ShipMovedSystem::execute(const PacketInformations &event, const UserInput &
         }
 
         ntw::UDPPacket packet;
-        packet << ntw::PACKET_TYPE::SHIP_MOVEMENT << event.source.id << vel << pos;
-        for (const auto &client : CLIENTS)
-        {
+        packet << PACKET_TYPE::SHIP_MOVEMENT << event.source.id << vel << pos;
+        // for (const auto &client : CLIENTS) //TODO: update this
+        // {
             // _manager.send(client.endpoint, packet);
-        }
+        // }
     }
 }

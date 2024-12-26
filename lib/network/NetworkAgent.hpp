@@ -11,51 +11,23 @@
 #include <iostream>
 #include <cstdint>
 #include <thread>
-#include <cstdint>
+#include <utility>
 
 #include "UDPPacket.hpp"
 
 namespace ntw
 {
-    /**
-     * @brief This enum will describe what the packet is for.
-     *
-     *  - NONE: No packet type
-     *  - CONNECT: Connection packet
-     *  - DISCONNECT: Disconnection packet
-     *  - MESSAGE: Message packet (temporary
-     *  - POSITION: Position packet (temporary)
-     */
-    enum class PACKET_TYPE
-    {
-        NONE = 0,
-        CONNECT,
-        DISCONNECT,
-        MESSAGE,
-        POSITION,
-        START,
-        YOUR_SHIP,
-        NEW_SHIP,
-        SHIP_MOVEMENT,
-        USER_INPUT,
-        NEW_PROJECTILE,
-        NEW_MONSTER,
-        MONSTER_KILLED
-    };
 
-    struct ClientInformations
+
+    struct ClientInformation
     {
         asio::ip::udp::endpoint endpoint;
-        enum class Type {
-            VIEWER,
-            PLAYER
-        } type;
         std::string name;
         std::uint32_t id = 0;
 
-        ClientInformations(asio::ip::udp::endpoint endpoint, Type type, std::uint32_t id, std::string name = "") : endpoint(endpoint), type(type), id(id) {}
-        ClientInformations(const ClientInformations &) = default;
-        ClientInformations &operator=(const ClientInformations &) = default;
+        ClientInformation(asio::ip::udp::endpoint endpoint, const std::uint32_t& id, const std::string& name = "") : endpoint(std::move(endpoint)), id(id) {}
+        ClientInformation(const ClientInformation &) = default;
+        ClientInformation &operator=(const ClientInformation &) = default;
     };
 
     /**
@@ -66,10 +38,9 @@ namespace ntw
     public:
         /**
          * @brief Constructor for the NetworkAgent class
-         * @param ctx The io_context
          * @param port The port to create the agent at
          */
-        NetworkAgent(std::uint32_t port = 0) : _socket(this->_ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
+        explicit NetworkAgent(const std::uint32_t& port = 0) : _socket(this->_ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
         {
 
             this->_port = this->_socket.local_endpoint().port();
@@ -84,7 +55,6 @@ namespace ntw
             this->_stop();
         }
 
-        virtual void run() = 0;
         virtual void stop() = 0;
 
     protected:
@@ -139,12 +109,13 @@ namespace ntw
         }
 
         /**
-         * @brief Handler used when receiving a packet, will determined if all went according to plan
+         * @brief Handler used when receiving a packet, will determine if all went according to plan
          * @param e Error code linked to the reception
          * @param bytes The amount of bytes received
          */
-        void _handleReceive(const std::error_code &e, std::size_t bytes)
+        void _handleReceive(const std::error_code &e, const std::size_t& bytes)
         {
+            //TODO: handle receive errors
             if (e)
                 return;
 
@@ -154,10 +125,11 @@ namespace ntw
                 uint16_t calculated_checksum = packet.calculateChecksum();
                 if (calculated_checksum == packet.checksum)
                 {
-                    this->_onPacketReceived(this->_client, packet); // yipee
+                    this->_onPacketReceived(this->_client, packet);
                 }
                 else
                 {
+                    //TODO: handle corrupted packet
                     std::cerr << "got some corrupted packet :( (checksum mismatch: " << calculated_checksum << " != " << packet.checksum << ")" << std::endl;
                 }
             }
@@ -165,12 +137,13 @@ namespace ntw
         }
 
         /**
-         * @brief Handler used after sending a packer
+         * @brief Handler used after sending a packet
          * @param e Error code linked to the sending
          * @param bytes The amount of bytes sent
          */
         void _handleSend(const std::error_code &e, std::size_t bytes)
         {
+            //TODO: handle send errors
         }
 
     protected:
@@ -180,7 +153,7 @@ namespace ntw
         asio::io_context _ctx;
         asio::ip::udp::socket _socket;
         asio::ip::udp::endpoint _client;
-        std::array<char, 1024> _buffer;
+        std::array<char, 1024> _buffer{};
         std::thread _thread;
     };
 }

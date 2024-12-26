@@ -11,8 +11,8 @@
 #include "BaseSystems/Abstracts/ASystem.hpp"
 #include "BaseComponents.hpp"
 #include "../Components.hpp"
-#include <config.h>
-#include "../Events/PacketInformations.hpp"
+#include "Config.hpp"
+#include "../Events/PacketInformation.hpp"
 #include <SFML/Graphics.hpp>
 
 class NewProjectileSystem final : public ASystem
@@ -20,7 +20,7 @@ class NewProjectileSystem final : public ASystem
 public:
     explicit NewProjectileSystem(ecs::Registry &registry) : ASystem(registry, "NewProjectileSystem") {}
 
-    void execute(const PacketInformations &event, const sf::Texture &projectileTex) const {
+    void execute(const PacketInformation &event, const sf::Texture &projectileTex) const {
         std::uint32_t projectileId; 
         std::uint32_t shipId;
         event.packet >> shipId >> projectileId;

@@ -16,8 +16,9 @@
 #include "engine/RestrictedSceneManager.hpp"
 #include "../Systems/ShipMovedSystem.hpp"
 #include "../Systems/ShipShootedSystem.hpp"
+#include "PacketTypes.hpp"
 
-class PacketHandler final : public ecs::EventHandler<PacketInformations>
+class PacketHandler final : public ecs::EventHandler<PacketInformation>
 {
 public:
     explicit PacketHandler(ecs::Registry &registry, RestrictedSceneManager &manager) :
@@ -31,11 +32,11 @@ public:
 
     ~PacketHandler() override = default;
 
-    void receive(const PacketInformations &event) override
+    void receive(const PacketInformation &event) override
     {
         switch (event.type)
         {
-        case ntw::PACKET_TYPE::USER_INPUT:
+        case PACKET_TYPE::USER_INPUT:
         {
             UserInput input{};
             event.packet >> input;

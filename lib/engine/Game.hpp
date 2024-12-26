@@ -52,7 +52,6 @@ namespace game
             auto module = new Module(std::forward<Params>(params)...);
             this->_modules.push_back(module);
             return module;
-
         }
 
         template<scene::SceneType T>

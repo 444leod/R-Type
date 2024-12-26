@@ -16,6 +16,8 @@
 #include "BaseComponents.hpp"
 #include "ecs/Registry.hpp"
 #include "network/NetworkAgent.hpp"
+#include "Config.hpp"
+#include "PacketTypes.hpp"
 
 void Level1::initialize()
 {
@@ -142,7 +144,7 @@ void Level1::onExit()
 {
     /*
     ntw::UDPPacket packet;
-    packet << ntw::PACKET_TYPE::DISCONNECT;
+    packet << PACKET_TYPE::DISCONNECT;
     */
     //_manager.send(this->_server, packet);
 }
@@ -156,7 +158,7 @@ void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& pac
         auto type = PACKET_TYPE{};
         packet >> type;
 
-        _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet});
+        _eventDispatcher.broadcast(PacketInformation{.type = type, .packet = packet});
 
 //    auto spaceshipSprite = sf::Sprite(_spaceshipTex);
 //    spaceshipSprite.setOrigin(0, 0);

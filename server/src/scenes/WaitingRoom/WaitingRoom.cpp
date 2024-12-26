@@ -9,11 +9,12 @@
 #include "ecs/Registry.hpp"
 #include <algorithm>
 #include <cmath>
-#include <config.h>
+#include "Config.hpp"
+
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include "Global.hpp"
+#include "PacketTypes.hpp"
 
 inline bool isInputAvailable() {
     fd_set readfds;
@@ -112,14 +113,14 @@ void WaitingRoom::onEnter()
     _registry.clear();
 
     float y = 50.0f;
-    for (const auto& client : CLIENTS) {
-        auto entity = _registry.create();
-        _registry.addComponent<Position>(entity, {50.0f, y});
-        sf::Text clientText("Client " + std::to_string(client.id), _font, 20);
-        clientText.setFillColor(sf::Color::White);
-        _registry.addComponent<Text>(entity, {clientText});
-        y += 30.0f;
-    }
+    // for (const auto& client : CLIENTS) { //todo: update this
+    //     auto entity = _registry.create();
+    //     _registry.addComponent<Position>(entity, {50.0f, y});
+    //     sf::Text clientText("Client " + std::to_string(client.id), _font, 20);
+    //     clientText.setFillColor(sf::Color::White);
+    //     _registry.addComponent<Text>(entity, {clientText});
+    //     y += 30.0f;
+    // }
 
     auto exitButtonEntity = _registry.create();
     _registry.addComponent<Position>(exitButtonEntity, {20.0f, 20.0f});
@@ -141,7 +142,7 @@ void WaitingRoom::onEnter(const AScene& lastScene)
 void WaitingRoom::onExit()
 {
     ntw::UDPPacket packet;
-    packet << ntw::PACKET_TYPE::DISCONNECT;
+    packet << PACKET_TYPE::DISCONNECT;
 
     //this->_broadcast(packet);
 }
@@ -168,8 +169,8 @@ void WaitingRoom::onExit(const AScene& nextScene)
     {
         if (packet_type != PACKET_TYPE::CONNECT)
             return;
-        CLIENTS.push_back(ntw::ClientInformations(src,
-            (CLIENTS.size() > 4) ? ntw::ClientInformations::Type::VIEWER : ntw::ClientInformations::Type::PLAYER,
+        CLIENTS.push_back(ntw::ClientInformation(src,
+            (CLIENTS.size() > 4) ? ntw::ClientInformation::Type::VIEWER : ntw::ClientInformation::Type::PLAYER,
             CLIENTS.size()
         ));
 
@@ -191,7 +192,7 @@ void WaitingRoom::onExit(const AScene& nextScene)
     }
 } */
 
-void WaitingRoom::_onConnect(const ntw::ClientInformations& src, ntw::UDPPacket& packet)
+void WaitingRoom::_onConnect(const ntw::ClientInformation& src, ntw::UDPPacket& packet)
 {
     std::string name;
     packet >> name;
@@ -204,22 +205,22 @@ void WaitingRoom::_onConnect(const ntw::ClientInformations& src, ntw::UDPPacket&
     _manager.send(src.endpoint, response); */
 
     auto entity = _registry.create();
-    _registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * CLIENTS.size()});
+    // _registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * CLIENTS.size()}); //TODO: update this
     sf::Text clientText("Client " + std::to_string(src.id), _font, 20);
     clientText.setFillColor(sf::Color::White);
     _registry.addComponent<Text>(entity, {clientText});
 }
 
-void WaitingRoom::_onDisconnect(const ntw::ClientInformations& src, ntw::UDPPacket& packet) {
+void WaitingRoom::_onDisconnect(const ntw::ClientInformation& src, ntw::UDPPacket& packet) {
     std::cout << "Client disconnected: " << src.endpoint << std::endl;
-    std::erase_if(CLIENTS, [&src](const auto& client) {
-        return client.endpoint == src.endpoint;
-    });
+    // std::erase_if(CLIENTS, [&src](const auto& client) { //TODO: update this
+    //     return client.endpoint == src.endpoint;
+    // });
 
     //send informations about players connected
 }
 
-void WaitingRoom::_onMessage(const ntw::ClientInformations& source, ntw::UDPPacket& packet)
+void WaitingRoom::_onMessage(const ntw::ClientInformation& source, ntw::UDPPacket& packet)
 {
     std::string message;
     packet >> message;
@@ -238,11 +239,11 @@ void WaitingRoom::_onStart(const std::vector<std::string>& args)
 {
     std::cout << "Starting game..." << std::endl;
 
-    if (CLIENTS.empty())
-    {
-        std::cout << "Not enough players to start the game." << std::endl;
-        return;
-    }
+    // if (CLIENTS.empty()) // TODO: update this
+    // {
+    //     std::cout << "Not enough players to start the game." << std::endl;
+    //     return;
+    // }
 
     //this->_broadcast(ntw::UDPPacket{} << PACKET_TYPE::START);
     _manager.load("Level1");

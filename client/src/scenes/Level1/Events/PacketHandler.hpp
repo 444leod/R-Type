@@ -13,15 +13,15 @@
 #include "ecs/Registry.hpp"
 #include "network/UDPPacket.hpp"
 #include "network/NetworkAgent.hpp"
-#include "config.h"
 #include "engine/RestrictedSceneManager.hpp"
 #include "BaseComponents.hpp"
-#include "PacketInformations.hpp"
+#include "PacketInformation.hpp"
 #include "../Systems/ShipMovementSystem.hpp"
 #include "../Systems/NewProjectileSystem.hpp"
 #include "../Systems/MonsterKilledSystem.hpp"
+#include "PacketTypes.hpp"
 
-class PacketHandler final : public ecs::EventHandler<PacketInformations>
+class PacketHandler final : public ecs::EventHandler<PacketInformation>
 {
 public:
     explicit PacketHandler(ecs::Registry &registry, RestrictedSceneManager &manager) :
@@ -38,11 +38,11 @@ public:
     }
     ~PacketHandler() override = default;
 
-    void receive(const PacketInformations &event) override
+    void receive(const PacketInformation &event) override
     {
         switch (event.type)
         {
-        case ntw::PACKET_TYPE::YOUR_SHIP:
+        case PACKET_TYPE::YOUR_SHIP:
         {
             std::uint32_t id;
             event.packet >> id;
@@ -51,7 +51,7 @@ public:
             _registry.addComponent(self_spaceship, Ship{.id = id});
             return;
         }
-        case ntw::PACKET_TYPE::NEW_SHIP:
+        case PACKET_TYPE::NEW_SHIP:
         {
             std::uint32_t id;
             event.packet >> id;
@@ -59,22 +59,22 @@ public:
             _registry.addComponent(ally_spaceship, Ship{.id = id});
             return;
         }
-        case ntw::PACKET_TYPE::DISCONNECT:
+        case PACKET_TYPE::DISCONNECT:
         {
             _manager.stop();
             return;
         }
-        case ntw::PACKET_TYPE::SHIP_MOVEMENT:
+        case PACKET_TYPE::SHIP_MOVEMENT:
         {
             _shipMovementSystem.execute(event);
             return;
         }
-        case ntw::PACKET_TYPE::NEW_PROJECTILE:
+        case PACKET_TYPE::NEW_PROJECTILE:
         {
             _newProjectileSystem.execute(event, _projectileTex);
             return;
         }
-        case ntw::PACKET_TYPE::NEW_MONSTER:
+        case PACKET_TYPE::NEW_MONSTER:
         {
             uint32_t id;
             Transform transform{};
@@ -92,7 +92,7 @@ public:
             _registry.addComponent(bug, Hitbox{});
             return;
         }
-        case ntw::PACKET_TYPE::MONSTER_KILLED:
+        case PACKET_TYPE::MONSTER_KILLED:
         {
             _monsterKilledSystem.execute(event, _explosionTex);
             return;

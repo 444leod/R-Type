@@ -15,6 +15,7 @@
 #include <functional>
 #include <map>
 #include "network/NetworkAgent.hpp"
+#include "PacketTypes.hpp"
 
 #define TARGET_TICKRATE 30
 
@@ -103,7 +104,7 @@ private:
         /**
          * @brief This code is temporary!!!
         */
-//        ntw::PACKET_TYPE packet_type{};
+//        PACKET_TYPE packet_type{};
 //        packet >> packet_type;
 //         if (_packet_handlers.contains(packet_type))
 //            _packet_handlers.at(packet_type)(src, packet);
@@ -147,14 +148,14 @@ private:
     {
         this->_running = false;
         ntw::UDPPacket packet;
-        packet << ntw::PACKET_TYPE::DISCONNECT;
+        packet << PACKET_TYPE::DISCONNECT;
         this->_broadcast(packet);
         std::cout << "Exiting..." << std::endl;
     } },
     { "start", [&]()
     {
         ntw::UDPPacket packet;
-        packet << ntw::PACKET_TYPE::START;
+        packet << PACKET_TYPE::START;
         this->_broadcast(packet);
         _command_handlers["start"] = []() {};
     } },

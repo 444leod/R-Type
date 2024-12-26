@@ -9,13 +9,13 @@
 #include "ecs/Registry.hpp"
 #include <algorithm>
 #include <cmath>
-#include <config.h>
 #include <iostream>
 #include <ranges>
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include "network/NetworkAgent.hpp"
+#include "PacketTypes.hpp"
 
 void WaitingRoom::initialize()
 {
@@ -102,7 +102,7 @@ void WaitingRoom::onEnter() {
     //SERVER = asio::ip::udp::endpoint(addr, port); //dead code
 
     ntw::UDPPacket packet;
-    packet << ntw::PACKET_TYPE::CONNECT;
+    packet << PACKET_TYPE::CONNECT;
     packet << "ClientName";
 
     //_manager.send(SERVER, packet); //dead code
@@ -128,7 +128,7 @@ void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPP
     // std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
     //           << ", ack: " << packet.ack_number << ")" << std::endl;
 
-    ntw::PACKET_TYPE packet_type{};
+    PACKET_TYPE packet_type{};
     packet >> packet_type;
     if (_packet_handlers.contains(packet_type))
         _packet_handlers.at(packet_type)(packet);

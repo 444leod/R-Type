@@ -7,14 +7,14 @@
 
 #include <algorithm>
 #include <cmath>
-#include <config.h>
+#include "Config.hpp"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "Level1.hpp"
 #include "network/NetworkAgent.hpp"
 #include "ecs/Registry.hpp"
-#include "Global.hpp"
 #include "../UserInput.hpp"
+#include "PacketTypes.hpp"
 
 void Level1::initialize() {}
 
@@ -145,12 +145,12 @@ void Level1::onEnter() {
 
 void Level1::onEnter(const AScene& lastScene)
 {
-    for (const auto& client : CLIENTS) {
-        std::cout << "Client " << client.id << " connected" << std::endl;
-        std::cout << "Endpoint: " << client.endpoint << std::endl;
-
-        //_manager.send(client.endpoint, UDPPacket{} << PACKET_TYPE::MESSAGE << "Welcome to the game!");
-    }
+    // for (const auto& client : CLIENTS) { //TODO: update this
+    //     std::cout << "Client " << client.id << " connected" << std::endl;
+    //     std::cout << "Endpoint: " << client.endpoint << std::endl;
+    //
+    //     //_manager.send(client.endpoint, UDPPacket{} << PACKET_TYPE::MESSAGE << "Welcome to the game!");
+    // }
 
     _registry.clear();
 
@@ -158,31 +158,32 @@ void Level1::onEnter(const AScene& lastScene)
     spaceshipSprite.setOrigin(0, 0);
     spaceshipSprite.setScale(SCALE, SCALE);
 
-    for (const auto& client : CLIENTS) {
-        const auto spaceship = _registry.create();
-        _registry.addComponent(spaceship, spaceshipSprite);
-        _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
-        _registry.addComponent(spaceship, Ship{ .id = client.id });
-        _registry.addComponent(spaceship, Hitbox{});
-        _registry.addComponent(spaceship, Velocity{.x = 0, .y = 0});
-        #if DEBUG
-            _registry.addComponent(spaceship, Debug{});
-        #endif
+    // for (const auto& client : CLIENTS) { //todo: update this
+    //     const auto spaceship = _registry.create();
+    //     _registry.addComponent(spaceship, spaceshipSprite);
+    //     _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
+    //     _registry.addComponent(spaceship, Ship{ .id = client.id });
+    //     _registry.addComponent(spaceship, Hitbox{});
+    //     _registry.addComponent(spaceship, Velocity{.x = 0, .y = 0});
+    //     #if DEBUG
+    //         _registry.addComponent(spaceship, Debug{});
+    //     #endif
+    //
+    //     {
+    //         /* UDPPacket packet;
+    //         packet << PACKET_TYPE::NEW_SHIP << client.id;
+    //         for (const auto& subclient : CLIENTS) {
+    //             if (subclient.id == client.id)
+    //                 continue;
+    //             _manager.send(subclient.endpoint, packet);
+    //         } */
+    //     }
 
-        {
-            /* UDPPacket packet;
-            packet << PACKET_TYPE::NEW_SHIP << client.id;
-            for (const auto& subclient : CLIENTS) {
-                if (subclient.id == client.id)
-                    continue;
-                _manager.send(subclient.endpoint, packet);
-            } */
-        }
-
-        ntw::UDPPacket self_ship;
-        self_ship << ntw::PACKET_TYPE::YOUR_SHIP << client.id;
-        //_manager.send(client.endpoint, self_ship);
-    }
+    //
+    //     ntw::UDPPacket self_ship;
+    //     self_ship << PACKET_TYPE::YOUR_SHIP << client.id;
+    //     //_manager.send(client.endpoint, self_ship);
+    // }
 
     const auto background = _registry.create();
 
@@ -226,7 +227,7 @@ void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& pac
             return;
         }
 
-        _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet, .source = *begin});
+        _eventDispatcher.broadcast(PacketInformation{.type = type, .packet = packet, .source = *begin});
 }
  */
 

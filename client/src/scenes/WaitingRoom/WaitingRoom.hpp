@@ -13,9 +13,7 @@
 #include "engine/AScene.hpp"
 #include "BaseComponents.hpp"
 #include <chrono>
-#include <functional>
 #include <optional>
-#include "Global.hpp"
 
 inline sf::Font get_default_font() {
     sf::Font font;

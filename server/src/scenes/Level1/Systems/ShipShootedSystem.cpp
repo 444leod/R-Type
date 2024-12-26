@@ -10,11 +10,11 @@
 #include "../Components.hpp"
 
 #include "network/UDPPacket.hpp"
-#include "Global.hpp"
-#include "config.h"
+#include "Config.hpp"
 #include <SFML/Graphics.hpp>
+#include "PacketTypes.hpp"
 
-void ShipShootedSystem::execute(const PacketInformations &event, const sf::Texture &_projectileTex) {
+void ShipShootedSystem::execute(const PacketInformation &event, const sf::Texture &_projectileTex) {
     for (auto [entity, ship, transform] : _registry.view<Ship, Transform>())
     {
         if (ship.id != event.source.id)
@@ -34,7 +34,7 @@ void ShipShootedSystem::execute(const PacketInformations &event, const sf::Textu
         _registry.addComponent(projectile, Projectile{ .id = projectileId });
         _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
         ntw::UDPPacket packet;
-        packet << ntw::PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId;
+        packet << PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId;
         // for (const auto &client : CLIENTS)
             // _manager.send(client.endpoint, packet);
         projectileId++;

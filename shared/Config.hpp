@@ -1,6 +1,9 @@
-//
-// Created by nicolas on 12/11/24.
-//
+/*
+** EPITECH PROJECT, 2024
+** rtype
+** File description:
+** Config.hpp
+*/
 
 #ifndef CONFIG_H
 #define CONFIG_H

@@ -12,8 +12,9 @@
 #include "BaseSystems/Abstracts/ASystem.hpp"
 #include "BaseComponents.hpp"
 #include "../Components.hpp"
-#include <config.h>
-#include "../Events/PacketInformations.hpp"
+#include "Config.hpp"
+
+#include "../Events/PacketInformation.hpp"
 #include <SFML/Graphics.hpp>
 
 class MonsterKilledSystem final : public ASystem
@@ -21,7 +22,7 @@ class MonsterKilledSystem final : public ASystem
 public:
     explicit MonsterKilledSystem(ecs::Registry &registry) : ASystem(registry, "MonsterKilledSystem") {}
 
-    void execute(const PacketInformations &event, const sf::Texture &explosionTex) const {
+    void execute(const PacketInformation &event, const sf::Texture &explosionTex) const {
         uint32_t monster_id;
         uint32_t projectile_id;
         event.packet >> monster_id >> projectile_id;

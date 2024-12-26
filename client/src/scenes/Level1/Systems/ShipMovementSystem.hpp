@@ -11,14 +11,14 @@
 #include "BaseSystems/Abstracts/ASystem.hpp"
 #include "BaseComponents.hpp"
 #include "../Components.hpp"
-#include "../Events/PacketInformations.hpp"
+#include "../Events/PacketInformation.hpp"
 
 class ShipMovementSystem final : public ASystem
 {
 public:
     explicit ShipMovementSystem(ecs::Registry &registry) : ASystem(registry, "ShipMovementSystem") {}
 
-    void execute(const PacketInformations &event) const {
+    void execute(const PacketInformation &event) const {
         std::uint32_t id;
         Velocity velocity{};
         Transform position{};

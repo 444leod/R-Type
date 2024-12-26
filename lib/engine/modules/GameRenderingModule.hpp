@@ -20,44 +20,50 @@ namespace ecs {
     class Registry;
 }
 
-class GameRenderingModule final : public IGameModule
+namespace engine
 {
-public:
-    GameRenderingModule(const std::uint32_t& width, const std::uint32_t& height, std::string  title) : _title(std::move(title)), _mode(width, height) {}
-    ~GameRenderingModule() override = default;
 
-    void start() override
+    class GameRenderingModule final : public IGameModule
     {
-        this->_window.create(this->_mode, this->_title);
-    }
+    public:
+        GameRenderingModule(const std::uint32_t& width, const std::uint32_t& height, std::string  title) : _title(std::move(title)), _mode(width, height) {}
+        ~GameRenderingModule() override = default;
 
-    void stop() override
-    {
-        this->_window.close();
-    }
-
-    void update(game::RestrictedGame &game) override
-    {
-        const auto *target_module = game.scenes().current().getModule<SceneRenderingModule>();
-
-        _window.clear();
-        sf::Event event{};
-        while (this->_window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                game.stop();
-                return;
-            }
-            if (target_module == nullptr)
-                continue;
+        void start() override
+        {
+            this->_window.create(this->_mode, this->_title);
         }
-        // call system with registry
-        _window.display();
-    }
 
-protected:
-private:
-    std::string _title;
-    sf::VideoMode _mode;
-    sf::RenderWindow _window;
-    std::vector<sf::Event> _events;
-};
+        void stop() override
+        {
+            this->_window.close();
+        }
+
+        void update(game::RestrictedGame &game) override
+        {
+            const auto *target_module = game.scenes().current().getModule<SceneRenderingModule>();
+
+            _window.clear();
+            sf::Event event{};
+            while (this->_window.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    game.stop();
+                    return;
+                }
+                if (target_module == nullptr)
+                    continue;
+            }
+            // call system with registry
+            _window.display();
+        }
+
+    protected:
+    private:
+        std::string _title;
+        sf::VideoMode _mode;
+        sf::RenderWindow _window;
+        std::vector<sf::Event> _events;
+    };
+
+}
+

@@ -10,7 +10,8 @@
 
 #include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "BaseComponents.hpp"
-#include <config.h>
+#include "Config.hpp"
+
 
 class MovementSystem final : public AUpdateSystem
 {

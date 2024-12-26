@@ -14,9 +14,9 @@
 #include "ecs/Registry.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
-#include "Global.hpp"
 #include "network/NetworkAgent.hpp"
 #include "engine/RestrictedSceneManager.hpp"
+#include "PacketTypes.hpp"
 
 class InputHandler : public ecs::EventHandler<UserInput> {
 public:
@@ -27,7 +27,7 @@ public:
         if (event.key == sf::Keyboard::Key::Space && event.pressed)
         {
             ntw::UDPPacket packet;
-            packet << ntw::PACKET_TYPE::USER_INPUT << event;
+            packet << PACKET_TYPE::USER_INPUT << event;
             //_manager.send(SERVER, packet);
             return;
         }
@@ -39,7 +39,7 @@ public:
             case sf::Keyboard::Key::Right:
             {
                 ntw::UDPPacket packet;
-                packet << ntw::PACKET_TYPE::USER_INPUT << event;
+                packet << PACKET_TYPE::USER_INPUT << event;
                 //_manager.send(SERVER, packet);
             }
             default:

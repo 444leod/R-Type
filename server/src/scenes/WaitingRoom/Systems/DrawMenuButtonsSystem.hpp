@@ -19,9 +19,9 @@ public:
     explicit DrawMenuButtonsSystem(ecs::Registry &registry) : ARenderSystem(registry, "DrawMenuButtonsSystem") {}
 
     void execute(sf::RenderWindow& window) override {
+        //TODO: Change this questionnable system
         sf::Font font;
         font.loadFromFile("assets/arial.ttf");
-        //TODO: Change this questionnable system
         _registry.view<Position, RectangleButton>().each([&](const auto& entity, auto& pos, auto& button) {
             button.shape.setPosition(pos.x, pos.y);
             window.draw(button.shape);

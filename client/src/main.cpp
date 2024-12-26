@@ -10,10 +10,10 @@
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
 #include "engine/modules/GameRenderingModule.hpp"
 
-int main(void) {
+int main() {
     auto game = game::Game();
 
-    game.addModule<GameRenderingModule>(800, 600, "R-Type");
+    game.addModule<engine::GameRenderingModule>(800, 600, "R-Type - Client");
 
     const auto main = game.registerScene<WaitingRoom>("main");
 

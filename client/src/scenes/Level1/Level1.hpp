@@ -37,7 +37,7 @@ public:
         _bugTex.loadFromFile("assets/r-typesheet8.gif");
         _explosionTex.loadFromFile("assets/r-typesheet44.gif", sf::IntRect(131, 0, 192, 32));
         _eventDispatcher.link<UserInput>(&_inputHandler);
-        _eventDispatcher.link<PacketInformations>(&_packetHandler);
+        _eventDispatcher.link<PacketInformation>(&_packetHandler);
         // systems
         // update systems
         this->_updateSystems.push_back(std::make_unique<ParallaxSystem>(_registry));
@@ -74,7 +74,7 @@ private:
     InputHandler _inputHandler{_registry, _manager};
     PacketHandler _packetHandler{_registry, _manager};
 
-    std::vector<ntw::ClientInformations> _clients;
+    std::vector<ntw::ClientInformation> _clients;
 
     //this is temporary, if this texture get deleted, then the sprite will not be able to render
     sf::Texture _spaceshipTex;

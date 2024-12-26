@@ -11,6 +11,7 @@
 #include <map>
 #include <optional>
 #include "network/NetworkAgent.hpp"
+#include "PacketTypes.hpp"
 
 #pragma once
 
@@ -39,7 +40,7 @@ public:
         this->_server = asio::ip::udp::endpoint(addr, port);
 
         ntw::UDPPacket packet;
-        packet << ntw::PACKET_TYPE::CONNECT;
+        packet << PACKET_TYPE::CONNECT;
         packet << "CONNECT";
         this->_send(this->_server, packet);
 
@@ -75,7 +76,7 @@ public:
     void sendMessage(const std::string& msg)
     {
         ntw::UDPPacket packet;
-        packet << ntw::PACKET_TYPE::MESSAGE;
+        packet << PACKET_TYPE::MESSAGE;
         packet << msg;
         this->_send(this->_server, packet);
     }
@@ -98,7 +99,7 @@ private:
         std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
                   << ", ack: " << packet.ack_number << ")" << std::endl;
 
-        ntw::PACKET_TYPE packet_type{};
+        PACKET_TYPE packet_type{};
         packet >> packet_type;
         if (_packet_handlers.contains(packet_type))
             _packet_handlers.at(packet_type)(packet);
@@ -110,9 +111,9 @@ private:
     asio::ip::udp::endpoint _server;
     bool _running = false;
     sf::RenderWindow _window;
-    std::map<ntw::PACKET_TYPE, std::function<void(ntw::UDPPacket&)>> _packet_handlers = {
+    std::map<PACKET_TYPE, std::function<void(ntw::UDPPacket&)>> _packet_handlers = {
         {
-            ntw::PACKET_TYPE::CONNECT, [&](ntw::UDPPacket& packet)
+            PACKET_TYPE::CONNECT, [&](ntw::UDPPacket& packet)
             {
                 std::cout << "Received CONNECT packet." << std::endl;
                 std::uint32_t client_id;
@@ -122,14 +123,14 @@ private:
             }
         },
         {
-            ntw::PACKET_TYPE::DISCONNECT, [&](ntw::UDPPacket& packet)
+            PACKET_TYPE::DISCONNECT, [&](ntw::UDPPacket& packet)
             {
                 std::cout << "Received DISCONNECT packet." << std::endl;
                 this->_running = false;
             }
         },
         {
-            ntw::PACKET_TYPE::MESSAGE, [&](ntw::UDPPacket& packet)
+            PACKET_TYPE::MESSAGE, [&](ntw::UDPPacket& packet)
             {
                 std::string msg;
                 packet >> msg;
@@ -137,7 +138,7 @@ private:
             }
         },
         {
-            ntw::PACKET_TYPE::START, [&](ntw::UDPPacket& packet)
+            PACKET_TYPE::START, [&](ntw::UDPPacket& packet)
             {
                 std::cout << "Received START packet." << std::endl;
             }

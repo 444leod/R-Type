@@ -10,7 +10,6 @@
 
 #include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "BaseComponents.hpp"
-#include <config.h>
 
 class RemoveOutOfBoundProjectilesSystem final : public AUpdateSystem
 {
