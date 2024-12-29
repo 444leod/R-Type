@@ -13,14 +13,6 @@
 #include <stdexcept>
 #include "Entity.hpp"
 
-class ISparseSetObserver {
-public:
-    virtual ~ISparseSetObserver() = default;
-
-    virtual void onEntitySet(const Entity& entity) = 0;
-    virtual void onEntityErased(const Entity& entity) = 0;
-};
-
 class ISparseSet {
 public:
     virtual ~ISparseSet() = default;
@@ -31,8 +23,6 @@ public:
     [[nodiscard]] virtual const std::vector<Entity>& entities() const noexcept = 0;
     [[nodiscard]] virtual std::size_t size() const noexcept = 0;
     [[nodiscard]] virtual std::size_t capacity() const noexcept = 0;
-    virtual void addObserver(ISparseSetObserver *observer) noexcept = 0;
-    virtual void removeObserver(ISparseSetObserver *observer) noexcept = 0;
     virtual void display() const = 0;
     friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
 };
@@ -88,9 +78,6 @@ public:
             this->_components.push_back(component);
             this->_add_in_sparse(entity, size);
         }
-
-        for (auto observer : this->_observers)
-            observer->onEntitySet(entity);
     }
 
     /**
@@ -112,9 +99,6 @@ public:
         // Delete in dense lists
         this->_dense.pop_back();
         this->_components.pop_back();
-
-        for (auto observer : this->_observers)
-            observer->onEntityErased(entity);
     }
 
     /**
@@ -126,17 +110,6 @@ public:
         this->_dense.clear();
         this->_components.clear();
     }
-
-    /**
-     * @brief Add an observer to this set
-     * @param observer The observer to be added
-     */
-    void addObserver(ISparseSetObserver *observer) noexcept override { this->_observers.push_back(observer); }
-    /**
-     * @brief Remove an observer from this set
-     * @param observer The observer to be removed
-     */
-    void removeObserver(ISparseSetObserver *observer) noexcept override { std::erase(this->_observers, observer); }
 
     /**
      * @brief Returns the list of entities contained in the set
@@ -216,7 +189,6 @@ private:
     std::vector<std::size_t> _sparse = { };
     std::vector<Entity> _dense = {};
     std::vector<T> _components = {};
-    std::vector<ISparseSetObserver *> _observers = {};
 };
 
 #endif //SPARSESET_HPP
