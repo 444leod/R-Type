@@ -12,9 +12,11 @@
 #include <vector>
 #include <cstdint>
 
+#include "BaseSystems/Render/DrawSpritesSystem.hpp"
+#include "BaseSystems/Render/DrawTextsSystem.hpp"
 #include "../AScene.hpp"
 #include "IGameModule.hpp"
-#include "SceneRenderingModule.hpp"
+#include "ISceneEventsModule.hpp"
 
 namespace ecs {
     class Registry;
@@ -23,10 +25,16 @@ namespace ecs {
 namespace engine
 {
 
-    class GameRenderingModule final : public IGameModule
+    class GameRenderingModule final : public AGameModule
     {
     public:
-        GameRenderingModule(const std::uint32_t& width, const std::uint32_t& height, std::string  title) : _title(std::move(title)), _mode(width, height) {}
+        GameRenderingModule(game::RestrictedGame& game, const std::uint32_t& width, const std::uint32_t& height, std::string  title):
+            AGameModule(game),
+            _title(std::move(title)),
+            _mode(width, height),
+            _spritesSystem(game.registry()),
+            _textsSystem(game.registry())
+        {}
         ~GameRenderingModule() override = default;
 
         void start() override
@@ -34,35 +42,52 @@ namespace engine
             this->_window.create(this->_mode, this->_title);
         }
 
+        void refresh(AScene& scene) override
+        {
+            // Dumbly deactivate / reactivate modules to avoid redering dumb stuff when uneeded
+            this->_spritesSystem.disable();
+            this->_spritesSystem.disable();
+            this->_target = scene.getModule<ISceneEventsModule>();
+            if (this->_target == nullptr)
+                return;
+            this->_spritesSystem.enable();
+            this->_spritesSystem.enable();
+        }
+
         void stop() override
         {
             this->_window.close();
         }
 
-        void update(game::RestrictedGame &game) override
+        void update() override
         {
-            const auto *target_module = game.scenes().current().getModule<SceneRenderingModule>();
-
-            _window.clear();
             sf::Event event{};
             while (this->_window.pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
-                    game.stop();
+                    this->_game.stop();
                     return;
                 }
-                if (target_module == nullptr)
+                if (this->_target == nullptr)
                     continue;
+                this->_target->onEvent(event);
             }
-            // call system with registry
-            _window.display();
+
+            this->_window.clear();
+            this->_spritesSystem.execute(this->_window);
+            this->_textsSystem.execute(this->_window);
+            this->_window.display();
         }
 
     protected:
     private:
+        std::shared_ptr<ISceneEventsModule> _target;
+
         std::string _title;
         sf::VideoMode _mode;
         sf::RenderWindow _window;
-        std::vector<sf::Event> _events;
+
+        DrawSpritesSystem _spritesSystem;
+        DrawTextsSystem _textsSystem;
     };
 
 }
