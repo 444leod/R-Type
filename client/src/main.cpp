@@ -9,11 +9,14 @@
 #include "scenes/Level1/Level1.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
 #include "engine/modules/GameRenderingModule.hpp"
+#include "Modules/NetworkGameModule.hpp"
 
 int main() {
     auto game = game::Game();
 
-    game.addModule<engine::GameRenderingModule>(800, 600, "R-Type - Client");
+    // game.addModule<engine::GameRenderingModule>(800, 600, "R-Type - Client");
+
+    game.addModule<NetworkGameModule>("127.0.0.1", 25565);
 
     const auto main = game.registerScene<WaitingRoom>("main");
 
