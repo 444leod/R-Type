@@ -163,7 +163,7 @@ namespace ecs {
           if (this->_dense.empty()) {
             return;
           }
-          std::cout << ecs::Family<T>::name() << " set:" << std::endl;
+          /*std::cout << ecs::Family<T>::name() << " set:" << std::endl;*/
           std::cout << "Index | Dense Index | Dense Content | Component" << std::endl;
           for (std::size_t i = 0; i < this->_dense.size(); i++) {
             std::cout << i << "    | sparse[" << i << "] = " << this->_sparse[i] << " | dense[" << i << "] = " << this->_dense[i] << " | component = " << &this->_components[i] << std::endl;
