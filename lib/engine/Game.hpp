@@ -21,10 +21,10 @@ namespace game
 {
 
     template <typename T>
-    concept GameModule = std::is_base_of_v<IGameModule, T>;
+    concept GameModule = std::is_base_of_v<AGameModule, T>;
 
     template <typename T, typename... Params>
-    concept ConstructibleGameModule = std::constructible_from<T, Params...>;
+    concept ConstructibleGameModule = std::constructible_from<T, RestrictedGame&, Params...>;
 
     class Game final : public RestrictedGame
     {
@@ -49,7 +49,7 @@ namespace game
             requires ConstructibleGameModule<Module, Params...>
         Module* addModule(Params&&... params)
         {
-            auto module = new Module(std::forward<Params>(params)...);
+            auto module = new Module(*this, std::forward<Params>(params)...);
             this->_modules.push_back(module);
             return module;
         }
@@ -77,7 +77,7 @@ namespace game
             {
                 this->_sceneManager.update();
                 for (const auto module: this->_modules)
-                    module->update(*this);
+                    module->update();
                 this->_sceneManager.current().update(deltaTime);
                 this->_registry.flush();
 
@@ -103,7 +103,7 @@ namespace game
         }
 
     private:
-        std::vector<IGameModule *> _modules;
+        std::vector<AGameModule *> _modules;
         ecs::Registry _registry;
         ecs::EventDispatcher _events;
         SceneManager _sceneManager;
