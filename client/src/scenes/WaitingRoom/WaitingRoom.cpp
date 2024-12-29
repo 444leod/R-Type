@@ -79,8 +79,6 @@ void WaitingRoom::onEvent(sf::Event &event)
 */
 
 void WaitingRoom::onEnter() {
-    _registry.clear();
-
     std::cout << "Game is running..." << std::endl;
 
     std::cout << "Ip of the host (enter for localhost): " << std::flush;
@@ -104,6 +102,18 @@ void WaitingRoom::onEnter() {
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::CONNECT;
     packet << "ClientName";
+
+    sf::Text sftext;
+    sftext.setFont(_font);
+    sftext.setCharacterSize(30);
+    sftext.setFillColor(sf::Color::White);
+    sftext.setString("Connecting to the server...");
+
+    auto enttext = _registry.create();
+    _registry.addComponent(enttext, Text { .text = sftext });
+    _registry.addComponent(enttext, Position { .x = 10, .y = 10 });
+
+    std::cout << _registry.view<Position, Text>().size() << " entity has Position and Text!" << std::endl;
 
     //_manager.send(SERVER, packet); //dead code
 }
