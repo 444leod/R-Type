@@ -9,7 +9,7 @@
 
 #include "RestrictedGame.hpp"
 
-#include "modules/IGameModule.hpp"
+#include "modules/AGameModule.hpp"
 
 #include "ecs/Registry.hpp"
 #include "ecs/EventDispatcher.hpp"
@@ -75,7 +75,9 @@ namespace game
 
             while (_running)
             {
-                this->_sceneManager.update();
+                if (this->_sceneManager.update())
+                    for (const auto module: this->_modules)
+                        module->refresh(this->_sceneManager.current());
                 for (const auto module: this->_modules)
                     module->update();
                 this->_sceneManager.current().update(deltaTime);

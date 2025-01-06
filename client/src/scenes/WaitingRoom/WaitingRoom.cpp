@@ -113,8 +113,6 @@ void WaitingRoom::onEnter() {
     _registry.addComponent(enttext, Text { .text = sftext });
     _registry.addComponent(enttext, Position { .x = 10, .y = 10 });
 
-    std::cout << _registry.view<Position, Text>().size() << " entity has Position and Text!" << std::endl;
-
     //_manager.send(SERVER, packet); //dead code
 }
 

@@ -15,8 +15,8 @@
 #include "BaseSystems/Render/DrawSpritesSystem.hpp"
 #include "BaseSystems/Render/DrawTextsSystem.hpp"
 #include "../AScene.hpp"
-#include "IGameModule.hpp"
-#include "ISceneEventsModule.hpp"
+#include "AGameModule.hpp"
+#include "ASceneEventsModule.hpp"
 
 namespace ecs {
     class Registry;
@@ -47,7 +47,7 @@ namespace engine
             // Dumbly deactivate / reactivate modules to avoid redering dumb stuff when uneeded
             this->_spritesSystem.disable();
             this->_spritesSystem.disable();
-            this->_target = scene.getModule<ISceneEventsModule>();
+            this->_target = scene.getModule<ASceneEventsModule>();
             if (this->_target == nullptr)
                 return;
             this->_spritesSystem.enable();
@@ -80,7 +80,7 @@ namespace engine
 
     protected:
     private:
-        std::shared_ptr<ISceneEventsModule> _target;
+        std::shared_ptr<ASceneEventsModule> _target;
 
         std::string _title;
         sf::VideoMode _mode;

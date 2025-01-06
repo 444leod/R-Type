@@ -13,21 +13,22 @@ class SceneManager;
 #include <map>
 #include <vector>
 #include <memory>
+
 #include "RestrictedSceneManager.hpp"
 #include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "BaseSystems/Abstracts/ARenderSystem.hpp"
 #include "ecs/Registry.hpp"
 #include "ecs/Family.hpp"
-#include "modules/ISceneModule.hpp"
+#include "modules/ASceneModule.hpp"
 
 namespace engine
 {
 
     template <typename T>
-    concept SceneModule = std::is_base_of_v<ISceneModule, T>;
+    concept SceneModule = std::is_base_of_v<ASceneModule, T>;
 
     template <typename T, typename... Params>
-    concept ConstructibleGameModule = std::constructible_from<T, Params...>;
+    concept ConstructibleSceneModule = std::constructible_from<T, AScene&, Params...>;
 
 }
 
@@ -138,11 +139,11 @@ public:
     }
 
     template <engine::SceneModule T, typename... Params>
-        requires engine::ConstructibleGameModule<T, Params...>
+        requires engine::ConstructibleSceneModule<T, Params...>
     std::shared_ptr<T> addModule(Params&&... params)
     {
-        auto module = std::make_shared<T>(std::forward(params)...);
-        this->_modules.push_back(std::make_shared<T>(std::forward(params)...));
+        auto module = std::make_shared<T>(*this, std::forward(params)...);
+        this->_modules.push_back(module);
         return module;
     }
 
@@ -184,7 +185,7 @@ protected:
 
 
 private:
-    std::vector<std::shared_ptr<ISceneModule>> _modules = {};
+    std::vector<std::shared_ptr<ASceneModule>> _modules = {};
     const std::string& _name = "";
 };
 

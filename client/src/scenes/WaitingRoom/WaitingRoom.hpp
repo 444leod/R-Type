@@ -16,7 +16,7 @@
 #include "engine/AScene.hpp"
 #include "BaseComponents.hpp"
 
-#include "WaitingRoomEvents.hpp"
+#include "./modules/WaitingRoomEvents.hpp"
 
 class WaitingRoom final : public AScene {
 public:

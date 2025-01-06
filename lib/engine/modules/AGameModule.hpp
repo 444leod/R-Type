@@ -10,10 +10,12 @@
 namespace ecs {
     class EventDispatcher;
 }
-namespace game
-{
+namespace game {
     class RestrictedGame;
 }
+class AScene;
+
+
 
 class AGameModule
 {
