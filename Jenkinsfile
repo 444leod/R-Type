@@ -48,7 +48,8 @@ pipeline {
                 stage('Format & Tidy Check') {
                     agent {
                         docker {
-                            image 'xianpengshen/clang-tools:all'
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            forcePull true
                             args '-u root'
                         }
                     }
