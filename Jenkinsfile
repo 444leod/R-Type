@@ -49,7 +49,6 @@ pipeline {
                     agent {
                         docker {
                             image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
-                            alwaysPull true
                             args '-u root'
                         }
                     }
@@ -60,6 +59,23 @@ pipeline {
                                     sh '''
                                         chmod +x ./scripts/check_format.sh
                                         ./scripts/check_format.sh
+                                    '''
+                                }
+                            }
+                        }
+                        stage('Tidy Check') {
+                            steps {
+                                script {
+                                    sh '''#!/bin/bash
+                                        make clean
+                                        make conan_ci
+                                        source rtype_venv/bin/activate
+                                        make deps
+                                        cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+                                    '''
+                                    sh '''
+                                        chmod +x ./scripts/check_tidy.sh
+                                        ./scripts/check_tidy.sh
                                     '''
                                 }
                             }
