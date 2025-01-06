@@ -48,7 +48,7 @@ pipeline {
                 stage('Format & Tidy Check') {
                     agent {
                         docker {
-                            image 'xianpengshen/clang-tools'
+                            image 'xianpengshen/clang-tools:all'
                             args '-u root'
                         }
                     }
