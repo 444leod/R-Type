@@ -184,7 +184,7 @@ pipeline {
                     }
                     post {
                         always {
-                            sh 'sudo rm -rf ./*'
+                            sh 'rm -rf ./.* ./*'
                         }
                     }
                 }
@@ -251,7 +251,7 @@ pipeline {
                     }
                     post {
                         always {
-                            sh 'sudo rm -rf ./*'
+                            sh 'rm -rf ./.* ./*'
                         }
                     }
                 }
@@ -260,7 +260,7 @@ pipeline {
     }
     post {
         always {
-            sh 'sudo rm -rf ./*'
+            sh 'sudo rm -rf ./.* ./*'
             echo "Pipeline OK"
         }
         failure {
