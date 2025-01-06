@@ -45,7 +45,7 @@ pipeline {
         stage('Parallel Builds') {
             failFast false
             parallel {
-                stage('Format & Tidy Check') {
+                stage('Format & Tidy') {
                     agent {
                         docker {
                             image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
@@ -53,9 +53,20 @@ pipeline {
                         }
                     }
                     stages {
-                        stage('Format Check') {
+                        stage('Setup') {
                             steps {
-                                script {
+                                sh '''#!/bin/bash
+                                    make clean
+                                    make conan_ci
+                                    source rtype_venv/bin/activate
+                                    make deps
+                                    cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+                                '''
+                            }
+                        }
+                        stage('Format') {
+                            steps {
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                                     sh '''
                                         chmod +x ./scripts/check_format.sh
                                         ./scripts/check_format.sh
@@ -63,16 +74,9 @@ pipeline {
                                 }
                             }
                         }
-                        stage('Tidy Check') {
+                        stage('Tidy') {
                             steps {
-                                script {
-                                    sh '''#!/bin/bash
-                                        make clean
-                                        make conan_ci
-                                        source rtype_venv/bin/activate
-                                        make deps
-                                        cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-                                    '''
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                                     sh '''
                                         chmod +x ./scripts/check_tidy.sh
                                         ./scripts/check_tidy.sh
