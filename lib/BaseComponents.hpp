@@ -60,6 +60,7 @@ struct Enemy {
 
 struct Text {
     std::string message;
+    std::string font;
     std::uint32_t fontSize;
     struct {
         std::uint32_t r;

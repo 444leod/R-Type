@@ -128,6 +128,7 @@ void WaitingRoom::onEnter()
         auto entity = _registry.create();
         Text clientText = {
             .message = "Client " + std::to_string(client.id),
+            .font = "./assets/arial.ttf",
             .fontSize = 20,
             .color = {255, 255, 255}};
         _registry.addComponent<Text>(entity, clientText);
@@ -220,6 +221,7 @@ void WaitingRoom::_onConnect(const ClientInformations &src, UDPPacket &packet)
     auto entity = _registry.create();
     Text clientText = {
         .message = "Client " + std::to_string(src.id),
+        .font = "./assets/arial.ttf",
         .fontSize = 20,
         .color = {255, 255, 255}
     };
