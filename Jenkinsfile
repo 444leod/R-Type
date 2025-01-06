@@ -45,6 +45,26 @@ pipeline {
         stage('Parallel Builds') {
             failFast false
             parallel {
+                stage('Format & Tidy Check') {
+                    agent {
+                        docker {
+                            image 'xianpengshen/clang-tools'
+                            args '-u root'
+                        }
+                    }
+                    stages {
+                        stage('Format Check') {
+                            steps {
+                                script {
+                                    sh '''
+                                        chmod +x ./scripts/check_format.sh
+                                        ./scripts/check_format.sh
+                                    '''
+                                }
+                            }
+                        }
+                    }
+                }
                 stage('Documentation') {
                     when {
                         branch 'main'
