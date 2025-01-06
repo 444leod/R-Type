@@ -49,7 +49,7 @@ pipeline {
                     agent {
                         docker {
                             image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
-                            forcePull true
+                            alwaysPull true
                             args '-u root'
                         }
                     }
