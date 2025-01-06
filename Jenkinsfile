@@ -176,11 +176,6 @@ pipeline {
                                             chmod +x ./scripts/upload_artifacts.sh
                                             RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
                                         """
-                                    } else {
-                                        sh """
-                                            chmod +x ./scripts/comment_artifacts.sh
-                                            ./scripts/comment_artifacts.sh linux
-                                        """
                                     }
                                     archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
                                 }
@@ -189,8 +184,7 @@ pipeline {
                     }
                     post {
                         always {
-                            sh 'chmod -R 777 .'
-                            cleanWs()
+                            sh 'sudo rm -rf ./*'
                         }
                     }
                 }
@@ -249,11 +243,6 @@ pipeline {
                                             chmod +x ./scripts/upload_artifacts.sh
                                             RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
                                         """
-                                    } else {
-                                        sh """
-                                            chmod +x ./scripts/comment_artifacts.sh
-                                            ./scripts/comment_artifacts.sh windows
-                                        """
                                     }
                                     archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
                                 }
@@ -262,8 +251,7 @@ pipeline {
                     }
                     post {
                         always {
-                            sh 'chmod -R 777 .'
-                            cleanWs()
+                            sh 'sudo rm -rf ./*'
                         }
                     }
                 }
@@ -272,8 +260,7 @@ pipeline {
     }
     post {
         always {
-            sh 'sudo chmod -R 777 .'
-            cleanWs()
+            sh 'sudo rm -rf ./*'
             echo "Pipeline OK"
         }
         failure {

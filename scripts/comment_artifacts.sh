@@ -19,7 +19,7 @@ mkdir -p "$temp_dir"
 
 cp r-type_*.tar.gz "$temp_dir/" 2>/dev/null || true
 
-gh api \
+gh api \@
   --method POST \
   "/repos/${repo}/commits/${commit_sha}/comments" \
   -F "body=🔨 ${platform^} binaries for commit ${commit_sha:0:7} successfully built.
