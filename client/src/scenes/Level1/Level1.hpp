@@ -27,6 +27,7 @@
 #include <memory>
 
 #include "../UserInput.hpp"
+#include "./modules/Level1Events.hpp"
 
 class Level1 final : public AScene {
 public:

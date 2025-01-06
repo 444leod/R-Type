@@ -18,7 +18,7 @@ int main() {
     main->addModule<WaitingRoomEvents>();
 
     const auto level1 = game.registerScene<Level1>("game");
-    //level1->addModule<Level1EventsModule>();
+    level1->addModule<Level1Events>();
 
     game.run();
     return 0;
