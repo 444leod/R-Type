@@ -10,20 +10,19 @@
 
 class SceneManager;
 
-#include <SFML/Graphics.hpp>
-#include "UDPPacket.hpp"
+#include "BaseSystems/Abstracts/ARenderSystem.hpp"
+#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "ISceneManager.hpp"
 #include "Registry.hpp"
-#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
-#include "BaseSystems/Abstracts/ARenderSystem.hpp"
-#include <vector>
+#include "UDPPacket.hpp"
+#include <SFML/Graphics.hpp>
 #include <memory>
+#include <vector>
 
 class AScene {
-public:
-    AScene(ISceneManager& manager, const std::string& name) :
-        _manager(manager), _name(name) {}
-    virtual~AScene() = default;
+  public:
+    AScene(ISceneManager& manager, const std::string& name) : _manager(manager), _name(name) {}
+    virtual ~AScene() = default;
 
     /**
      * @brief Called once at the start of the program
@@ -35,13 +34,13 @@ public:
      * @param deltaTime The time between this frame and the last
      * @param window The window to render to
      */
-    virtual void update(double deltaTime, const sf::RenderWindow &window) = 0;
+    virtual void update(double deltaTime, const sf::RenderWindow& window) = 0;
 
     /**
      * @brief Used to render the elements in a scene
      * @param window The  window to render to
      */
-    virtual void render(sf::RenderWindow &window) = 0;
+    virtual void render(sf::RenderWindow& window) = 0;
 
     /**
      * @brief Gets the name of the scene
@@ -53,7 +52,7 @@ public:
      * @brief Called for every window event.
      * @param event The event to be taken care of
      */
-    virtual void onEvent(sf::Event &event) = 0;
+    virtual void onEvent(sf::Event& event) = 0;
 
     /**
      * @brief Called when the Scene starts without a predecessor
@@ -79,18 +78,14 @@ public:
 
     virtual void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) = 0;
 
-    void flush()
-    {
-        this->_registry.flush();
-    }
+    void flush() { this->_registry.flush(); }
 
     /**
      * @brief Enables a system
      * @param systemName The name of the system to enable
      * @return true if the system was found and enabled, false otherwise
      */
-    bool enableSystem(const std::string systemName)
-    {
+    bool enableSystem(const std::string systemName) {
         for (auto& system : this->_updateSystems) {
             if (system->name() == systemName) {
                 system->enable();
@@ -111,8 +106,7 @@ public:
      * @param systemName The name of the system to disable
      * @return true if the system was found and disabled, false otherwise
      */
-    bool disableSystem(const std::string systemName)
-    {
+    bool disableSystem(const std::string systemName) {
         for (auto& system : this->_updateSystems) {
             if (system->name() == systemName) {
                 system->disable();
@@ -128,15 +122,14 @@ public:
         return false;
     }
 
-
-protected:
+  protected:
     /**
      * @brief Executes all the update systems in the scene
      * @param deltaTime The time between this frame and the last
-     * @param window The window used as a reference for the system for logic, not for rendering
+     * @param window The window used as a reference for the system for logic,
+     * not for rendering
      */
-    void _executeUpdateSystems(double deltaTime)
-    {
+    void _executeUpdateSystems(double deltaTime) {
         for (auto& system : this->_updateSystems) {
             if (system->isEnabled()) {
                 system->execute(deltaTime);
@@ -148,8 +141,7 @@ protected:
      * @brief Executes all the render systems in the scene
      * @param window The window to render to
      */
-    void _executeRenderSystems(sf::RenderWindow& window)
-    {
+    void _executeRenderSystems(sf::RenderWindow& window) {
         for (auto& system : this->_renderSystems) {
             if (system->isEnabled()) {
                 system->execute(window);
@@ -163,8 +155,8 @@ protected:
     std::vector<std::unique_ptr<AUpdateSystem>> _updateSystems;
     std::vector<std::unique_ptr<ARenderSystem>> _renderSystems;
 
-private:
+  private:
     const std::string& _name = "";
 };
 
-#endif //ASCENE_HPP
+#endif // ASCENE_HPP

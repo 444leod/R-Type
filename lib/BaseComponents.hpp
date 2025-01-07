@@ -8,8 +8,8 @@
 #ifndef BASECOMPONENTS_HPP_
 #define BASECOMPONENTS_HPP_
 
-#include <cstdint>
 #include <SFML/Graphics.hpp>
+#include <cstdint>
 #include <functional>
 
 // TODO: Decide how to organize the components in the lib

@@ -8,19 +8,16 @@
 #ifndef ANIMATESYSTEM_HPP_
 #define ANIMATESYSTEM_HPP_
 
-
-
-#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "BaseComponents.hpp"
+#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include <config.h>
 
-class AnimateSystem final : public AUpdateSystem
-{
-public:
-    AnimateSystem(Registry &registry, const std::string name = "AnimateSystem") : AUpdateSystem(registry, name) {}
+class AnimateSystem final : public AUpdateSystem {
+  public:
+    AnimateSystem(Registry& registry, const std::string name = "AnimateSystem") : AUpdateSystem(registry, name) {}
 
     void execute(const double deltaTime) override {
-        _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation & animation, sf::Sprite &sprite) {
+        _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation& animation, sf::Sprite& sprite) {
             if (animation.currentFrame == animation.frameCount) {
                 if (animation.loop) {
                     animation.currentFrame = 0;

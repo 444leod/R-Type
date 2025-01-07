@@ -6,17 +6,16 @@
 */
 
 #include "ShipShootedSystem.hpp"
-#include "BaseComponents.hpp"
 #include "../Components.hpp"
+#include "BaseComponents.hpp"
 
-#include "UDPPacket.hpp"
 #include "Global.hpp"
+#include "UDPPacket.hpp"
 #include "config.h"
 #include <SFML/Graphics.hpp>
 
-void ShipShootedSystem::execute(const PacketInformations &event, const sf::Texture &_projectileTex) {
-    for (auto [entity, ship, transform] : _registry.view<Ship, Transform>())
-    {
+void ShipShootedSystem::execute(const PacketInformations& event, const sf::Texture& _projectileTex) {
+    for (auto [entity, ship, transform] : _registry.view<Ship, Transform>()) {
         if (ship.id != event.source.id)
             continue;
 
@@ -31,11 +30,11 @@ void ShipShootedSystem::execute(const PacketInformations &event, const sf::Textu
         _registry.addComponent(projectile, Hitbox{});
         _registry.addComponent(projectile, projectileSprite);
         _registry.addComponent(projectile, shootTransform);
-        _registry.addComponent(projectile, Projectile{ .id = projectileId });
+        _registry.addComponent(projectile, Projectile{.id = projectileId});
         _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
         UDPPacket packet;
         packet << PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId;
-        for (const auto &client : CLIENTS)
+        for (const auto& client : CLIENTS)
             _manager.send(client.endpoint, packet);
         projectileId++;
     }

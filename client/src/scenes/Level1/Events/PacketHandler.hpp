@@ -9,27 +9,20 @@
 #define PACKETHANDLER_HPP
 
 #include "../Components.hpp"
+#include "../Systems/MonsterKilledSystem.hpp"
+#include "../Systems/NewProjectileSystem.hpp"
+#include "../Systems/ShipMovementSystem.hpp"
+#include "BaseComponents.hpp"
 #include "EventDispatcher.hpp"
+#include "ISceneManager.hpp"
+#include "PacketInformations.hpp"
 #include "Registry.hpp"
 #include "UDPPacket.hpp"
 #include "config.h"
-#include "ISceneManager.hpp"
-#include "BaseComponents.hpp"
-#include "PacketInformations.hpp"
-#include "../Systems/ShipMovementSystem.hpp"
-#include "../Systems/NewProjectileSystem.hpp"
-#include "../Systems/MonsterKilledSystem.hpp"
 
-class PacketHandler : public EventHandler<PacketInformations>
-{
-public:
-    explicit PacketHandler(Registry &registry, ISceneManager &manager) :
-        _registry(registry),
-        _manager(manager),
-        _shipMovementSystem(_registry),
-        _newProjectileSystem(_registry),
-        _monsterKilledSystem(_registry)
-    {
+class PacketHandler : public EventHandler<PacketInformations> {
+  public:
+    explicit PacketHandler(Registry& registry, ISceneManager& manager) : _registry(registry), _manager(manager), _shipMovementSystem(_registry), _newProjectileSystem(_registry), _monsterKilledSystem(_registry) {
         _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
         _bugTex.loadFromFile("assets/r-typesheet8.gif");
@@ -37,12 +30,9 @@ public:
     }
     ~PacketHandler() override = default;
 
-    void receive(const PacketInformations &event) override
-    {
-        switch (event.type)
-        {
-        case PACKET_TYPE::YOUR_SHIP:
-        {
+    void receive(const PacketInformations& event) override {
+        switch (event.type) {
+        case PACKET_TYPE::YOUR_SHIP: {
             std::uint32_t id;
             event.packet >> id;
             const auto self_spaceship = this->_generateSpaceship(Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
@@ -50,31 +40,26 @@ public:
             _registry.addComponent(self_spaceship, Ship{.id = id});
             return;
         }
-        case PACKET_TYPE::NEW_SHIP:
-        {
+        case PACKET_TYPE::NEW_SHIP: {
             std::uint32_t id;
             event.packet >> id;
             const auto ally_spaceship = this->_generateSpaceship(Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
             _registry.addComponent(ally_spaceship, Ship{.id = id});
             return;
         }
-        case PACKET_TYPE::DISCONNECT:
-        {
+        case PACKET_TYPE::DISCONNECT: {
             _manager.stop();
             return;
         }
-        case PACKET_TYPE::SHIP_MOVEMENT:
-        {
+        case PACKET_TYPE::SHIP_MOVEMENT: {
             _shipMovementSystem.execute(event);
             return;
         }
-        case PACKET_TYPE::NEW_PROJECTILE:
-        {
+        case PACKET_TYPE::NEW_PROJECTILE: {
             _newProjectileSystem.execute(event, _projectileTex);
             return;
         }
-        case PACKET_TYPE::NEW_MONSTER:
-        {
+        case PACKET_TYPE::NEW_MONSTER: {
             uint32_t id;
             Transform transform{};
             event.packet >> id >> transform;
@@ -85,14 +70,13 @@ public:
             bugSprite.setPosition(transform.x, transform.y);
             _registry.addComponent(bug, bugSprite);
             _registry.addComponent(bug, Bug{});
-            _registry.addComponent(bug, Enemy{ .id = id });
+            _registry.addComponent(bug, Enemy{.id = id});
             _registry.addComponent(bug, transform);
             _registry.addComponent(bug, Velocity{.x = -100, .y = 0});
             _registry.addComponent(bug, Hitbox{});
             return;
         }
-        case PACKET_TYPE::MONSTER_KILLED:
-        {
+        case PACKET_TYPE::MONSTER_KILLED: {
             _monsterKilledSystem.execute(event, _explosionTex);
             return;
         }
@@ -101,9 +85,8 @@ public:
         }
     }
 
-private:
-    Entity _generateSpaceship(const Transform &transform) const
-    {
+  private:
+    Entity _generateSpaceship(const Transform& transform) const {
         const auto spaceship = _registry.create();
 
         auto spaceshipSprite = sf::Sprite(_spaceshipTex);
@@ -121,8 +104,8 @@ private:
         return spaceship;
     }
 
-    Registry &_registry;
-    ISceneManager &_manager;
+    Registry& _registry;
+    ISceneManager& _manager;
     sf::Texture _spaceshipTex;
     sf::Texture _projectileTex;
     sf::Texture _bugTex;

@@ -12,10 +12,9 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
-class AUpdateSystem : public ASystem
-{
-public:
-    AUpdateSystem(Registry &registry, const std::string name) : ASystem(registry, name) {}
+class AUpdateSystem : public ASystem {
+  public:
+    AUpdateSystem(Registry& registry, const std::string name) : ASystem(registry, name) {}
 
     /**
      * @brief Execute a 'update' system's logic

@@ -9,12 +9,13 @@
 #define FAMILY_HPP
 
 #include <cstddef>
-#include <type_traits>
 #include <iostream>
+#include <type_traits>
 
 /*
-    This code is a simple implementation of a family class that generates a unique identifier for each type.
-     sadly, this code is not working everywhere, so I will use a different approach.
+    This code is a simple implementation of a family class that generates a
+   unique identifier for each type. sadly, this code is not working everywhere,
+   so I will use a different approach.
 */
 
 /*
@@ -40,28 +41,28 @@ public:
  * compilers (clang, gnuc, or MSCV) and are not OS dependent.
  */
 #ifndef GENERATOR_API
-#   if defined GENERATOR_API_EXPORT
-#       define GENERATOR_API GENERATOR_EXPORT
-#   elif defined GENERATOR_API_IMPORT
-#       define GENERATOR_API GENERATOR_IMPORT
-#   else /* No API */
-#       define GENERATOR_API
-#   endif
+#if defined GENERATOR_API_EXPORT
+#define GENERATOR_API GENERATOR_EXPORT
+#elif defined GENERATOR_API_IMPORT
+#define GENERATOR_API GENERATOR_IMPORT
+#else /* No API */
+#define GENERATOR_API
+#endif
 #endif
 #if defined _WIN32 || defined __CYGWIN__ || defined _MSC_VER
-#    define GENERATOR_EXPORT __declspec(dllexport)
-#    define GENERATOR_IMPORT __declspec(dllimport)
+#define GENERATOR_EXPORT __declspec(dllexport)
+#define GENERATOR_IMPORT __declspec(dllimport)
 #elif defined __GNUC__ && __GNUC__ >= 4
-#    define GENERATOR_EXPORT __attribute__((visibility("default")))
-#    define GENERATOR_IMPORT __attribute__((visibility("default")))
+#define GENERATOR_EXPORT __attribute__((visibility("default")))
+#define GENERATOR_IMPORT __attribute__((visibility("default")))
 #else /* Unsupported compiler */
-#    define GENERATOR_EXPORT
-#    define GENERATOR_IMPORT
+#define GENERATOR_EXPORT
+#define GENERATOR_IMPORT
 #endif
 #if defined _MSC_VER
-#   define GENERATOR_PRETTY_FUNCTION __FUNCSIG__
+#define GENERATOR_PRETTY_FUNCTION __FUNCSIG__
 #elif defined __clang__ || (defined __GNUC__)
-#   define GENERATOR_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#define GENERATOR_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #endif
 
 /**
@@ -98,20 +99,19 @@ constexpr std::string get_type_name(const char* pretty_function) {
  * incrementing value each time it is called. The value starts from 0 and
  * increments by 1 with each call.
  */
-struct GENERATOR_API generator {
-    /**
-     * @brief Returns the next unique incrementing value.
-     *
-     * This static method returns a unique value that increments by 1 each time
-     * it is called. The initial value is 0.
-     *
-     * @return The next unique incrementing value as a std::size_t.
-     */
-    static std::size_t next() {
-        static std::size_t value{};
-        return value++;
-    }
-};
+struct GENERATOR_API generator{/**
+                                * @brief Returns the next unique incrementing value.
+                                *
+                                * This static method returns a unique value that increments by 1 each time
+                                * it is called. The initial value is 0.
+                                *
+                                * @return The next unique incrementing value as a std::size_t.
+                                */
+    static std::size_t next(){static std::size_t value{};
+return value++;
+}
+}
+;
 
 /**
  * @brief A structure to provide a unique identifier for a given type.
@@ -122,8 +122,8 @@ struct GENERATOR_API generator {
  *
  * @tparam Type The type for which the unique identifier is generated.
  */
-template<typename Type>
-struct GENERATOR_API final_type {
+template <typename Type>
+struct GENERATOR_API final_type{
 #if defined GENERATOR_PRETTY_FUNCTION
     /**
      * @brief Returns the unique identifier for the type.
@@ -133,14 +133,11 @@ struct GENERATOR_API final_type {
      *
      * @return The unique identifier as a std::size_t.
      */
-    static constexpr std::size_t id() {
-        constexpr auto value = hash(GENERATOR_PRETTY_FUNCTION);
-        return value;
-    }
+    static constexpr std::size_t id(){constexpr auto value = hash(GENERATOR_PRETTY_FUNCTION);
+return value;
+}
 
-    static constexpr std::string name() {
-        return get_type_name(GENERATOR_PRETTY_FUNCTION);
-    }
+static constexpr std::string name() { return get_type_name(GENERATOR_PRETTY_FUNCTION); }
 #else
     /**
      * @brief Returns the unique identifier for the type.
@@ -150,16 +147,14 @@ struct GENERATOR_API final_type {
      *
      * @return The unique identifier as a std::size_t.
      */
-    static std::size_t id() {
-        static const std::size_t value = generator::next();
-        return value;
-    }
+    static std::size_t id(){static const std::size_t value = generator::next();
+return value;
+}
 
-    static std::string name() {
-            return typeid(Type).name();
-    }
+static std::string name() { return typeid(Type).name(); }
 #endif
-};
+}
+;
 
 /**
  * @brief A structure to provide the unique id of a given raw type.
@@ -169,8 +164,7 @@ struct GENERATOR_API final_type {
  *
  * @tparam T The raw type for which the unique identifier is generated.
  */
-template<typename T>
-struct GENERATOR_API type {
+template <typename T> struct GENERATOR_API type {
     using Type = std::decay_t<T>;
     /**
      * @brief Returns the unique identifier for the raw type.
@@ -180,9 +174,7 @@ struct GENERATOR_API type {
      *
      * @return The unique identifier as a std::size_t.
      */
-    static constexpr std::size_t id() {
-        return final_type<Type>::id();
-    }
+    static constexpr std::size_t id() { return final_type<Type>::id(); }
 
     static constexpr std::string name() {
         std::string_view name = final_type<Type>::name();
@@ -192,4 +184,4 @@ struct GENERATOR_API type {
     }
 };
 
-#endif //FAMILY_HPP
+#endif // FAMILY_HPP

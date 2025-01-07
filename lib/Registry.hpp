@@ -8,25 +8,23 @@
 #ifndef REGISTRY_HPP
 #define REGISTRY_HPP
 
+#include "Entity.hpp"
+#include "Family.hpp"
+#include "SparseSet.hpp"
+#include "View.hpp"
+#include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <map>
 #include <vector>
-#include <cassert>
-#include <algorithm>
-#include "Family.hpp"
-#include "Entity.hpp"
-#include "SparseSet.hpp"
-#include "View.hpp"
 
 /**
  * @brief The class representation of the  Registry.
  */
-class Registry
-{
-public:
+class Registry {
+  public:
     Registry() = default;
-    ~Registry()
-    {
+    ~Registry() {
         for (auto [_, sparse] : this->_sparse_sets)
             delete sparse;
     }
@@ -37,18 +35,13 @@ public:
      * @tparam ...Components Additional kind of components to query
      * @return A new view with entities queried.
      */
-    template <typename First, typename... Components>
-    View<First, Components...> view()
-    {
-        return View<First, Components...>(_sparse_sets);
-    }
+    template <typename First, typename... Components> View<First, Components...> view() { return View<First, Components...>(_sparse_sets); }
 
     /**
      * @brief Spawns a new Entity, used to attach components to
      * @return An new unique Entity
      */
-    unsigned int create()
-    {
+    unsigned int create() {
         const auto entity = Registry::_get_new_entity_id();
 
         _entities.emplace_back(entity);
@@ -59,19 +52,14 @@ public:
      * @brief Deletes an Entity and all attached components
      * @param entity The Entity to delete
      */
-    void remove(const Entity entity)
-    {
-        _queue_remove.push_back(entity);
-    }
+    void remove(const Entity entity) { _queue_remove.push_back(entity); }
 
     /**
      * @brief Call the registry flush
      */
-    void flush()
-    {
-        for (auto entity: _queue_remove)
-        {
-            for (auto const &[id, sparse] : _sparse_sets)
+    void flush() {
+        for (auto entity : _queue_remove) {
+            for (auto const& [id, sparse] : _sparse_sets)
                 if (sparse->contains(entity))
                     sparse->remove(entity);
             _entities.erase(std::find(_entities.begin(), _entities.end(), entity));
@@ -82,9 +70,8 @@ public:
     /**
      * @brief Removes all the Entities
      */
-    void clear()
-    {
-        for (auto const &[id, sparse] : _sparse_sets)
+    void clear() {
+        for (auto const& [id, sparse] : _sparse_sets)
             sparse->clear();
         _entities.clear();
     }
@@ -95,11 +82,8 @@ public:
      * @tparam Component The type of component to clear
      * @tparam  OtherComponents Additional types of components to clear
      */
-    template <typename Component, typename... OtherComponents>
-    void clear()
-    {
-        for (const auto types = { type<Component>::id(), type<OtherComponents>::id()... }; auto id : types)
-        {
+    template <typename Component, typename... OtherComponents> void clear() {
+        for (const auto types = {type<Component>::id(), type<OtherComponents>::id()...}; auto id : types) {
             if (_sparse_sets.contains(id))
                 _sparse_sets.at(id)->clear();
         }
@@ -107,23 +91,20 @@ public:
 
     /**
      * @brief Attaches a Component to an Entity
-     * @tparam T The type of component to attach. Can be deduced by the parameter
+     * @tparam T The type of component to attach. Can be deduced by the
+     * parameter
      * @param entity The Entity to attach to
      * @param component The Component information to attach
      */
-    template <typename T>
-    T& addComponent(Entity entity, const T &component)
-    {
+    template <typename T> T& addComponent(Entity entity, const T& component) {
         const auto id = type<T>::id();
-        SparseSet<T> *set = nullptr;
+        SparseSet<T>* set = nullptr;
 
-        if (!this->_sparse_sets.contains(id))
-        {
+        if (!this->_sparse_sets.contains(id)) {
             set = new SparseSet<T>();
             this->_sparse_sets[id] = set;
-        }
-        else
-            set = dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id));
+        } else
+            set = dynamic_cast<SparseSet<T>*>(this->_sparse_sets.at(id));
         set->set(entity, component);
         return set->at(entity);
     }
@@ -133,13 +114,10 @@ public:
      * @tparam T The type of component to remove
      * @param entity The Entity to remove from
      */
-    template <typename T>
-    void removeComponent(Entity entity)
-    {
+    template <typename T> void removeComponent(Entity entity) {
         const auto id = type<T>::id();
 
-        if (!this->_sparse_sets.contains(id))
-        {
+        if (!this->_sparse_sets.contains(id)) {
             return;
         }
         this->_sparse_sets.at(id)->remove(entity);
@@ -148,10 +126,9 @@ public:
     /**
      * @brief Used as debug to print out all the sparse-sets data
      */
-    void displaySparse() const
-    {
+    void displaySparse() const {
         std::cout << "There is a sparse array for the following components: " << std::endl;
-        for (auto const &[id, sparse] : _sparse_sets)
+        for (auto const& [id, sparse] : _sparse_sets)
             std::cout << id << std::endl;
     }
 
@@ -165,12 +142,9 @@ public:
      *
      * @return True if the Entity has the component, false otherwise
      */
-    template <typename Component, typename... OtherComponents>
-    bool has_all_of(const Entity& entity)
-    {
+    template <typename Component, typename... OtherComponents> bool has_all_of(const Entity& entity) {
 
-        for (const auto types = { type<Component>::id(), type<OtherComponents>::id()... };auto id : types)
-        {
+        for (const auto types = {type<Component>::id(), type<OtherComponents>::id()...}; auto id : types) {
             if (!_sparse_sets.contains(id))
                 return false;
             if (!_sparse_sets.at(id)->contains(entity))
@@ -189,12 +163,9 @@ public:
      *
      * @return True if the Entity has any of the components, false otherwise
      */
-    template <typename Component, typename... OtherComponents>
-    bool has_any_of(const Entity& entity)
-    {
+    template <typename Component, typename... OtherComponents> bool has_any_of(const Entity& entity) {
 
-        for (const auto types = { type<Component>::id(), type<OtherComponents>::id()... };auto id : types)
-        {
+        for (const auto types = {type<Component>::id(), type<OtherComponents>::id()...}; auto id : types) {
             if (_sparse_sets.contains(id) && _sparse_sets.at(id)->contains(entity))
                 return true;
         }
@@ -210,39 +181,34 @@ public:
      *
      * @return The component
      */
-    template <typename T>
-    T& get(const Entity entity)
-    {
+    template <typename T> T& get(const Entity entity) {
         const auto id = type<T>::id();
 
-        if (!this->_sparse_sets.contains(id))
-        {
+        if (!this->_sparse_sets.contains(id)) {
             throw std::out_of_range("No such component in the registry:" + type<T>::name());
         }
 
-        const auto set = dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id));
+        const auto set = dynamic_cast<SparseSet<T>*>(this->_sparse_sets.at(id));
 
-        if (!set->contains(entity))
-        {
+        if (!set->contains(entity)) {
             throw std::out_of_range(entity + " does not have the component " + type<T>::name());
         }
         return set->at(entity);
     }
 
-private:
+  private:
     /**
      * @brief Gets a new available Entity ID
      * @return A new unique Entity ID
      */
-    static Entity _get_new_entity_id()
-    {
+    static Entity _get_new_entity_id() {
         static Entity value = 0;
         return value++;
     }
 
     std::vector<Entity> _queue_remove = {};
     std::vector<Entity> _entities = {};
-    std::map<std::size_t, ISparseSet *> _sparse_sets = {};
+    std::map<std::size_t, ISparseSet*> _sparse_sets = {};
 };
 
-#endif //REGISTRY_HPP
+#endif // REGISTRY_HPP

@@ -10,10 +10,9 @@
 
 #include "NetworkAgent.hpp"
 
-struct PacketInformations : public IEvent
-{
+struct PacketInformations : public IEvent {
     PACKET_TYPE type;
-    UDPPacket &packet;
+    UDPPacket& packet;
 };
 
 #endif /* !PACKETINFORMATIONS_HPP_ */

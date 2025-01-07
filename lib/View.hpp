@@ -8,15 +8,15 @@
 #ifndef VIEW_HPP
 #define VIEW_HPP
 
-#include <iostream>
-#include <map>
-#include <vector>
-#include <tuple>
-#include <cstdint>
 #include "Entity.hpp"
 #include "Family.hpp"
 #include "SparseSet.hpp"
+#include <cstdint>
+#include <iostream>
+#include <map>
 #include <ranges>
+#include <tuple>
+#include <vector>
 
 inline std::ostream& operator<<(std::ostream& os, const std::vector<Entity>& vec) {
     if (vec.empty())
@@ -30,21 +30,18 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<Entity>& vec
 /**
  * @brief Trait to check if T is in the list of types.
  */
-template <typename T, typename... Types>
-struct is_part_of : std::false_type {};
+template <typename T, typename... Types> struct is_part_of : std::false_type {};
 
 /**
- * @brief Recursive case: T is part of the list if it matches the first type or any of the remaining types.
+ * @brief Recursive case: T is part of the list if it matches the first type or
+ * any of the remaining types.
  */
-template <typename T, typename First, typename... Rest>
-struct is_part_of<T, First, Rest...>
-    : std::conditional_t<std::is_same_v<T, First>, std::true_type, is_part_of<T, Rest...>> {};
+template <typename T, typename First, typename... Rest> struct is_part_of<T, First, Rest...> : std::conditional_t<std::is_same_v<T, First>, std::true_type, is_part_of<T, Rest...>> {};
 
 /**
  * @brief Helper variable template to simplify usage.
  */
-template <typename T, typename... Types>
-inline constexpr bool is_part_of_v = is_part_of<T, Types...>::value;
+template <typename T, typename... Types> inline constexpr bool is_part_of_v = is_part_of<T, Types...>::value;
 
 /**
  * @brief Define the part_of concept using the is_part_of struct.
@@ -58,25 +55,22 @@ concept part_of = is_part_of_v<T, Types...>;
  * @tparam Component The main component type.
  * @tparam Others Other component types.
  */
-template <typename Component, typename... Others>
-class View
-{
-public:
+template <typename Component, typename... Others> class View {
+  public:
     using ComponentsTuple = std::tuple<Component, Others...>;
 
     /**
      * @brief Iterator class to iterate over entities and their components.
      */
     class Iterator {
-    public:
+      public:
         /**
          * @brief Constructor to initialize the iterator.
          *
          * @param entityIdsIterator Iterator to the entity IDs.
          * @param sparse_sets Reference to the map of sparse sets.
          */
-        Iterator(const std::vector<size_t>::iterator entityIdsIterator, std::map<std::size_t, ISparseSet *>& sparse_sets)
-            : _entityIdsIterator{entityIdsIterator}, _sparse_sets{sparse_sets} {}
+        Iterator(const std::vector<size_t>::iterator entityIdsIterator, std::map<std::size_t, ISparseSet*>& sparse_sets) : _entityIdsIterator{entityIdsIterator}, _sparse_sets{sparse_sets} {}
 
         /**
          * @brief Dereference operator to get the entity and its components.
@@ -85,11 +79,7 @@ public:
          */
         std::tuple<const Entity&, Component&, Others&...> operator*() {
             const Entity& entity = *_entityIdsIterator;
-            return std::tie(
-                entity,
-                this->get<Component>(entity),
-                this->get<Others>(entity)...
-            );
+            return std::tie(entity, this->get<Component>(entity), this->get<Others>(entity)...);
         }
 
         /**
@@ -120,9 +110,7 @@ public:
          *
          * @return True if the iterators are equal, false otherwise.
          */
-        bool operator==(const Iterator& other) const {
-            return _entityIdsIterator == other._entityIdsIterator;
-        }
+        bool operator==(const Iterator& other) const { return _entityIdsIterator == other._entityIdsIterator; }
 
         /**
          * @brief Inequality comparison operator.
@@ -131,11 +119,9 @@ public:
          *
          * @return True if the iterators are not equal, false otherwise.
          */
-        bool operator!=(const Iterator& other) const {
-            return _entityIdsIterator != other._entityIdsIterator;
-        }
+        bool operator!=(const Iterator& other) const { return _entityIdsIterator != other._entityIdsIterator; }
 
-    private:
+      private:
         /**
          * @brief Helper function to get a component of an entity.
          *
@@ -144,22 +130,19 @@ public:
          *
          * @return Reference to the component.
          */
-        template <typename T>
-        [[nodiscard]] T& get(const Entity& entity) {
-            return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).at(entity);
-        }
+        template <typename T> [[nodiscard]] T& get(const Entity& entity) { return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).at(entity); }
 
         std::vector<size_t>::iterator _entityIdsIterator;
-        std::map<std::size_t, ISparseSet *>& _sparse_sets;
+        std::map<std::size_t, ISparseSet*>& _sparse_sets;
     };
 
-public:
+  public:
     /**
      * @brief Constructor to initialize the view with the sparse sets.
      *
      * @param sparse_sets Reference to the map of sparse sets.
      */
-    explicit View(std::map<std::size_t, ISparseSet *>& sparse_sets) : _type_ids{type<Component>::id(), type<Others>::id()...}, _sparse_sets{sparse_sets} {
+    explicit View(std::map<std::size_t, ISparseSet*>& sparse_sets) : _type_ids{type<Component>::id(), type<Others>::id()...}, _sparse_sets{sparse_sets} {
         // std::cout << "View types: " << type<Component>::name();
         // ((std::cout << ", " << type<Others>::name()), ...);
         // std::cout << std::endl;
@@ -174,48 +157,40 @@ public:
     /**
      * @brief Refresh the view by querying the entities again.
      */
-    void refresh() {
-        this->_queryEntities();
-    }
+    void refresh() { this->_queryEntities(); }
 
     /**
      * @brief Return an iterator to the beginning.
      *
      * @return Iterator to the beginning.
      */
-    Iterator begin() {
-        return Iterator(_entities.begin(), _view_sets);
-    }
+    Iterator begin() { return Iterator(_entities.begin(), _view_sets); }
 
     /**
      * @brief Return an iterator to the end.
      *
      * @return Iterator to the end.
      */
-    Iterator end() {
-        return Iterator(_entities.end(), _view_sets);
-    }
+    Iterator end() { return Iterator(_entities.end(), _view_sets); }
 
     /**
      * @brief Return the number of entities in the view.
      *
      * @return Number of entities.
      */
-    [[nodiscard]] std::size_t size() const {
-        return _entities.size();
-    }
+    [[nodiscard]] std::size_t size() const { return _entities.size(); }
 
     /**
-     * @brief Iterate over each entity and its components, applying the given function.
+     * @brief Iterate over each entity and its components, applying the given
+     * function.
      *
      * @tparam Func The type of the function to apply.
      * @param func The function to apply to each entity and its components.
      */
-    template <typename Func>
-    void each(Func&& func) {
+    template <typename Func> void each(Func&& func) {
         // std::cout << "each with entities: " << _entities << std::endl;
         for (auto entity : _entities) {
-            if (const auto entity_it = std::ranges::find(_entities, entity);entity_it == _entities.end())
+            if (const auto entity_it = std::ranges::find(_entities, entity); entity_it == _entities.end())
                 continue;
             if constexpr (std::is_invocable_v<Func, Entity, Component&, Others&...>) {
                 func(entity, this->get<Component>(entity), this->get<Others>(entity)...);
@@ -234,13 +209,14 @@ public:
      * @return Reference to the component.
      */
     template <typename T>
-    requires part_of<T, Component, Others...>
+        requires part_of<T, Component, Others...>
     [[nodiscard]] T& get(const Entity& entity) {
         return dynamic_cast<SparseSet<T>&>(*_view_sets.at(type<T>::id())).at(entity);
     }
 
     /**
-     * @brief Return a vector of tuples containing each entity and its components.
+     * @brief Return a vector of tuples containing each entity and its
+     * components.
      *
      * @return Vector of tuples with entities and their components.
      */
@@ -257,9 +233,7 @@ public:
      *
      * @return Vector of entities.
      */
-    [[nodiscard]] std::vector<Entity> entities() const noexcept {
-        return _entities;
-    }
+    [[nodiscard]] std::vector<Entity> entities() const noexcept { return _entities; }
 
     /**
      * @brief Output stream operator to print the view.
@@ -269,7 +243,7 @@ public:
      *
      * @return Reference to the output stream.
      */
-    friend std::ostream &operator<<(std::ostream &os, const View &view) {
+    friend std::ostream& operator<<(std::ostream& os, const View& view) {
         std::vector<Entity> identifiers = view._type_ids;
         if (identifiers.empty())
             return os;
@@ -297,13 +271,13 @@ public:
         }
     }
 
-private:
-    std::map<std::size_t, ISparseSet *>& _sparse_sets;
-    std::map<std::size_t, ISparseSet *> _view_sets;
+  private:
+    std::map<std::size_t, ISparseSet*>& _sparse_sets;
+    std::map<std::size_t, ISparseSet*> _view_sets;
     std::vector<std::size_t> _type_ids;
     std::vector<Entity> _entities;
 
-private:
+  private:
     /**
      * @brief Query the entities that have the required components.
      */
@@ -312,10 +286,10 @@ private:
         uint8_t minimum = -1;
         uint8_t index = 0;
 
-        for (const auto& id : _type_ids)
-        {
+        for (const auto& id : _type_ids) {
             if (!_sparse_sets.contains(id)) {
-                // std::cerr << "Component " << id << " is not in the registry" << std::endl;
+                // std::cerr << "Component " << id << " is not in the registry"
+                // << std::endl;
                 return;
             }
             const auto& set = _sparse_sets.at(id);
@@ -352,4 +326,4 @@ private:
     }
 };
 
-#endif //VIEW_HPP
+#endif // VIEW_HPP

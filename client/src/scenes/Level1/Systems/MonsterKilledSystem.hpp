@@ -8,27 +8,25 @@
 #ifndef MONSTERKILLEDSYSTEM_HPP_
 #define MONSTERKILLEDSYSTEM_HPP_
 
-
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
 #include "../Components.hpp"
-#include <config.h>
 #include "../Events/PacketInformations.hpp"
+#include "BaseComponents.hpp"
+#include "BaseSystems/Abstracts/ASystem.hpp"
 #include <SFML/Graphics.hpp>
+#include <config.h>
 
-class MonsterKilledSystem final : public ASystem
-{
-public:
-    MonsterKilledSystem(Registry &registry) : ASystem(registry, "MonsterKilledSystem") {}
+class MonsterKilledSystem final : public ASystem {
+  public:
+    MonsterKilledSystem(Registry& registry) : ASystem(registry, "MonsterKilledSystem") {}
 
-    void execute(const PacketInformations &event, const sf::Texture &explosionTex) {
+    void execute(const PacketInformations& event, const sf::Texture& explosionTex) {
         uint32_t monster_id;
         uint32_t projectile_id;
         Transform transform;
         event.packet >> monster_id >> projectile_id;
 
-        _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&e_enemy, const sf::Sprite& sprite, const Transform& transform)  {
-            _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&p_projectile, const Transform& projectile_transform) {
+        _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy& e_enemy, const sf::Sprite& sprite, const Transform& transform) {
+            _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile& p_projectile, const Transform& projectile_transform) {
                 if (e_enemy.id != monster_id || p_projectile.id != projectile_id)
                     return;
                 const auto explosion = _registry.create();

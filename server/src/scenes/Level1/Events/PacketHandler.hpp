@@ -9,44 +9,31 @@
 #define PACKETHANDLER_HPP
 
 #include "../Components.hpp"
-#include "EventDispatcher.hpp"
-#include "Registry.hpp"
-#include "ISceneManager.hpp"
 #include "../Systems/ShipMovedSystem.hpp"
 #include "../Systems/ShipShootedSystem.hpp"
-#include <cstdint>
+#include "EventDispatcher.hpp"
+#include "ISceneManager.hpp"
+#include "Registry.hpp"
 #include <config.h>
+#include <cstdint>
 
-
-class PacketHandler final : public EventHandler<PacketInformations>
-{
-public:
-    explicit PacketHandler(Registry &registry, ISceneManager &manager) :
-        _registry(registry),
-        _manager(manager),
-        _shipMovedSystem(_registry, _manager),
-        _shipShootedSystem(_registry, _manager)
-    {
+class PacketHandler final : public EventHandler<PacketInformations> {
+  public:
+    explicit PacketHandler(Registry& registry, ISceneManager& manager) : _registry(registry), _manager(manager), _shipMovedSystem(_registry, _manager), _shipShootedSystem(_registry, _manager) {
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
     }
 
     ~PacketHandler() override = default;
 
-    void receive(const PacketInformations &event) override
-    {
-        switch (event.type)
-        {
-        case PACKET_TYPE::USER_INPUT:
-        {
+    void receive(const PacketInformations& event) override {
+        switch (event.type) {
+        case PACKET_TYPE::USER_INPUT: {
             UserInput input{};
             event.packet >> input;
 
-            if (input.key >= sf::Keyboard::Left && input.key <= sf::Keyboard::Down)
-            {
+            if (input.key >= sf::Keyboard::Left && input.key <= sf::Keyboard::Down) {
                 _shipMovedSystem.execute(event, input);
-            }
-            else if (input.key == sf::Keyboard::Space)
-            {
+            } else if (input.key == sf::Keyboard::Space) {
                 _shipShootedSystem.execute(event, _projectileTex);
             }
         }
@@ -55,9 +42,9 @@ public:
         }
     }
 
-private:
-    Registry &_registry;
-    ISceneManager &_manager;
+  private:
+    Registry& _registry;
+    ISceneManager& _manager;
 
     sf::Texture _projectileTex;
     ShipMovedSystem _shipMovedSystem;

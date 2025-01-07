@@ -4,7 +4,7 @@ files=$(find . -type f \( -name "*.cpp" -o -name "*.hpp" \) -not -path "./build/
 
 format_issues=0
 for file in $files; do
-    diff=$(clang-format --style=file "$file" | diff "$file" -)
+    diff=$(clang-format -style=file "$file" | diff "$file" -)
     if [ -n "$diff" ]; then
         echo "❌ $file needs formatting"
         echo "$diff"
