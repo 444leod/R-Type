@@ -98,7 +98,7 @@ namespace ecs {
          * @param component The Component informations to attach
          */
         template <typename T>
-        void addComponent(Entity entity, const T &component)
+        void addComponent(Entity entity, T component)
         {
             const auto id = Family<T>::id();
             SparseSet<T> *set = nullptr;

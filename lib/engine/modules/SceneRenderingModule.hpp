@@ -9,12 +9,12 @@
 
 #include <SFML/Window/Event.hpp>
 #include <vector>
-#include "ISceneModule.hpp"
+#include "ASceneModule.hpp"
 
-class SceneRenderingModule final : public ISceneModule
+class SceneRenderingModule final : public ASceneModule
 {
 public:
-    SceneRenderingModule() = default;
+    explicit SceneRenderingModule(AScene& scene) : ASceneModule(scene) {}
     ~SceneRenderingModule() override = default;
 
     void registerEvent(const sf::Event& event)

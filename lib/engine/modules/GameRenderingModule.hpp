@@ -13,7 +13,7 @@
 #include <cstdint>
 
 #include "../AScene.hpp"
-#include "IGameModule.hpp"
+#include "AGameModule.hpp"
 #include "SceneRenderingModule.hpp"
 
 namespace ecs {
@@ -23,10 +23,10 @@ namespace ecs {
 namespace engine
 {
 
-    class GameRenderingModule final : public IGameModule
+    class GameRenderingModule final : public AGameModule
     {
     public:
-        GameRenderingModule(const std::uint32_t& width, const std::uint32_t& height, std::string  title) : _title(std::move(title)), _mode(width, height) {}
+        GameRenderingModule(game::RestrictedGame& game, const std::uint32_t& width, const std::uint32_t& height, std::string  title) : AGameModule(game),  _title(std::move(title)), _mode(width, height) {}
         ~GameRenderingModule() override = default;
 
         void start() override
@@ -39,18 +39,23 @@ namespace engine
             this->_window.close();
         }
 
-        void update(game::RestrictedGame &game) override
+        void refresh(AScene& scene) override
         {
-            const auto *target_module = game.scenes().current().getModule<SceneRenderingModule>();
+            const auto target_module = _game.scenes().current().getModule<SceneRenderingModule>();
 
+            _sceneRenderingModule = target_module;
+        }
+
+        void update() override
+        {
             _window.clear();
             sf::Event event{};
             while (this->_window.pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
-                    game.stop();
+                    _game.stop();
                     return;
                 }
-                if (target_module == nullptr)
+                if (_sceneRenderingModule == nullptr)
                     continue;
             }
             // call system with registry
@@ -63,6 +68,8 @@ namespace engine
         sf::VideoMode _mode;
         sf::RenderWindow _window;
         std::vector<sf::Event> _events;
+
+        std::shared_ptr<SceneRenderingModule> _sceneRenderingModule;
     };
 
 }
