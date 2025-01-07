@@ -36,7 +36,7 @@ public:
                     return;
                 }
             }
-            if (animation.elapsedTime >= animation.spf) {
+            if (animation.elapsedTime >= animation.frameDuration) {
                 sprite.setTextureRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
                 animation.currentFrame++;
                 animation.elapsedTime = 0;

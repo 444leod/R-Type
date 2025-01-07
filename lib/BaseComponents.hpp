@@ -45,6 +45,7 @@ struct Animation {
     float elapsedTime = 0;
     std::pair<int, int> frameSize{};
     float spf{};
+    float frameDuration{};
     unsigned int frameCount{};
     bool loop{};
     unsigned int currentFrame = 1;
