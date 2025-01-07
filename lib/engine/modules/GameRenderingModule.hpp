@@ -46,12 +46,12 @@ namespace engine
         {
             // Dumbly deactivate / reactivate modules to avoid redering dumb stuff when uneeded
             this->_spritesSystem.disable();
-            this->_spritesSystem.disable();
+            this->_textsSystem.disable();
             this->_target = scene.getModule<ASceneEventsModule>();
             if (this->_target == nullptr)
                 return;
             this->_spritesSystem.enable();
-            this->_spritesSystem.enable();
+            this->_textsSystem.enable();
         }
 
         void stop() override
