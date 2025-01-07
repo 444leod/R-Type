@@ -103,14 +103,13 @@ void WaitingRoom::onEnter() {
     packet << PACKET_TYPE::CONNECT;
     packet << "ClientName";
 
-    sf::Text sftext;
-    sftext.setFont(_font);
-    sftext.setCharacterSize(30);
-    sftext.setFillColor(sf::Color::White);
-    sftext.setString("Connecting to the server...");
-
     auto enttext = _registry.create();
-    _registry.addComponent(enttext, Text { .text = sftext });
+    _registry.addComponent(enttext, Text {
+        .message = "Connecting to the server...",
+        .font = "./assets/arial.ttf",
+        .fontSize = 30,
+        .color = { 255, 255, 255 }
+    });
     _registry.addComponent(enttext, Position { .x = 10, .y = 10 });
 
     //_manager.send(SERVER, packet); //dead code
