@@ -64,6 +64,14 @@ public:
 private:
     void addProjectile(const Transform& transform);
     void addBug(const Transform& transform);
+    void _handleYourShip(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    void _handleNewShip(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    void _handleDisconnect(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    void _handleShipMovement(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    void _handleNewProjectile(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    void _handleNewMonster(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    void _handleMonsterKilled(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+
 
 public:
 private:

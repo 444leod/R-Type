@@ -15,6 +15,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include "PacketTypes.hpp"
+#include "NetworkModules/ANetworkSceneModule.hpp"
 
 inline bool isInputAvailable() {
     fd_set readfds;
@@ -133,6 +134,38 @@ void WaitingRoom::onEnter()
     sf::RectangleShape startButtonShape({100.0f, 40.0f});
     startButtonShape.setFillColor(sf::Color::Green);
     _registry.addComponent<RectangleButton>(startButtonEntity, {startButtonShape, "Start", [this](){ _onStart({}); }});
+
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (net == nullptr)
+    {
+        std::cout << "1No network module found, exiting..." << std::endl;
+        game::RestrictedGame::instance().stop();
+        return;
+    }
+
+    this->getModule<APacketHandlerSceneModule>()->setHandler(PACKET_TYPE::CONNECT, [net] (ecs::Registry& registry, RestrictedSceneManager& manager, const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) {
+        auto clients = net->clients();
+
+        const auto client = std::ranges::find_if(clients, [&src](const auto& actualClient) {
+            return actualClient.endpoint == src;
+        });
+
+        if (client != clients.end())
+            return;
+
+        std::string name;
+        packet >> name;
+        std::cout << "Client connected: " << name << std::endl;
+
+        const ntw::ClientInformation clientInfo(src, name);
+        net->addClient(clientInfo);
+
+        ntw::UDPPacket response;
+        response << PACKET_TYPE::CONNECT;
+        response << clientInfo;
+
+        net->queuePacket(response);
+    });
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene)
@@ -144,11 +177,16 @@ void WaitingRoom::onExit()
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 
-    //this->_broadcast(packet);
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (net == nullptr)
+        return;
+
+    net->queuePacket(packet);
 }
 
 void WaitingRoom::onExit(const AScene& nextScene)
 {
+    std::cout << "Exiting to " << nextScene.name() << std::endl;
 }
 
 /* void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
@@ -204,7 +242,7 @@ void WaitingRoom::_onConnect(const ntw::ClientInformation& src, ntw::UDPPacket& 
 
     _manager.send(src.endpoint, response); */
 
-    auto entity = _registry.create();
+    const auto entity = _registry.create();
     // _registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * CLIENTS.size()}); //TODO: update this
     sf::Text clientText("Client " + std::to_string(src.id), _font, 20);
     clientText.setFillColor(sf::Color::White);
@@ -230,7 +268,7 @@ void WaitingRoom::_onMessage(const ntw::ClientInformation& source, ntw::UDPPacke
 void WaitingRoom::_onExit(const std::vector<std::string>& args)
 {
     std::cout << "Exiting..." << std::endl;
-    _manager.stop();
+    game::RestrictedGame::instance().stop();
 
     //this->_broadcast(ntw::UDPPacket{} << PACKET_TYPE::DISCONNECT);
 }
@@ -245,6 +283,25 @@ void WaitingRoom::_onStart(const std::vector<std::string>& args)
     //     return;
     // }
 
+    ntw::UDPPacket packet = ntw::UDPPacket{} << PACKET_TYPE::START;
+
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (net == nullptr)
+    {
+            std::cout << "Network module not found." << std::endl;
+            game::RestrictedGame::instance().stop();
+            return;
+    }
+
+    if (net->clients().empty())
+    {
+        std::cout << "Not enough players to start the game." << std::endl;
+        return;
+    }
+
+    net->queuePacket(packet);
+
     //this->_broadcast(ntw::UDPPacket{} << PACKET_TYPE::START);
-    _manager.load("Level1");
+    _manager.load("game");
+    std::cout << "Game started." << std::endl;
 }

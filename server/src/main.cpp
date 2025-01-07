@@ -12,16 +12,28 @@
 #include "engine/modules/GameRenderingModule.hpp"
 #include "Modules/NetworkGameModule.hpp"
 
+#include "scenes/WaitingRoom/Modules/PacketHandlerSceneModule.hpp"
+
+#include "NetworkModules/ANetworkSceneModule.hpp"
+
 int main(void)
 {
     auto game = game::Game();
 
     // game.addModule<engine::GameRenderingModule>(800, 600, "R-Type Server");
 
-    game.addModule<NetworkGameModule>(25565);
+    const auto networkGameModule = game.addModule<NetworkGameModule>(25565);
 
-    game.registerScene<WaitingRoom>("main");
-    game.registerScene<Level1>("game");
+    const auto waitingRoom = game.registerScene<WaitingRoom>("main");
+
+    waitingRoom->addModule<SceneRenderingModule>();
+    waitingRoom->addModule<waiting_room::PacketHandlerSceneModule>(game.registry(), game.scenes());
+    waitingRoom->addModule<ANetworkSceneModule>(*networkGameModule);
+
+    const auto level1 = game.registerScene<Level1>("game");
+
+    level1->addModule<SceneRenderingModule>();
+
     game.run();
     return 0;
 }

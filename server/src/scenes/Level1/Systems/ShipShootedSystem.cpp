@@ -20,10 +20,12 @@ void ShipShootedSystem::execute(const PacketInformation &event, const sf::Textur
         if (ship.id != event.source.id)
             continue;
 
+        constexpr auto projectileVelocity = Velocity{.x = 200, .y = 0};
+        const auto shootTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
+
         static uint32_t projectileId = 0;
         const auto projectile = _registry.create();
         auto projectileSprite = sf::Sprite(_projectileTex);
-        const auto shootTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
         projectileSprite.setOrigin(0, 0);
         projectileSprite.setScale(SCALE, SCALE);
         projectileSprite.setPosition(shootTransform.x, shootTransform.y);
@@ -32,11 +34,14 @@ void ShipShootedSystem::execute(const PacketInformation &event, const sf::Textur
         _registry.addComponent(projectile, projectileSprite);
         _registry.addComponent(projectile, shootTransform);
         _registry.addComponent(projectile, Projectile{ .id = projectileId });
-        _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
+        _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = projectileVelocity});
         ntw::UDPPacket packet;
-        packet << PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId;
+        packet << PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId << shootTransform << projectileVelocity;
+
         // for (const auto &client : CLIENTS)
             // _manager.send(client.endpoint, packet);
+
         projectileId++;
+        return;
     }
 }

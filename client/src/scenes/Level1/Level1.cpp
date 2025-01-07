@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <iostream>
 #include <thread>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window/Keyboard.hpp>
 #include "Level1.hpp"
 #include "../WaitingRoom/WaitingRoom.hpp"
 #include "Components.hpp"
@@ -18,6 +16,10 @@
 #include "network/NetworkAgent.hpp"
 #include "Config.hpp"
 #include "PacketTypes.hpp"
+
+#include "NetworkModules/ANetworkGameModule.hpp"
+
+#include <NetworkModules/ANetworkSceneModule.hpp>
 
 void Level1::initialize()
 {
@@ -102,6 +104,8 @@ void Level1::onEvent(sf::Event &event) {
 
 void Level1::onEnter() {
     _registry.clear();
+
+    /*
     const auto spaceship = _registry.create();
 
     auto spaceshipSprite = sf::Sprite(_spaceshipTex);
@@ -116,6 +120,8 @@ void Level1::onEnter() {
     #if DEBUG
         _registry.addComponent(spaceship, Debug{});
     #endif
+
+    */
 
     const auto background = _registry.create();
 
@@ -142,11 +148,13 @@ void Level1::onEnter(const AScene& lastScene)
 
 void Level1::onExit()
 {
-    /*
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
-    */
-    //_manager.send(this->_server, packet);
+
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (net == nullptr)
+        return;
+    net->queuePacket(packet);
 }
 
 void Level1::onExit(const AScene& nextScene)

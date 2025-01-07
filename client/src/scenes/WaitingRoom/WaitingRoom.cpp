@@ -17,6 +17,8 @@
 #include "network/NetworkAgent.hpp"
 #include "PacketTypes.hpp"
 
+#include <NetworkModules/ANetworkSceneModule.hpp>
+
 void WaitingRoom::initialize()
 {
 }
@@ -80,32 +82,6 @@ void WaitingRoom::onEvent(sf::Event &event)
 
 void WaitingRoom::onEnter() {
     _registry.clear();
-
-    std::cout << "Game is running..." << std::endl;
-
-    std::cout << "Ip of the host (enter for localhost): " << std::flush;
-    std::string ip;
-    std::getline(std::cin, ip);
-    if (ip.empty())
-        ip = "127.0.0.1";
-
-    std::cout << "Port of the host (enter for 25565): " << std::flush;
-    std::uint32_t port;
-    std::string port_str;
-    std::getline(std::cin, port_str);
-    if (port_str.empty())
-        port = 25565;
-    else
-        port = std::stoi(port_str);
-
-    const auto addr = asio::ip::address::from_string(ip);
-    //SERVER = asio::ip::udp::endpoint(addr, port); //dead code
-
-    ntw::UDPPacket packet;
-    packet << PACKET_TYPE::CONNECT;
-    packet << "ClientName";
-
-    //_manager.send(SERVER, packet); //dead code
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene)
