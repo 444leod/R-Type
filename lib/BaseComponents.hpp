@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 #include <functional>
+#include <string>
 
 // TODO: Decide how to organize the components in the lib
 
@@ -58,7 +59,14 @@ struct Enemy {
 // UI Components
 
 struct Text {
-    sf::Text text;
+    std::string message;
+    std::string font;
+    std::uint32_t fontSize;
+    struct {
+        std::uint32_t r;
+        std::uint32_t g;
+        std::uint32_t b;
+    } color;
 };
 
 struct RectangleButton {
