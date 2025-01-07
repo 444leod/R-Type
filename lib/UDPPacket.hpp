@@ -11,6 +11,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <ostream>
 
 /**
  * @brief Overload of the << operator for std::byte.
