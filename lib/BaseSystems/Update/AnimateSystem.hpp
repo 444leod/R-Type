@@ -26,14 +26,22 @@ public:
                     animation.currentFrame = 0;
                 } else {
                     animation.onEnd(entity);
+                    try {
+                        _registry.get<Animation>(entity);
+                    }
+                    catch (std::out_of_range) {
+                        return;
+                    }
                     _registry.removeComponent<Animation>(entity);
+                    return;
                 }
             }
-            if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
+            if (animation.elapsedTime >= animation.spf) {
                 sprite.setTextureRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
                 animation.currentFrame++;
-                animation.clock.restart();
+                animation.elapsedTime = 0;
             }
+            animation.elapsedTime += deltaTime;
         });
     }
 };

@@ -42,12 +42,12 @@ struct Position {
 };
 
 struct Animation {
-    sf::Clock clock = sf::Clock();
+    float elapsedTime = 0;
     std::pair<int, int> frameSize{};
-    float speed{};
-    unsigned int currentFrame = 1;
+    float spf{};
     unsigned int frameCount{};
     bool loop{};
+    unsigned int currentFrame = 1;
     std::function<void(Entity entity)> onEnd = [](Entity entity) {};
 };
 

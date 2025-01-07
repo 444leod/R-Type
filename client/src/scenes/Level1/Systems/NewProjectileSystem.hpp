@@ -39,7 +39,7 @@ public:
             _registry.addComponent(projectile, projectileSprite);
             _registry.addComponent(projectile, shootTransform);
             _registry.addComponent(projectile, Projectile{ .id = projectileId });
-            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
+            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .spf = 0.02, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
                 _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
             }});
         }

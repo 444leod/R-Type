@@ -39,7 +39,7 @@ public:
                 explosionSprite.setPosition(transform.x, transform.y);
                 _registry.addComponent(explosion, explosionSprite);
                 _registry.addComponent(explosion, Transform{.x = transform.x, .y = transform.y, .z = 1, .rotation = 0});
-                _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false, .onEnd = [&](Entity entity){
+                _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .spf = 0.1, .frameCount = 6, .loop = false, .onEnd = [&](Entity entity){
                     _registry.remove(entity);
                 }});
                 _registry.remove(enemy);
