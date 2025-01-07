@@ -24,7 +24,7 @@ public:
         std::uint32_t projectileId; 
         std::uint32_t shipId;
         event.packet >> shipId >> projectileId;
-        for (auto [entity, ship, transform] : _registry.view<Ship, Transform>().each())
+        for (auto [shipEntity, ship, transform] : _registry.view<Ship, Transform>().each())
         {
             if (ship.id != shipId)
                 continue;
@@ -39,7 +39,10 @@ public:
             _registry.addComponent(projectile, projectileSprite);
             _registry.addComponent(projectile, shootTransform);
             _registry.addComponent(projectile, Projectile{ .id = projectileId });
-            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
+            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
+                _registry.removeComponent<Animation>(entity);
+                _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
+            }});
         }
     }
 };

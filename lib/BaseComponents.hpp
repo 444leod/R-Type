@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 #include <functional>
+#include "Entity.hpp"
 
 // TODO: Decide how to organize the components in the lib
 
@@ -47,8 +48,7 @@ struct Animation {
     unsigned int currentFrame = 1;
     unsigned int frameCount{};
     bool loop{};
-    // TODO: Refacto to not have nested components
-    Velocity velocity{};
+    std::function<void(Entity entity)> onEnd = [](Entity entity) {};
 };
 
 struct Enemy {

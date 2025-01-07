@@ -25,11 +25,7 @@ public:
                 if (animation.loop) {
                     animation.currentFrame = 0;
                 } else {
-                    if (animation.velocity.x != 0 || animation.velocity.y != 0)
-                        _registry.addComponent(entity, animation.velocity);
-                    else
-                        _registry.remove(entity);
-                    _registry.removeComponent<Animation>(entity);
+                    animation.onEnd(entity);
                 }
             }
             if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
