@@ -56,6 +56,7 @@ pipeline {
                         stage('Setup') {
                             steps {
                                 sh '''#!/bin/bash
+                                    clang-format --version
                                     make clean
                                     make conan_ci
                                     source rtype_venv/bin/activate
