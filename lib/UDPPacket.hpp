@@ -9,9 +9,9 @@
 
 #include <cstdint>
 #include <cstring>
+#include <ostream>
 #include <string>
 #include <vector>
-#include <ostream>
 
 /**
  * @brief Overload of the << operator for std::byte.
