@@ -33,7 +33,6 @@ void ShipShootedSystem::execute(const PacketInformations &event, const sf::Textu
         _registry.addComponent(projectile, shootTransform);
         _registry.addComponent(projectile, Projectile{ .id = projectileId });
         _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
-            _registry.removeComponent<Animation>(entity);
             _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
         }});
         UDPPacket packet;

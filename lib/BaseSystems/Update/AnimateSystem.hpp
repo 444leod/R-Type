@@ -26,6 +26,7 @@ public:
                     animation.currentFrame = 0;
                 } else {
                     animation.onEnd(entity);
+                    _registry.removeComponent<Animation>(entity);
                 }
             }
             if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {

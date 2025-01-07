@@ -183,7 +183,6 @@ void Level1::addProjectile(const Transform& transform){
     _registry.addComponent(projectile, transform);
     _registry.addComponent(projectile, Projectile{});
     _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
-        _registry.removeComponent<Animation>(entity);
         _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
     }});
     #if DEBUG
