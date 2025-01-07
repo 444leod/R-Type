@@ -319,6 +319,8 @@ private:
                 return;
             }
             const auto& set = _sparse_sets.at(id);
+            if (!set)
+                return;
             _view_sets[id] = set;
             auto list = set->entities();
 
