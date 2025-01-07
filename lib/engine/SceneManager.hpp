@@ -121,11 +121,13 @@ public:
 
     /**
      * @brief Updates the state of the current scene.
+     *
+     * @return true if the scene was updated, false otherwise.
      */
-    void update()
+    bool update()
     {
         if (this->_loadingName.empty() || !this->_scenes.contains(this->_loadingName))
-            return;
+            return false;
 
         /// Exit the current scene if there was on e
         const auto next = this->_scenes[this->_loadingName];
@@ -138,6 +140,7 @@ public:
             ? this->_current->onEnter(*old)
             : this->_current->onEnter();
         this->_loadingName = "";
+        return true;
     }
 
     /**

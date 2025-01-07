@@ -8,12 +8,57 @@
 #ifndef A_NETWORK_GAME_MODULE_HPP
 #define A_NETWORK_GAME_MODULE_HPP
 
-#include "engine/modules/IGameModule.hpp"
-#include "network/NetworkAgent.hpp"
+#include <utility>
 
-class ANetworkGameModule : public IGameModule, public ntw::NetworkAgent {
+#include "engine/modules/AGameModule.hpp"
+#include "engine/modules/ASceneModule.hpp"
+#include "ecs/Registry.hpp"
+#include "network/NetworkAgent.hpp"
+#include "PacketTypes.hpp"
+#include "engine/RestrictedSceneManager.hpp"
+
+#include "engine/RestrictedGame.hpp"
+
+class ANetworkGameModule;
+
+class APacketHandlerSceneModule : public ASceneModule
+{
+protected:
+    explicit APacketHandlerSceneModule(AScene& scene, ecs::Registry& registry, RestrictedSceneManager& sceneManager) : ASceneModule(scene), _registry(registry), _sceneManager(sceneManager) {}
+    ~APacketHandlerSceneModule() override = default;
+
 public:
-    explicit ANetworkGameModule(const std::uint32_t& port = 0) : IGameModule(), NetworkAgent(port) {}
+    void handlePacket(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
+    {
+        PACKET_TYPE type;
+        packet >> type;
+
+        if (!this->_packetHandlers.contains(static_cast<std::size_t>(type))  )
+            return;
+        this->_packetHandlers.at(static_cast<std::size_t>(type))(_registry, _sceneManager, src, packet);
+    }
+
+    void setHandler(const PACKET_TYPE& type, std::function<void(ecs::Registry& registry, RestrictedSceneManager& manager, const asio::ip::udp::endpoint&, ntw::UDPPacket&)> handler)
+    {
+        this->_packetHandlers.set(static_cast<std::size_t>(type), std::move(handler));
+    }
+
+    void setHandlers(const std::map<PACKET_TYPE, std::function<void(ecs::Registry& registry, RestrictedSceneManager& manager, const asio::ip::udp::endpoint&, ntw::UDPPacket&)>>& handlers)
+    {
+        for (const auto& [type, handler] : handlers) {
+            this->setHandler(type, handler);
+        }
+    }
+
+protected:
+    ecs::Registry& _registry;
+    RestrictedSceneManager& _sceneManager;
+    ecs::SparseSet<std::function<void(ecs::Registry& registry, RestrictedSceneManager& manager, const asio::ip::udp::endpoint&, ntw::UDPPacket&)>> _packetHandlers;
+};
+
+class ANetworkGameModule : public AGameModule, public ntw::NetworkAgent {
+public:
+    explicit ANetworkGameModule(game::RestrictedGame& game, const std::uint32_t& port = 0) : AGameModule(game), NetworkAgent(port) {}
     ~ANetworkGameModule() override = default;
 
     void start() override
@@ -26,15 +71,22 @@ public:
             this->_packetHandler = &ANetworkGameModule::_doNothing;
     }
 
-    void update(game::RestrictedGame &game) override
+    void refresh(AScene& scene) override
     {
-        this->_handleStoredPackets(game);
+        const auto packetHandlerSceneModule = scene.getModule<APacketHandlerSceneModule>();
+
+        _packetHandlerSceneModule = packetHandlerSceneModule;
+    }
+
+    void update() override
+    {
+        this->_handleStoredPackets();
         this->_sendQueuedPackets();
     }
 
-    void addClient(ntw::ClientInformation& endpoint)
+    void addClient(const ntw::ClientInformation& endpoint)
     {
-            this->_clients.emplace_back(endpoint);
+        this->_clients.push_back(endpoint);
     }
 
     void queuePacket(const std::uint32_t& clientId, ntw::UDPPacket& packet)
@@ -67,6 +119,11 @@ public:
     void queuePacket(ntw::UDPPacket& packet)
     {
         this->_toSendGlobalPackets.emplace_back(packet);
+    }
+
+    [[nodiscard]] std::vector<ntw::ClientInformation> clients() const
+    {
+        return this->_clients;
     }
 
 protected:
@@ -102,20 +159,15 @@ protected:
         this->_toSendPackets.clear();
     }
 
-    virtual void _handleStoredPackets(game::RestrictedGame &game)
+    virtual void _handleStoredPackets()
     {
-        //    const auto* scenePacketHandler = game.scenes().current().getModule<PacketHandlerSceneModule>();
+        if (_packetHandlerSceneModule == nullptr) {
+            _receivedPackets.clear();
+            return;
+        }
 
-        //    if (scenePacketHandler == nullptr) {
-        //        _receivedPackets.clear();
-        //        return;
-        //    }
-
-        PACKET_TYPE type;
         for (auto& [src, packet] : _receivedPackets) {
-            packet >> type;
-            std::cout << "Got a packet from " << src << " with type " << static_cast<int>(type) << std::endl;
-            // scenePacketHandler->handlePacket(src, packet);
+            _packetHandlerSceneModule->handlePacket(src, packet);
         }
         _receivedPackets.clear();
     }
@@ -129,6 +181,8 @@ protected:
     std::vector<std::pair<const asio::ip::udp::endpoint, ntw::UDPPacket>> _receivedPackets;
     std::vector<ntw::UDPPacket> _toSendGlobalPackets;
     std::vector<std::pair<const asio::ip::udp::endpoint, ntw::UDPPacket>> _toSendPackets;
+
+    std::shared_ptr<APacketHandlerSceneModule> _packetHandlerSceneModule;
 
 };
 
