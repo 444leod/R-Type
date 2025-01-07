@@ -66,33 +66,22 @@ void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
 
 void WaitingRoom::render(sf::RenderWindow& window)
 {
-    _registry.view<Position, Renderable>().each([&](const auto& entity, auto& pos, auto& renderable) {
-        renderable.text.setPosition(pos.x, pos.y);
-        window.draw(renderable.text);
-    });
-
-    _registry.view<Position, Button>().each([&](const auto& entity, auto& pos, auto& button) {
-        button.shape.setPosition(pos.x, pos.y);
-        window.draw(button.shape);
-
-        sf::Text buttonText(button.label, font, 20);
-        buttonText.setPosition(pos.x + 10, pos.y + 10);
-        buttonText.setFillColor(sf::Color::White);
-        window.draw(buttonText);
-    });
+    _executeRenderSystems(window);
 }
 
 void WaitingRoom::onEvent(sf::Event &event)
 {
+    //! Will not refactor this part, not supposed to have a system here
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
         sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
-        _registry.view<Position, Button>().each([&](const auto& entity, auto& pos, auto& button) {
+        _registry.view<Position, RectangleButton>().each([&](const auto& entity, auto& pos, auto& button) {
             if (button.shape.getGlobalBounds().contains(mousePos)) {
                 button.onClick();
                 return;
             }
         });
     }
+
     switch (event.type) {
         case sf::Event::KeyPressed:
             switch (event.key.code) {
@@ -129,7 +118,7 @@ void WaitingRoom::onEnter()
         _registry.addComponent<Position>(entity, {50.0f, y});
         sf::Text clientText("Client " + std::to_string(client.id), font, 20);
         clientText.setFillColor(sf::Color::White);
-        _registry.addComponent<Renderable>(entity, {clientText});
+        _registry.addComponent<Text>(entity, {clientText});
         y += 30.0f;
     }
 
@@ -137,13 +126,13 @@ void WaitingRoom::onEnter()
     _registry.addComponent<Position>(exitButtonEntity, {20.0f, 20.0f});
     sf::RectangleShape exitButtonShape({100.0f, 40.0f});
     exitButtonShape.setFillColor(sf::Color::Red);
-    _registry.addComponent<Button>(exitButtonEntity, {exitButtonShape, "Exit", [this](){ _onExit({}); }});
+    _registry.addComponent<RectangleButton>(exitButtonEntity, {exitButtonShape, "Exit", [this](){ _onExit({}); }});
 
     auto startButtonEntity = _registry.create();
     _registry.addComponent<Position>(startButtonEntity, {140.0f, 20.0f});
     sf::RectangleShape startButtonShape({100.0f, 40.0f});
     startButtonShape.setFillColor(sf::Color::Green);
-    _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){ _onStart({}); }});
+    _registry.addComponent<RectangleButton>(startButtonEntity, {startButtonShape, "Start", [this](){ _onStart({}); }});
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene)
@@ -219,7 +208,7 @@ void WaitingRoom::_onConnect(const ClientInformations& src, UDPPacket& packet)
     _registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * CLIENTS.size()});
     sf::Text clientText("Client " + std::to_string(src.id), font, 20);
     clientText.setFillColor(sf::Color::White);
-    _registry.addComponent<Renderable>(entity, {clientText});
+    _registry.addComponent<Text>(entity, {clientText});
 }
 
 void WaitingRoom::_onDisconnect(const ClientInformations& src, UDPPacket& packet) {

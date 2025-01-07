@@ -10,7 +10,7 @@
 
 #include "Registry.hpp"
 #include "EventDispatcher.hpp"
-#include "Components.hpp"
+#include "BaseComponents.hpp"
 #include "NetworkedScene.hpp"
 #include "UDPPacket.hpp"
 #include <chrono>

@@ -8,12 +8,23 @@
 #ifndef LEVEL_1_HPP
 #define LEVEL_1_HPP
 
+// From Game Engine
 #include "AScene.hpp"
 #include "Registry.hpp"
 #include "EventDispatcher.hpp"
+#include "BaseComponents.hpp"
+#include "BaseSystems/Update/ParalaxSystem.hpp"
+#include "BaseSystems/Update/MovementSystem.hpp"
+#include "BaseSystems/Update/AnimateSystem.hpp"
+#include "BaseSystems/Render/DrawSpritesSystem.hpp"
+
+// Level1 specific
 #include "Components.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
+#include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
+#include "Systems/BugsMovementSystem.hpp"
+
 #include <chrono>
 
 class Level1 final : public AScene {
@@ -26,6 +37,15 @@ public:
         _explosionTex.loadFromFile("assets/r-typesheet44.gif", sf::IntRect(131, 0, 192, 32));
 //        _eventDispatcher.link<movement_event>(&_playerMovement);
         _eventDispatcher.link<PacketInformations>(&_packetHandler);
+        // systems
+        // update systems
+        this->_updateSystems.push_back(std::make_unique<ParallaxSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<MovementSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<AnimateSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<BugsMovementSystem>(_registry));
+        // render systems
+        this->_renderSystems.push_back(std::make_unique<DrawSpritesSystem>(_registry));
     }
 
     void initialize() override;
@@ -53,7 +73,6 @@ public:
 private:
     float _bugTimer = 0.f;
     std::uint32_t _enemyId = 0;
-    float _parallaxOffset = 0;
     EventDispatcher _eventDispatcher;
 
     InputHandler _inputHandler{_registry};
