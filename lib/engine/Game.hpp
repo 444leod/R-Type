@@ -15,6 +15,7 @@
 #include "ecs/EventDispatcher.hpp"
 #include "SceneManager.hpp"
 
+#include <memory>
 #include <thread>
 
 namespace game
@@ -30,11 +31,7 @@ namespace game
     {
     public:
         Game() = default;
-        ~Game() override
-        {
-            for (const auto module: this->_modules)
-                delete module;
-        }
+        ~Game() override = default;
 
         [[nodiscard]] const ecs::Registry& registry() const override { return this->_registry; }
         [[nodiscard]] ecs::Registry& registry() override { return this->_registry; }
@@ -47,9 +44,9 @@ namespace game
 
         template <GameModule Module, typename... Params>
             requires ConstructibleGameModule<Module, Params...>
-        Module* addModule(Params&&... params)
+        std::shared_ptr<Module> addModule(Params&&... params)
         {
-            auto module = new Module(*this, std::forward<Params>(params)...);
+            auto module = std::make_shared<Module>(*this, std::forward<Params>(params)...);
             this->_modules.push_back(module);
             return module;
         }
@@ -60,8 +57,9 @@ namespace game
             return this->_sceneManager.registerScene<T>(name, this->_registry);
         }
 
-        void run() {
-                this->run(this->_sceneManager.loaded());
+        void run()
+        {
+            this->run(this->_sceneManager.loaded());
         }
 
         void run(const std::string& scene) {
@@ -105,7 +103,7 @@ namespace game
         }
 
     private:
-        std::vector<AGameModule *> _modules;
+        std::vector<std::shared_ptr<AGameModule>> _modules;
         ecs::Registry _registry;
         ecs::EventDispatcher _events;
         SceneManager _sceneManager;
