@@ -6,7 +6,7 @@
 */
 
 #include "WaitingRoom.hpp"
-#include "ecs/Registry.hpp"
+
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -14,8 +14,11 @@
 #include <thread>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
+
 #include "network/NetworkAgent.hpp"
+#include "ecs/Registry.hpp"
 #include "PacketTypes.hpp"
+#include "engine/modules/ASceneEventsModule.hpp"
 
 void WaitingRoom::initialize()
 {
@@ -79,7 +82,7 @@ void WaitingRoom::onEvent(sf::Event &event)
 */
 
 void WaitingRoom::onEnter() {
-    std::cout << "Game is running..." << std::endl;
+    /*std::cout << "Game is running..." << std::endl;
 
     std::cout << "Ip of the host (enter for localhost): " << std::flush;
     std::string ip;
@@ -101,7 +104,22 @@ void WaitingRoom::onEnter() {
 
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::CONNECT;
-    packet << "ClientName";
+    packet << "ClientName";*/
+
+    auto events = this->getModule<ASceneEventsModule>();
+    if (events != nullptr) {
+        events->addHandler(
+            [&] (sf::Event& e) {
+                return e.type == sf::Event::KeyPressed
+                    && e.key.code <= sf::Keyboard::Z
+                    && e.key.code >= sf::Keyboard::A;
+            },
+            [&] (sf::Event& e) {
+                std::cout << "Pressed key: " << (char)(e.key.code + 'A') << std::endl;
+            }
+        );
+    } else
+        std::cout << "No module for type ASceneEventsModule" << std::endl;
 
     auto enttext = _registry.create();
     _registry.addComponent(enttext, Text {

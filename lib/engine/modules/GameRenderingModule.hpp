@@ -69,7 +69,7 @@ namespace engine
                 }
                 if (this->_target == nullptr)
                     continue;
-                this->_target->onEvent(event);
+                this->_target->trigger(event);
             }
 
             this->_window.clear();

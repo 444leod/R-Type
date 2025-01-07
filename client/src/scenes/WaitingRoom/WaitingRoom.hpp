@@ -16,8 +16,6 @@
 #include "engine/AScene.hpp"
 #include "BaseComponents.hpp"
 
-#include "./modules/WaitingRoomEvents.hpp"
-
 class WaitingRoom final : public AScene {
 public:
     WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n) {}

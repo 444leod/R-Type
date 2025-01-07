@@ -15,7 +15,7 @@ int main() {
     game.addModule<engine::GameRenderingModule>(800, 600, "R-Type - Client");
 
     const auto main = game.registerScene<WaitingRoom>("main");
-    main->addModule<WaitingRoomEvents>();
+    main->addModule<ASceneEventsModule>();
 
     const auto level1 = game.registerScene<Level1>("game");
     level1->addModule<Level1Events>();
