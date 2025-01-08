@@ -50,13 +50,13 @@ pipeline {
                         docker {
                             image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
                             args '-u root'
+                            alwaysPull true
                         }
                     }
                     stages {
                         stage('Setup') {
                             steps {
                                 sh '''#!/bin/bash
-                                    clang-format --version
                                     make clean
                                     make conan_ci
                                     source rtype_venv/bin/activate
