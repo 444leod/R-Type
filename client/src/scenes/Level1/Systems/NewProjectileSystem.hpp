@@ -23,7 +23,7 @@ class NewProjectileSystem final : public ASystem {
         std::uint32_t projectileId;
         std::uint32_t shipId;
         event.packet >> shipId >> projectileId;
-        for (auto [entity, ship, transform] : _registry.view<Ship, Transform>().each()) {
+        for (auto [shipEntity, ship, transform] : _registry.view<Ship, Transform>().each()) {
             if (ship.id != shipId)
                 continue;
             const auto projectile = _registry.create();
@@ -36,8 +36,10 @@ class NewProjectileSystem final : public ASystem {
             _registry.addComponent(projectile, Hitbox{});
             _registry.addComponent(projectile, projectileSprite);
             _registry.addComponent(projectile, shootTransform);
-            _registry.addComponent(projectile, Projectile{.id = projectileId});
-            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
+            _registry.addComponent(projectile, Projectile{ .id = projectileId });
+            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = 0.02, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
+                _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
+            }});
         }
     }
 };
