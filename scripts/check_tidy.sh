@@ -4,10 +4,16 @@ build_dir="build"
 
 files=$(find . -type f \( -name "*.cpp" -o -name "*.hpp" \) -not -path "./build/*")
 
+if ! command -v clang-tidy-19 &> /dev/null; then
+    clang_tidy_command="clang-tidy"
+else
+    clang_tidy_command="clang-tidy-19"
+fi
+
 tidy_issues=0
 for file in $files; do
     echo "Checking $file..."
-    if ! clang-tidy \
+    if ! $clang_tidy_command \
         -p="${build_dir}" \
         --extra-arg="-I${build_dir}" \
         --warnings-as-errors=* \
