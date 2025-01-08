@@ -25,8 +25,7 @@ class AnimateSystem final : public AUpdateSystem {
                     animation.onEnd(entity);
                     try {
                         _registry.get<Animation>(entity);
-                    }
-                    catch (std::out_of_range) {
+                    } catch (std::out_of_range) {
                         return;
                     }
                     _registry.removeComponent<Animation>(entity);

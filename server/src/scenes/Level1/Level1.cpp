@@ -44,12 +44,10 @@ void Level1::update(const double deltaTime, const sf::RenderWindow& window) {
             explosionSprite.setPosition(projectile_transform.x, projectile_transform.y);
             _registry.addComponent(explosion, explosionSprite);
             _registry.addComponent(explosion, Transform{.x = projectile_transform.x, .y = projectile_transform.y, .z = 1, .rotation = 0});
-            _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .frameDuration = 0.1, .frameCount = 6, .loop = false, .onEnd = [&](Entity entity){
-                _registry.remove(entity);
-            }});
-            #if DEBUG
-                _registry.addComponent(explosion, Debug{});
-            #endif
+            _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .frameDuration = 0.1, .frameCount = 6, .loop = false, .onEnd = [&](Entity entity) { _registry.remove(entity); }});
+#if DEBUG
+            _registry.addComponent(explosion, Debug{});
+#endif
 
             _registry.remove(enemy);
             _registry.remove(projectile);

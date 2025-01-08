@@ -8,10 +8,10 @@
 #ifndef BASECOMPONENTS_HPP_
 #define BASECOMPONENTS_HPP_
 
+#include "Entity.hpp"
 #include <SFML/Graphics.hpp>
 #include <cstdint>
 #include <functional>
-#include "Entity.hpp"
 
 // TODO: Decide how to organize the components in the lib
 
@@ -44,7 +44,7 @@ struct Position {
 /**
  * @struct Animation
  * @brief Represents an animation component.
- * 
+ *
  * This struct holds the properties and behaviors of an animation, including
  * frame size, duration, and looping behavior.
  */
@@ -82,7 +82,7 @@ struct Animation {
     /**
      * @brief The function to call when the animation ends (if loop is false).
      * @param entity The Entity that the animation is attached to.
-     * 
+     *
      * This function takes an Entity as a parameter and is called when the
      * animation completes.
      */

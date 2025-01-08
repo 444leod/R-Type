@@ -36,10 +36,8 @@ class NewProjectileSystem final : public ASystem {
             _registry.addComponent(projectile, Hitbox{});
             _registry.addComponent(projectile, projectileSprite);
             _registry.addComponent(projectile, shootTransform);
-            _registry.addComponent(projectile, Projectile{ .id = projectileId });
-            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = 0.02, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
-                _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
-            }});
+            _registry.addComponent(projectile, Projectile{.id = projectileId});
+            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = 0.02, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }});
         }
     }
 };
