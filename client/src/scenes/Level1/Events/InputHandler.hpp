@@ -16,9 +16,12 @@
 #include <SFML/Window/Keyboard.hpp>
 #include "network/NetworkAgent.hpp"
 #include "engine/RestrictedSceneManager.hpp"
+#include "engine/RestrictedGame.hpp"
 #include "PacketTypes.hpp"
 
-class InputHandler : public ecs::EventHandler<UserInput> {
+#include <NetworkModules/ANetworkSceneModule.hpp>
+
+class InputHandler final : public ecs::EventHandler<UserInput> {
 public:
     explicit InputHandler(ecs::Registry& registry, RestrictedSceneManager& manager) : _registry(registry), _manager(manager) {}
     ~InputHandler() override = default;
@@ -28,7 +31,7 @@ public:
         {
             ntw::UDPPacket packet;
             packet << PACKET_TYPE::USER_INPUT << event;
-            //_manager.send(SERVER, packet);
+            game::RestrictedGame::instance().scenes().current().getModule<ANetworkSceneModule>()->queuePacket(packet);
             return;
         }
         switch (event.key)
@@ -40,7 +43,8 @@ public:
             {
                 ntw::UDPPacket packet;
                 packet << PACKET_TYPE::USER_INPUT << event;
-                //_manager.send(SERVER, packet);
+                game::RestrictedGame::instance().scenes().current().getModule<ANetworkSceneModule>()->queuePacket(packet);
+
             }
             default:
                 break;

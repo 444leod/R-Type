@@ -5,8 +5,8 @@
 ** PacketTypes.hpp
 */
 
-#ifndef PACKETTYPES_HPP
-#define PACKETTYPES_HPP
+#ifndef PACKET_TYPES_HPP
+#define PACKET_TYPES_HPP
 
 /**
   * @brief This enum will describe what the packet is for.
@@ -17,21 +17,30 @@
   *  - MESSAGE: Message packet (temporary
   *  - POSITION: Position packet (temporary)
   */
- enum class PACKET_TYPE
- {
-     NONE = 0,
-     CONNECT,
-     DISCONNECT,
-     MESSAGE,
-     POSITION,
-     START,
-     YOUR_SHIP,
-     NEW_SHIP,
-     SHIP_MOVEMENT,
-     USER_INPUT,
-     NEW_PROJECTILE,
-     NEW_MONSTER,
-     MONSTER_KILLED
- };
+enum class PACKET_TYPE
+{
+    NONE = 0,
 
-#endif //PACKETTYPES_HPP
+    CONNECT,
+    DISCONNECT,
+    AUTHENTICATED,
+    NEW_CLIENT,
+    CLIENT_DISCONNECTED,
+
+    MESSAGE,
+
+    START,
+
+    POSITION,
+    YOUR_SHIP,
+    NEW_SHIP,
+
+    SHIP_MOVEMENT,
+    USER_INPUT,
+
+    NEW_PROJECTILE,
+    NEW_MONSTER,
+    MONSTER_KILLED
+};
+
+#endif //PACKET_TYPES_HPP

@@ -2,10 +2,10 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** ShipMovedSystem
+** ShipMovementSystem
 */
 
-#include "ShipMovedSystem.hpp"
+#include "ShipMovementSystem.hpp"
 #include "BaseComponents.hpp"
 #include "../Components.hpp"
 
@@ -13,7 +13,7 @@
 #include <SFML/Graphics.hpp>
 #include "PacketTypes.hpp"
 
-void ShipMovedSystem::execute(const PacketInformation &event, const UserInput &input) const
+void ShipMovementSystem::execute(const PacketInformation &event, const UserInput &input) const
 {
     for (auto [ship_id, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>())
     {

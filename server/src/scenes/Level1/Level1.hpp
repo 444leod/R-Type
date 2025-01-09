@@ -36,7 +36,6 @@ public:
         _bugTex.loadFromFile("assets/r-typesheet8.gif");
         _explosionTex.loadFromFile("assets/r-typesheet44.gif", sf::IntRect(131, 0, 192, 32));
 //        _eventDispatcher.link<movement_event>(&_playerMovement);
-        _eventDispatcher.link<PacketInformation>(&_packetHandler);
         // systems
         // update systems
         this->_updateSystems.push_back(std::make_unique<ParallaxSystem>(_registry));

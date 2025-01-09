@@ -5,8 +5,8 @@
 ** DrawMenuButtonsSystem
 */
 
-#ifndef DRAWMENUBUTTONSSYSTEM_HPP_
-#define DRAWMENUBUTTONSSYSTEM_HPP_
+#ifndef DRAW_MENU_BUTTONS_SYSTEM_HPP_
+#define DRAW_MENU_BUTTONS_SYSTEM_HPP_
 
 #include "BaseSystems/Abstracts/ARenderSystem.hpp"
 #include "BaseComponents.hpp"
@@ -34,4 +34,4 @@ public:
     }
 };
 
-#endif /* !DRAWMENUBUTTONSSYSTEM_HPP_ */
+#endif /* !DRAW_MENU_BUTTONS_SYSTEM_HPP_ */

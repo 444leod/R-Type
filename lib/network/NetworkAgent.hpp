@@ -23,7 +23,8 @@ namespace ntw
         std::string name;
         std::uint32_t id = 0;
 
-        explicit ClientInformation(asio::ip::udp::endpoint endpoint, std::string  name = "") : endpoint(std::move(endpoint)), id(_lastId++), name(std::move(name)) {}
+        explicit ClientInformation(asio::ip::udp::endpoint endpoint, std::string name = "") : endpoint(std::move(endpoint)), name(std::move(name)), id(_lastId++) {}
+        ClientInformation(asio::ip::udp::endpoint endpoint, const std::uint32_t& id, std::string name = "") : endpoint(std::move(endpoint)), name(std::move(name)), id(id) {}
         ClientInformation(const ClientInformation &) = default;
         ClientInformation &operator=(const ClientInformation &) = default;
 
@@ -84,7 +85,7 @@ namespace ntw
          * @param dest The endpoint to send to
          * @param packet The packet to send
          */
-        void _send(const asio::ip::udp::endpoint &dest, const UDPPacket &packet)
+        void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet)
         {
             auto serialized = packet.serialize();
             // std::cout << "Sending packet to " << dest << " (" << serialized.size() << " bytes)" << std::endl;

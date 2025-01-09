@@ -46,6 +46,21 @@ public:
         this->_networkGameModule.addClient(endpoint);
     }
 
+    void removeClient(const std::uint32_t& id) const
+    {
+        this->_networkGameModule.removeClient(id);
+    }
+
+    void removeClient(const asio::ip::udp::endpoint& endpoint) const
+    {
+        this->_networkGameModule.removeClient(endpoint);
+    }
+
+    void removeClient(const std::string& name) const
+    {
+        this->_networkGameModule.removeClient(name);
+    }
+
     [[nodiscard]] std::vector<ntw::ClientInformation> clients() const
     {
         return this->_networkGameModule.clients();

@@ -27,8 +27,8 @@ int main(void)
     const auto waitingRoom = game.registerScene<WaitingRoom>("main");
 
     waitingRoom->addModule<SceneRenderingModule>();
-    waitingRoom->addModule<waiting_room::PacketHandlerSceneModule>(game.registry(), game.scenes());
-    waitingRoom->addModule<ANetworkSceneModule>(*networkGameModule);
+    auto waitingRoomNetwork = waitingRoom->addModule<ANetworkSceneModule>(*networkGameModule);
+    waitingRoom->addModule<waiting_room::PacketHandlerSceneModule>(game.registry(), game.scenes(), waitingRoomNetwork);
 
     const auto level1 = game.registerScene<Level1>("game");
 

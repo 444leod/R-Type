@@ -2,10 +2,10 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** ShipShootedSystem
+** ShipShotSystem
 */
 
-#include "ShipShootedSystem.hpp"
+#include "ShipShotSystem.hpp"
 #include "BaseComponents.hpp"
 #include "../Components.hpp"
 
@@ -13,8 +13,26 @@
 #include "Config.hpp"
 #include <SFML/Graphics.hpp>
 #include "PacketTypes.hpp"
+#include "Components.hpp"
 
-void ShipShootedSystem::execute(const PacketInformation &event, const sf::Texture &_projectileTex) {
+std::optional<Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
+{
+    for (auto [entity, info] : registry.view<Client>())
+    {
+        if (info.info.endpoint == source)
+            return entity;
+    }
+    return std::nullopt;
+}
+
+void ShipShotSystem::execute(const asio::ip::udp::endpoint &source) const
+{
+    const auto entity = getEntityBySource(_registry, source);
+    if (!entity.has_value())
+            return;
+
+    const auto ship = _registry.
+
     for (auto [entity, ship, transform] : _registry.view<Ship, Transform>())
     {
         if (ship.id != event.source.id)

@@ -16,6 +16,8 @@
 #include <SFML/Window/Keyboard.hpp>
 #include "PacketTypes.hpp"
 #include "NetworkModules/ANetworkSceneModule.hpp"
+#include "Components.hpp"
+#include "Systems/RemoveClientSystem.hpp"
 
 inline bool isInputAvailable() {
     fd_set readfds;
@@ -138,34 +140,10 @@ void WaitingRoom::onEnter()
     const auto net = this->getModule<ANetworkSceneModule>();
     if (net == nullptr)
     {
-        std::cout << "1No network module found, exiting..." << std::endl;
+        std::cout << "No network module found, exiting..." << std::endl;
         game::RestrictedGame::instance().stop();
         return;
     }
-
-    this->getModule<APacketHandlerSceneModule>()->setHandler(PACKET_TYPE::CONNECT, [net] (ecs::Registry& registry, RestrictedSceneManager& manager, const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) {
-        auto clients = net->clients();
-
-        const auto client = std::ranges::find_if(clients, [&src](const auto& actualClient) {
-            return actualClient.endpoint == src;
-        });
-
-        if (client != clients.end())
-            return;
-
-        std::string name;
-        packet >> name;
-        std::cout << "Client connected: " << name << std::endl;
-
-        const ntw::ClientInformation clientInfo(src, name);
-        net->addClient(clientInfo);
-
-        ntw::UDPPacket response;
-        response << PACKET_TYPE::CONNECT;
-        response << clientInfo;
-
-        net->queuePacket(response);
-    });
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene)
