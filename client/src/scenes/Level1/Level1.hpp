@@ -26,7 +26,7 @@
 #include <chrono>
 #include <memory>
 
-#include "../UserInput.hpp"
+#include "Structures/UserInput.hpp"
 
 class Level1 final : public AScene {
 public:

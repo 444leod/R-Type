@@ -15,7 +15,7 @@
 #include "PacketTypes.hpp"
 #include "Components.hpp"
 
-std::optional<Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
+static std::optional<Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
 {
     for (auto [entity, info] : registry.view<Client>())
     {
@@ -25,42 +25,41 @@ std::optional<Entity> getEntityBySource(ecs::Registry &registry, const asio::ip:
     return std::nullopt;
 }
 
-void ShipShotSystem::execute(const asio::ip::udp::endpoint &source) const
+void ShipShotSystem::execute(const asio::ip::udp::endpoint &source, const std::shared_ptr<ANetworkSceneModule>& net) const
 {
-    const auto entity = getEntityBySource(_registry, source);
-    if (!entity.has_value())
+    const auto entityId = getEntityBySource(_registry, source);
+    if (!entityId.has_value())
             return;
 
-    const auto ship = _registry.
+    const auto [id] = _registry.get<Ship>(*entityId);
+    const auto [x, y, z, rotation] = _registry.get<Transform>(*entityId);
 
-    for (auto [entity, ship, transform] : _registry.view<Ship, Transform>())
-    {
-        if (ship.id != event.source.id)
-            continue;
+    constexpr auto projectileVelocity = Velocity{.x = 200, .y = 0};
+    const auto shootTransform = Transform{.x = x + 33 * SCALE, .y = y + 2 * SCALE, .z = 1, .rotation = 0};
 
-        constexpr auto projectileVelocity = Velocity{.x = 200, .y = 0};
-        const auto shootTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
+    static uint32_t projectileId = 0;
+    const auto projectile = _registry.create();
 
-        static uint32_t projectileId = 0;
-        const auto projectile = _registry.create();
-        auto projectileSprite = sf::Sprite(_projectileTex);
-        projectileSprite.setOrigin(0, 0);
-        projectileSprite.setScale(SCALE, SCALE);
-        projectileSprite.setPosition(shootTransform.x, shootTransform.y);
-        projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
-        _registry.addComponent(projectile, Hitbox{});
-        _registry.addComponent(projectile, projectileSprite);
-        _registry.addComponent(projectile, shootTransform);
-        _registry.addComponent(projectile, Projectile{ .id = projectileId });
-        // _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
-      //   _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = 0.02, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
-      //     _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
-      // }});
-        UDPPacket packet;
-        packet << PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId;
-        for (const auto &client : CLIENTS)
-            _manager.send(client.endpoint, packet);
-        projectileId++;
-        return;
-    }
+    // auto projectileSprite = sf::Sprite(_projectileTex);
+    // projectileSprite.setOrigin(0, 0);
+    // projectileSprite.setScale(SCALE, SCALE);
+    // projectileSprite.setPosition(shootTransform.x, shootTransform.y);
+    // projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
+    // _registry.addComponent(projectile, projectileSprite);
+    
+    _registry.addComponent(projectile, Hitbox{});
+    _registry.addComponent(projectile, shootTransform);
+    _registry.addComponent(projectile, Projectile{ .id = projectileId++ });
+    _registry.addComponent(projectile, Animation{
+            .frameSize = {16, 16},
+            .frameDuration = 0.02,
+            .frameCount = 3,
+            .loop = false,
+            .onEnd = [&](const Entity& entity){ _registry.addComponent(entity, Velocity{.x = 200, .y = 0} ); }
+        }
+    );
+
+    ntw::UDPPacket packet;
+    packet << PACKET_TYPE::NEW_PROJECTILE << id << projectileId << shootTransform << projectileVelocity;
+    net->queuePacket(packet);
 }

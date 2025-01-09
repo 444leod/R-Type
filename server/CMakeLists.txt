@@ -8,10 +8,9 @@ set(SRC_FILES
     scenes/WaitingRoom/WaitingRoom.cpp
     scenes/WaitingRoom/Modules/PacketHandlerSceneModule.cpp
     scenes/Level1/Level1.cpp
-    scenes/Level1/Events/PacketHandler.cpp
     scenes/Level1/Events/InputHandler.cpp
-    scenes/Level1/Systems/ShipMovedSystem.cpp
-    scenes/Level1/Systems/ShipShootedSystem.cpp
+    scenes/Level1/Systems/ShipMovementSystem.cpp
+    scenes/Level1/Systems/ShipShotSystem.cpp
 )
 list(TRANSFORM SRC_FILES PREPEND "src/")
 add_executable(${PROJECT_NAME} ${SRC_FILES})

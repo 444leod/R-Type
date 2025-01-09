@@ -9,7 +9,7 @@
 #define A_NETWORK_SCENE_MODULE_HPP
 
 #include "engine/modules/ASceneModule.hpp"
-#include "ANetworkGameModule.hpp"
+#include "ANetworkGameModule.hpp" // Include full definition of ANetworkGameModule
 
 class ANetworkSceneModule : public ASceneModule {
 public:

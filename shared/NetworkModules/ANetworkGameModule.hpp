@@ -8,55 +8,12 @@
 #ifndef A_NETWORK_GAME_MODULE_HPP
 #define A_NETWORK_GAME_MODULE_HPP
 
-#include <utility>
-
 #include "engine/modules/AGameModule.hpp"
-#include "engine/modules/ASceneModule.hpp"
 #include "ecs/Registry.hpp"
 #include "network/NetworkAgent.hpp"
 #include "engine/RestrictedSceneManager.hpp"
 #include "engine/RestrictedGame.hpp"
-
-#include "NetworkModules/ANetworkSceneModule.hpp"
-#include "PacketTypes.hpp"
-
-class ANetworkGameModule;
-
-class APacketHandlerSceneModule : public ASceneModule
-{
-protected:
-    explicit APacketHandlerSceneModule(AScene& scene, ecs::Registry& registry, RestrictedSceneManager& sceneManager, const std::shared_ptr<ANetworkSceneModule>& net) : ASceneModule(scene), _registry(registry), _sceneManager(sceneManager), _net(net) {}
-    ~APacketHandlerSceneModule() override = default;
-
-public:
-    void handlePacket(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
-    {
-        PACKET_TYPE type;
-        packet >> type;
-
-        if (!this->_packetHandlers.contains(static_cast<std::size_t>(type))  )
-            return;
-        this->_packetHandlers.at(static_cast<std::size_t>(type))(_registry, _sceneManager, _net, src, packet);
-    }
-
-    void setHandler(const PACKET_TYPE& type, std::function<void(ecs::Registry& registry, RestrictedSceneManager& manager, std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint&, ntw::UDPPacket&)> handler)
-    {
-        this->_packetHandlers.set(static_cast<std::size_t>(type), std::move(handler));
-    }
-
-    void setHandlers(const std::map<PACKET_TYPE, std::function<void(ecs::Registry& registry, RestrictedSceneManager& manager, std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint&, ntw::UDPPacket&)>>& handlers)
-    {
-        for (const auto& [type, handler] : handlers) {
-            this->setHandler(type, handler);
-        }
-    }
-
-protected:
-    ecs::Registry& _registry;
-    RestrictedSceneManager& _sceneManager;
-    std::shared_ptr<ANetworkSceneModule> _net;
-    ecs::SparseSet<std::function<void(ecs::Registry& registry, RestrictedSceneManager& manager, std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint&, ntw::UDPPacket&)>> _packetHandlers;
-};
+#include "APacketHandlerSceneModule.hpp"
 
 class ANetworkGameModule : public AGameModule, public ntw::NetworkAgent {
 public:
@@ -137,7 +94,7 @@ public:
         this->queuePacket(it->endpoint, packet);
     }
 
-    void queuePacket(const std::string& name, ntw::UDPPacket& packet)
+    void queuePacket(const std::string& name, const ntw::UDPPacket& packet)
     {
         const auto it = std::ranges::find_if(this->_clients, [name](const ntw::ClientInformation& client) {
             return client.name == name;

@@ -9,15 +9,13 @@
 #include "ecs/Registry.hpp"
 #include <algorithm>
 #include <cmath>
-#include "Config.hpp"
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Keyboard.hpp>
 #include "PacketTypes.hpp"
 #include "NetworkModules/ANetworkSceneModule.hpp"
 #include "Components.hpp"
-#include "Systems/RemoveClientSystem.hpp"
+#include "../../Systems/RemoveClientSystem.hpp"
 
 inline bool isInputAvailable() {
     fd_set readfds;

@@ -13,7 +13,7 @@
 #include "Level1.hpp"
 #include "network/NetworkAgent.hpp"
 #include "ecs/Registry.hpp"
-#include "../UserInput.hpp"
+#include "Structures/UserInput.hpp"
 #include "PacketTypes.hpp"
 
 void Level1::initialize() {}

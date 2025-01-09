@@ -9,40 +9,48 @@
 #include "BaseComponents.hpp"
 #include "../Components.hpp"
 
-#include "network/NetworkAgent.hpp"
-#include <SFML/Graphics.hpp>
 #include "PacketTypes.hpp"
+#include "Components.hpp"
 
-void ShipMovementSystem::execute(const PacketInformation &event, const UserInput &input) const
+static std::optional<Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
 {
-    for (auto [ship_id, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>())
+    for (auto [entity, info] : registry.view<Client>())
     {
-        if (ship.id != event.source.id)
-            continue;
+        if (info.info.endpoint == source)
+            return entity;
+    }
+    return std::nullopt;
+}
 
-        switch (input.key)
-        {
+void ShipMovementSystem::execute(const asio::ip::udp::endpoint &source, const UserInput& input) const
+{
+    const auto entityId = getEntityBySource(_registry, source);
+    if (!entityId.has_value())
+        return;
+
+    const auto [id] = _registry.get<Ship>(*entityId);
+    auto velocity = _registry.get<Velocity>(*entityId);
+    const auto pos = _registry.get<Transform>(*entityId);
+
+    switch (input.key)
+    {
         case sf::Keyboard::Key::Up:
-            vel.y += input.pressed ? -75 : 75;
-            break;
+            velocity.y += input.pressed ? -75 : 75;
+        break;
         case sf::Keyboard::Key::Down:
-            vel.y += input.pressed ? 75 : -75;
-            break;
+            velocity.y += input.pressed ? 75 : -75;
+        break;
         case sf::Keyboard::Key::Left:
-            vel.x += input.pressed ? -75 : 75;
-            break;
+            velocity.x += input.pressed ? -75 : 75;
+        break;
         case sf::Keyboard::Key::Right:
-            vel.x += input.pressed ? 75 : -75;
-            break;
+            velocity.x += input.pressed ? 75 : -75;
+        break;
         default:
             break;
-        }
-
-        ntw::UDPPacket packet;
-        packet << PACKET_TYPE::SHIP_MOVEMENT << event.source.id << vel << pos;
-        // for (const auto &client : CLIENTS) //TODO: update this
-        // {
-            // _manager.send(client.endpoint, packet);
-        // }
     }
+
+    ntw::UDPPacket packet;
+    packet << PACKET_TYPE::SHIP_MOVEMENT << id << velocity << pos;
+    _net->queuePacket(packet);
 }

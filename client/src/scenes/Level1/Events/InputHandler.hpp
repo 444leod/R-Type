@@ -9,7 +9,7 @@
 #define PLAYERMOVEMENT_HPP
 
 #include "../Components.hpp"
-#include "../../UserInput.hpp"
+#include "Structures/UserInput.hpp"
 #include "ecs/EventDispatcher.hpp"
 #include "ecs/Registry.hpp"
 

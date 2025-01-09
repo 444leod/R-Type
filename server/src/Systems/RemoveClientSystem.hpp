@@ -10,8 +10,8 @@
 
 
 #include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
 #include "Components.hpp"
+#include "NetworkModules/ANetworkSceneModule.hpp"
 #include <asio.hpp>
 
 class RemoveClientSystem final : public ASystem

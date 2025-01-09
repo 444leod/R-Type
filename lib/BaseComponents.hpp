@@ -11,7 +11,7 @@
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 #include <functional>
-#include "Entity.hpp"
+#include "ecs/Entity.hpp"
 
 // TODO: Decide how to organize the components in the lib
 

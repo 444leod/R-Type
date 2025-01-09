@@ -50,7 +50,7 @@ void handleConnect(ecs::Registry& registry, RestrictedSceneManager&, const std::
     net->queuePacket(src, response);
 
     const auto newClient = registry.create();
-    registry.addComponent(newClient, Client{ .info = clientInfo });
+    registry.addComponent(newClient, Client{ clientInfo });
 }
 
 PacketHandlerSceneModule::PacketHandlerSceneModule(AScene& scene, ecs::Registry& registry, RestrictedSceneManager& sceneManager, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, registry, sceneManager, net)

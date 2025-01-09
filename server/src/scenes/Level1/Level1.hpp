@@ -21,7 +21,6 @@
 // Level1 specific
 #include "Components.hpp"
 #include "Events/InputHandler.hpp"
-#include "Events/PacketHandler.hpp"
 #include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
 #include "Systems/BugsMovementSystem.hpp"
 
@@ -69,7 +68,6 @@ private:
     ecs::EventDispatcher _eventDispatcher;
 
     InputHandler _inputHandler{_registry};
-    PacketHandler _packetHandler{_registry, _manager};
 
     //this is temporary, if this texture get deleted, then the sprite will not be able to render
     sf::Texture _spaceshipTex;

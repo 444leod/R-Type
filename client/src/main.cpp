@@ -24,15 +24,19 @@ int main() {
     const auto networkGameModule = game.addModule<NetworkGameModule>();
 
     const auto main = game.registerScene<WaitingRoom>("main");
-    main->addModule<SceneRenderingModule>();
-    main->addModule<waiting_room::PacketHandlerSceneModule>(game.registry(), game.scenes());
-    main->addModule<ANetworkSceneModule>(*networkGameModule);
+    {
+        main->addModule<SceneRenderingModule>();
+        const auto net = main->addModule<ANetworkSceneModule>(*networkGameModule);
+        main->addModule<waiting_room::PacketHandlerSceneModule>(game.registry(), game.scenes(), net);
+    }
 
 
     const auto level1 = game.registerScene<Level1>("game");
-    level1->addModule<SceneRenderingModule>();
-    level1->addModule<level1::PacketHandlerSceneModule>(game.registry(), game.scenes());
-    level1->addModule<ANetworkSceneModule>(*networkGameModule);
+    {
+        level1->addModule<SceneRenderingModule>();
+        const auto net = level1->addModule<ANetworkSceneModule>(*networkGameModule);
+        level1->addModule<level1::PacketHandlerSceneModule>(game.registry(), game.scenes(), net);
+    }
 
     game.run();
     return 0;
