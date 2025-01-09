@@ -21,7 +21,7 @@ public:
     explicit NewProjectileSystem(ecs::Registry &registry) : ASystem(registry, "NewProjectileSystem") {}
 
     void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity) {
-        for (auto [entity, ship, transform] : _registry.view<Ship, Transform>().each())
+        for (auto [_, ship, transform] : _registry.view<Ship, Transform>().each())
         {
             if (ship.id != shipId)
                 continue;
@@ -39,7 +39,14 @@ public:
             _registry.addComponent(projectile, Hitbox{});
             _registry.addComponent(projectile, transform);
             _registry.addComponent(projectile, Projectile{ .id = projectileId });
-            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = velocity});
+            _registry.addComponent(projectile, Animation{
+                    .frameSize = {16, 16},
+                    .frameDuration = 0.02,
+                    .frameCount = 3,
+                    .loop = false,
+                    .onEnd = [&](const Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }
+                }
+            );
             return;
         }
     }

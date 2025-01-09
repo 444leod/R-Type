@@ -17,14 +17,6 @@
 
 namespace ecs {
 
-    class ISparseSetObserver {
-    public:
-        virtual ~ISparseSetObserver() = default;
-
-        virtual void onEntitySet(const Entity& entity) = 0;
-        virtual void onEntityErased(const Entity& entity) = 0;
-    };
-
     class ISparseSet {
     public:
         virtual ~ISparseSet() = default;
@@ -35,8 +27,6 @@ namespace ecs {
         [[nodiscard]] virtual const std::vector<Entity>& entities() const noexcept = 0;
         [[nodiscard]] virtual std::size_t size() const noexcept = 0;
         [[nodiscard]] virtual std::size_t capacity() const noexcept = 0;
-        virtual void addObserver(ISparseSetObserver *observer) noexcept = 0;
-        virtual void removeObserver(ISparseSetObserver *observer) noexcept = 0;
         virtual void display() const = 0;
         friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
     };
@@ -92,9 +82,6 @@ namespace ecs {
                 this->_components.push_back(component);
                 this->_add_in_sparse(entity, size);
             }
-
-            for (auto observer : this->_observers)
-                observer->onEntitySet(entity);
         }
 
         /**
@@ -116,9 +103,6 @@ namespace ecs {
             // Delete in dense lists
             this->_dense.pop_back();
             this->_components.pop_back();
-
-            for (auto observer : this->_observers)
-                observer->onEntityErased(entity);
         }
 
         /**
@@ -130,17 +114,6 @@ namespace ecs {
             this->_dense.clear();
             this->_components.clear();
         }
-
-        /**
-         * @brief Add an observer to this set
-         * @param observer The observer to be added
-         */
-        void addObserver(ISparseSetObserver *observer) noexcept override { this->_observers.push_back(observer); }
-        /**
-         * @brief Remove an observer from this set
-         * @param observer The observer to be removed
-         */
-        void removeObserver(ISparseSetObserver *observer) noexcept override { std::erase(this->_observers, observer); }
 
         /**
          * @brief Returns the list of entities contained in the set
@@ -163,7 +136,7 @@ namespace ecs {
           if (this->_dense.empty()) {
             return;
           }
-          std::cout << ecs::Family<T>::name() << " set:" << std::endl;
+          std::cout << Family<T>::name() << " set:" << std::endl;
           std::cout << "Index | Dense Index | Dense Content | Component" << std::endl;
           for (std::size_t i = 0; i < this->_dense.size(); i++) {
             std::cout << i << "    | sparse[" << i << "] = " << this->_sparse[i] << " | dense[" << i << "] = " << this->_dense[i] << " | component = " << &this->_components[i] << std::endl;
@@ -220,7 +193,6 @@ namespace ecs {
         std::vector<std::size_t> _sparse = { };
         std::vector<Entity> _dense = {};
         std::vector<T> _components = {};
-        std::vector<ISparseSetObserver *> _observers = {};
     };
 
 }

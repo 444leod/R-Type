@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 #include <functional>
+#include "Entity.hpp"
 
 // TODO: Decide how to organize the components in the lib
 
@@ -41,15 +42,52 @@ struct Position {
     float x, y;
 };
 
+/**
+ * @struct Animation
+ * @brief Represents an animation component.
+ * 
+ * This struct holds the properties and behaviors of an animation, including
+ * frame size, duration, and looping behavior.
+ */
 struct Animation {
-    sf::Clock clock = sf::Clock();
+    /**
+     * @brief The time elapsed since the last frame.
+     */
+    float elapsedTime = 0;
+
+    /**
+     * @brief The size of a frame (width, height).
+     */
     std::pair<int, int> frameSize{};
-    float speed{};
-    unsigned int currentFrame = 1;
+
+    /**
+     * @brief The duration of a frame in seconds.
+     */
+    float frameDuration{};
+
+    /**
+     * @brief The total number of frames in the animation.
+     */
     unsigned int frameCount{};
+
+    /**
+     * @brief Indicates whether the animation should loop.
+     */
     bool loop{};
-    // TODO: Refacto to not have nested components
-    Velocity velocity{};
+
+    /**
+     * @brief The index of the current frame (1-based).
+     */
+    unsigned int currentFrame = 1;
+
+    /**
+     * @brief The function to call when the animation ends (if loop is false).
+     * @param entity The Entity that the animation is attached to.
+     * 
+     * This function takes an Entity as a parameter and is called when the
+     * animation completes.
+     */
+    std::function<void(Entity entity)> onEnd = [](Entity entity) {};
 };
 
 struct Enemy {

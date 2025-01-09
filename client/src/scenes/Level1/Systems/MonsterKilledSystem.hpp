@@ -17,7 +17,8 @@ class MonsterKilledSystem final : public ASystem
 public:
     explicit MonsterKilledSystem(ecs::Registry &registry) : ASystem(registry, "MonsterKilledSystem") {}
 
-    void execute(const std::uint32_t& monsterId, const std::uint32_t& projectileId) {
+    void execute(const std::uint32_t& monsterId, const std::uint32_t& projectileId)
+    {
         std::optional<std::tuple<Entity, Enemy, Transform>> monster = std::nullopt;
 
         for (auto &[entity, enemy, transform] : _registry.view<Enemy, Transform>().each())
@@ -61,7 +62,14 @@ public:
         // _registry.addComponent(explosion, explosionSprite);
 
         _registry.addComponent(explosion, Transform{.x = monsterTransform.x, .y = monsterTransform.y, .z = 1, .rotation = 0});
-        _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
+        _registry.addComponent(explosion, Animation {
+                .frameSize = {32, 32},
+                .frameDuration = 0.1,
+                .frameCount = 6,
+                .loop = false,
+                .onEnd = [&](const Entity& entity){ _registry.remove(entity); }
+            }
+        );
     }
 };
 

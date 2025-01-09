@@ -52,13 +52,14 @@ void ShipShotSystem::execute(const asio::ip::udp::endpoint &source) const
         _registry.addComponent(projectile, projectileSprite);
         _registry.addComponent(projectile, shootTransform);
         _registry.addComponent(projectile, Projectile{ .id = projectileId });
-        _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = projectileVelocity});
-        ntw::UDPPacket packet;
-        packet << PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId << shootTransform << projectileVelocity;
-
-        // for (const auto &client : CLIENTS)
-            // _manager.send(client.endpoint, packet);
-
+        // _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .speed = 20, .frameCount = 3, .loop = false, .velocity = Velocity{.x = 200, .y = 0}});
+      //   _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = 0.02, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
+      //     _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
+      // }});
+        UDPPacket packet;
+        packet << PACKET_TYPE::NEW_PROJECTILE << event.source.id << projectileId;
+        for (const auto &client : CLIENTS)
+            _manager.send(client.endpoint, packet);
         projectileId++;
         return;
     }
