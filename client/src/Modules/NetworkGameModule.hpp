@@ -50,7 +50,7 @@ public:
         packet << PACKET_TYPE::CONNECT;
         packet << name;
         this->_clients.emplace_back(server, "Server");
-        this->queuePacket(server, packet);
+        this->sendPacket(server, packet);
     }
     ~NetworkGameModule() override = default;
 

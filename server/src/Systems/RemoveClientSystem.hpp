@@ -46,7 +46,7 @@ public:
 
         net->removeClient(client->id);
 
-        net->queuePacket(disconnectPacket);
+        net->sendPacket(disconnectPacket);
 
     }
 };

@@ -29,7 +29,7 @@ namespace engine
         GameRenderingModule(game::RestrictedGame& game, const std::uint32_t& width, const std::uint32_t& height, std::string  title) : AGameModule(game),  _title(std::move(title)), _mode(width, height) {}
         ~GameRenderingModule() override = default;
 
-        void start() override
+        void start(AScene&) override
         {
             this->_window.create(this->_mode, this->_title);
         }

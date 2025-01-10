@@ -31,7 +31,7 @@ public:
         {
             ntw::UDPPacket packet;
             packet << PACKET_TYPE::USER_INPUT << event;
-            game::RestrictedGame::instance().scenes().current().getModule<ANetworkSceneModule>()->queuePacket(packet);
+            game::RestrictedGame::instance().scenes().current().getModule<ANetworkSceneModule>()->sendPacket(packet);
             return;
         }
         switch (event.key)
@@ -43,7 +43,7 @@ public:
             {
                 ntw::UDPPacket packet;
                 packet << PACKET_TYPE::USER_INPUT << event;
-                game::RestrictedGame::instance().scenes().current().getModule<ANetworkSceneModule>()->queuePacket(packet);
+                game::RestrictedGame::instance().scenes().current().getModule<ANetworkSceneModule>()->sendPacket(packet);
 
             }
             default:

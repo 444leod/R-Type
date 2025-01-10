@@ -62,11 +62,12 @@ namespace game
         void run(const std::string& scene) {
             this->_running = true;
             this->_sceneManager.load(scene);
+            this->_sceneManager.update();
             auto before = std::chrono::high_resolution_clock::now();
             double deltaTime = .0;
 
             for (const auto& module: this->_modules)
-                module->start();
+                module->start(this->_sceneManager.current());
 
             while (_running)
             {
@@ -80,10 +81,10 @@ namespace game
 
                 // Compute deltaTime
                 auto now = std::chrono::high_resolution_clock::now();
-                before = now;
                 deltaTime = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - before).count() / 1000.0;
                 if (deltaTime < this->_targetDeltaTime)
                     std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(this->_targetDeltaTime - deltaTime)));
+                before = now;
             }
 
             this->_sceneManager.stop();

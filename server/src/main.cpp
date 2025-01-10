@@ -13,6 +13,7 @@
 #include "Modules/NetworkGameModule.hpp"
 
 #include "scenes/WaitingRoom/Modules/PacketHandlerSceneModule.hpp"
+#include "scenes/Level1/Modules/PacketHandlerSceneModule.hpp"
 
 #include "NetworkModules/ANetworkSceneModule.hpp"
 
@@ -33,6 +34,8 @@ int main(void)
     const auto level1 = game.registerScene<Level1>("game");
 
     level1->addModule<SceneRenderingModule>();
+    auto level1Network = level1->addModule<ANetworkSceneModule>(*networkGameModule);
+    level1->addModule<level1::PacketHandlerSceneModule>(game.registry(), game.scenes(), level1Network);
 
     game.run();
     return 0;

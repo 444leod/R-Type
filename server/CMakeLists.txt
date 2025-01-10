@@ -11,6 +11,7 @@ set(SRC_FILES
     scenes/Level1/Events/InputHandler.cpp
     scenes/Level1/Systems/ShipMovementSystem.cpp
     scenes/Level1/Systems/ShipShotSystem.cpp
+    scenes/Level1/Modules/PacketHandlerSceneModule.cpp
 )
 list(TRANSFORM SRC_FILES PREPEND "src/")
 add_executable(${PROJECT_NAME} ${SRC_FILES})

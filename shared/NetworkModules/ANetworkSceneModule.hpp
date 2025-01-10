@@ -21,24 +21,25 @@ public:
         this->_networkGameModule.stop();
     }
 
-    void queuePacket(const asio::ip::udp::endpoint& dest, ntw::UDPPacket& packet) const
+    void sendPacket(const asio::ip::udp::endpoint& dest, const ntw::UDPPacket& packet) const
     {
-        this->_networkGameModule.queuePacket(dest, packet);
+
+        this->_networkGameModule.sendPacket(dest, packet);
     }
 
-    void queuePacket(const std::uint32_t& clientId, ntw::UDPPacket& packet) const
+    void sendPacket(const std::uint32_t& clientId, ntw::UDPPacket& packet) const
     {
-        this->_networkGameModule.queuePacket(clientId, packet);
+        this->_networkGameModule.sendPacket(clientId, packet);
     }
 
-    void queuePacket(const std::string& name, ntw::UDPPacket& packet) const
+    void sendPacket(const std::string& name, const ntw::UDPPacket& packet) const
     {
-            this->_networkGameModule.queuePacket(name, packet);
+            this->_networkGameModule.sendPacket(name, packet);
     }
 
-    void queuePacket(ntw::UDPPacket& packet) const
+    void sendPacket(const ntw::UDPPacket& packet) const
     {
-            this->_networkGameModule.queuePacket(packet);
+            this->_networkGameModule.sendPacket(packet);
     }
 
     void addClient(const ntw::ClientInformation& endpoint) const
@@ -59,6 +60,11 @@ public:
     void removeClient(const std::string& name) const
     {
         this->_networkGameModule.removeClient(name);
+    }
+
+    void resend() const
+    {
+        this->_networkGameModule.resend();
     }
 
     [[nodiscard]] std::vector<ntw::ClientInformation> clients() const

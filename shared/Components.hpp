@@ -8,8 +8,7 @@
 #ifndef SHARED_COMPONENTS_HPP
 #define SHARED_COMPONENTS_HPP
 
-#include <cstdint>
-#include <string>
+#include "network/NetworkAgent.hpp"
 
 struct Client
 {

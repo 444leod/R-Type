@@ -157,7 +157,7 @@ void WaitingRoom::onExit()
     if (net == nullptr)
         return;
 
-    net->queuePacket(packet);
+    net->sendPacket(packet);
 }
 
 void WaitingRoom::onExit(const AScene& nextScene)
@@ -275,7 +275,7 @@ void WaitingRoom::_onStart(const std::vector<std::string>& args)
         return;
     }
 
-    net->queuePacket(packet);
+    net->sendPacket(packet);
 
     //this->_broadcast(ntw::UDPPacket{} << PACKET_TYPE::START);
     _manager.load("game");

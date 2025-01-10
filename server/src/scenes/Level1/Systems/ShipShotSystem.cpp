@@ -25,7 +25,7 @@ static std::optional<Entity> getEntityBySource(ecs::Registry &registry, const as
     return std::nullopt;
 }
 
-void ShipShotSystem::execute(const asio::ip::udp::endpoint &source, const std::shared_ptr<ANetworkSceneModule>& net) const
+void ShipShotSystem::execute(const asio::ip::udp::endpoint &source) const
 {
     const auto entityId = getEntityBySource(_registry, source);
     if (!entityId.has_value())
@@ -61,5 +61,5 @@ void ShipShotSystem::execute(const asio::ip::udp::endpoint &source, const std::s
 
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::NEW_PROJECTILE << id << projectileId << shootTransform << projectileVelocity;
-    net->queuePacket(packet);
+    _net->sendPacket(packet);
 }

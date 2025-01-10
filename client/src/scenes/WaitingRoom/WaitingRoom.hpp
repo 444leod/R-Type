@@ -53,8 +53,12 @@ private:
 
     std::optional<std::uint32_t> _id = std::nullopt;
 
-    ecs::Registry _registry;
     ecs::EventDispatcher _eventDispatcher;
+
+    double _connectionTimer = 0;
+    std::uint8_t _connectionAttempts = 0;
+    double _pointTimer = 0;
+    std::uint8_t _pointNumber = 0;
 
 //    std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
 //        {"exit",    [this](const std::vector<std::string>& args) { this->_onExit(args); }},

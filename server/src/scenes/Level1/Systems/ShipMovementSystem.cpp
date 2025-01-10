@@ -52,5 +52,5 @@ void ShipMovementSystem::execute(const asio::ip::udp::endpoint &source, const Us
 
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::SHIP_MOVEMENT << id << velocity << pos;
-    _net->queuePacket(packet);
+    _net->sendPacket(packet);
 }

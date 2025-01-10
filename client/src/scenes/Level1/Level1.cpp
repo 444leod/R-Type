@@ -154,7 +154,7 @@ void Level1::onExit()
     const auto net = this->getModule<ANetworkSceneModule>();
     if (net == nullptr)
         return;
-    net->queuePacket(packet);
+    net->sendPacket(packet);
 }
 
 void Level1::onExit(const AScene& nextScene)

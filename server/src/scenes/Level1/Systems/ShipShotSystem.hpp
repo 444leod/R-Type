@@ -17,7 +17,7 @@ class ShipShotSystem final : public ASystem
 public:
     explicit ShipShotSystem(ecs::Registry &registry, const std::shared_ptr<ANetworkSceneModule>& net) : ASystem(registry, "ShipShotSystem"), _net(net) {}
 
-    void execute(const asio::ip::udp::endpoint &source, const std::shared_ptr<ANetworkSceneModule>& net) const;
+    void execute(const asio::ip::udp::endpoint &source) const;
     
 private:
     const std::shared_ptr<ANetworkSceneModule>& _net;

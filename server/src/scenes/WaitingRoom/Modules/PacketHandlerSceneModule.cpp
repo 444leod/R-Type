@@ -40,14 +40,14 @@ void handleConnect(ecs::Registry& registry, RestrictedSceneManager&, const std::
     newClientPacket << PACKET_TYPE::NEW_CLIENT;
     newClientPacket << clientInfo.id << clientInfo.name;
 
-    net->queuePacket(newClientPacket); // the order is important : the "new client" is sent to the clients except the new one
+    net->sendPacket(newClientPacket); // the order is important : the "new client" is sent to the clients except the new one
 
     ntw::UDPPacket response;
     response << PACKET_TYPE::AUTHENTICATED;
     response << clientInfo.id << clientInfo.name;
 
     net->addClient(clientInfo);
-    net->queuePacket(src, response);
+    net->sendPacket(src, response);
 
     const auto newClient = registry.create();
     registry.addComponent(newClient, Client{ clientInfo });

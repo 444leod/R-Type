@@ -7,15 +7,9 @@
 
 #include "WaitingRoom.hpp"
 #include "ecs/Registry.hpp"
-#include <algorithm>
-#include <cmath>
 #include <iostream>
-#include <ranges>
-#include <thread>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include "network/NetworkAgent.hpp"
-#include "PacketTypes.hpp"
+
+#include "Components.hpp"
 
 #include <NetworkModules/ANetworkSceneModule.hpp>
 
@@ -25,6 +19,34 @@ void WaitingRoom::initialize()
 
 void WaitingRoom::update(const double& deltaTime)
 {
+    if (_registry.view<Client>().size() != 0)
+    {
+
+    } else
+    {
+
+        if (_connectionAttempts > 5) {
+            std::cout << "\nFailed to connect to the server" << std::endl;
+            game::RestrictedGame::instance().stop();
+            return;
+        }
+
+        _connectionTimer += deltaTime;
+        _pointTimer += deltaTime;
+
+        if (_connectionTimer > 3) {
+            _connectionTimer = 0;
+            _connectionAttempts++;
+            const auto net = this->getModule<ANetworkSceneModule>();
+            net->resend();
+        }
+
+        if (_pointTimer > 1) {
+            _pointTimer = 0;
+            _pointNumber = (_pointNumber + 1) % 4;
+            std::cout << "\rConnecting to the server" << std::string(_pointNumber, '.') << std::string(3 - _pointNumber, ' ') << std::flush;
+        }
+    }
 }
 
 /*
@@ -94,6 +116,7 @@ void WaitingRoom::onExit()
 
 void WaitingRoom::onExit(const AScene& nextScene)
 {
+    std::cout << "\nSuccessfully connected to the server!" << std::endl;
 }
 
 /*
