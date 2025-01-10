@@ -27,16 +27,11 @@ public:
         uint32_t projectile_id;
         event.packet >> monster_id >> projectile_id;
 
-        _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&e_enemy, const sf::Sprite& sprite, const Transform& transform)  {
+        _registry.view<Enemy, Sprite, Transform>().each([&](const Entity& enemy, const Enemy&e_enemy, const Sprite&, const Transform& transform)  {
             _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&p_projectile, const Transform& projectile_transform) {
                 if (e_enemy.id != monster_id || p_projectile.id != projectile_id)
                     return;
                 const auto explosion = _registry.create();
-                auto explosionSprite = sf::Sprite(explosionTex);
-                explosionSprite.setOrigin(16, 16);
-                explosionSprite.setScale(SCALE, SCALE);
-                explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
-                explosionSprite.setPosition(transform.x, transform.y);
                 _registry.addComponent(explosion, explosionSprite);
                 _registry.addComponent(explosion, Transform{.x = transform.x, .y = transform.y, .z = 1, .rotation = 0});
                 _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});

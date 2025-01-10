@@ -21,7 +21,7 @@ public:
     explicit AnimateSystem(ecs::Registry &registry) : AUpdateSystem(registry, "AnimateSystem") {}
 
     void execute(const double& deltaTime) override {
-        _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation & animation, sf::Sprite &sprite) {
+        _registry.view<Animation, Sprite>().each([&](const Entity& entity, Animation & animation, Sprite &sprite) {
             if (animation.currentFrame == animation.frameCount) {
                 if (animation.loop) {
                     animation.currentFrame = 0;
@@ -34,7 +34,7 @@ public:
                 }
             }
             if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
-                sprite.setTextureRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
+                sprite.textureRect = sf::IntRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
                 animation.currentFrame++;
                 animation.clock.restart();
             }

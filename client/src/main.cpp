@@ -12,7 +12,7 @@
 
 int main() {
     auto game = game::Game();
-    game.addModule<engine::GameRenderingModule>(800, 600, "R-Type - Client");
+    game.addModule<engine::GameRenderingModule>(1700, 900, "R-Type - Client");
 
     const auto main = game.registerScene<WaitingRoom>("main");
     main->addModule<ASceneEventsModule>();

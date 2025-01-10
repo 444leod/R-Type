@@ -14,6 +14,8 @@
 #include <SFML/Graphics.hpp>
 #include "PacketTypes.hpp"
 
+#include "Sprites/Level1.hpp"
+
 void ShipShootedSystem::execute(const PacketInformation &event, const sf::Texture &_projectileTex) {
     for (auto [entity, ship, transform] : _registry.view<Ship, Transform>())
     {
@@ -22,12 +24,7 @@ void ShipShootedSystem::execute(const PacketInformation &event, const sf::Textur
 
         static uint32_t projectileId = 0;
         const auto projectile = _registry.create();
-        auto projectileSprite = sf::Sprite(_projectileTex);
         const auto shootTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
-        projectileSprite.setOrigin(0, 0);
-        projectileSprite.setScale(SCALE, SCALE);
-        projectileSprite.setPosition(shootTransform.x, shootTransform.y);
-        projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
         _registry.addComponent(projectile, Hitbox{});
         _registry.addComponent(projectile, projectileSprite);
         _registry.addComponent(projectile, shootTransform);

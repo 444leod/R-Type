@@ -36,11 +36,6 @@ void Level1::update(const double& deltaTime) {
                 _manager.send(client.endpoint, packet);
             */
             const auto explosion = _registry.create();
-            auto explosionSprite = sf::Sprite(_explosionTex);
-            explosionSprite.setOrigin(16, 16);
-            explosionSprite.setScale(SCALE, SCALE);
-            explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
-            explosionSprite.setPosition(projectile_transform.x, projectile_transform.y);
             _registry.addComponent(explosion, explosionSprite);
             _registry.addComponent(explosion, Transform{.x = projectile_transform.x, .y = projectile_transform.y, .z = 1, .rotation = 0});
             _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
@@ -120,10 +115,6 @@ void Level1::onEnter() {
     _registry.clear();
     const auto spaceship = _registry.create();
 
-    auto spaceshipSprite = sf::Sprite(_spaceshipTex);
-    spaceshipSprite.setOrigin(0, 0);
-    spaceshipSprite.setScale(SCALE, SCALE);
-
     _registry.addComponent(spaceship, spaceshipSprite);
     _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
     _registry.addComponent(spaceship, Self{});
@@ -134,9 +125,6 @@ void Level1::onEnter() {
     #endif
 
     const auto background = _registry.create();
-
-    auto backgroundSprite = sf::Sprite(_backgroundTex);
-    backgroundSprite.setScale(SCALE, SCALE);
 
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
@@ -153,10 +141,6 @@ void Level1::onEnter(const AScene& lastScene)
     // }
 
     _registry.clear();
-
-    auto spaceshipSprite = sf::Sprite(_spaceshipTex);
-    spaceshipSprite.setOrigin(0, 0);
-    spaceshipSprite.setScale(SCALE, SCALE);
 
     // for (const auto& client : CLIENTS) { //todo: update this
     //     const auto spaceship = _registry.create();
@@ -186,9 +170,6 @@ void Level1::onEnter(const AScene& lastScene)
     // }
 
     const auto background = _registry.create();
-
-    auto backgroundSprite = sf::Sprite(_backgroundTex);
-    backgroundSprite.setScale(SCALE, SCALE);
 
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
@@ -234,10 +215,6 @@ void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& pac
 void Level1::addBug(const Transform& transform) {
 
     const auto bug = _registry.create();
-    auto bugSprite = sf::Sprite(_bugTex);
-    bugSprite.setOrigin(16, 13);
-    bugSprite.setScale(SCALE, SCALE);
-    bugSprite.setPosition(transform.x, transform.y);
     _registry.addComponent(bug, bugSprite);
     _registry.addComponent(bug, Bug{});
     _registry.addComponent(bug, Enemy{ .id = _enemyId });
