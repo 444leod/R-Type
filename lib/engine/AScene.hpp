@@ -13,21 +13,22 @@ class SceneManager;
 #include <map>
 #include <vector>
 #include <memory>
+
 #include "RestrictedSceneManager.hpp"
 #include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "BaseSystems/Abstracts/ARenderSystem.hpp"
 #include "ecs/Registry.hpp"
 #include "ecs/Family.hpp"
-#include "modules/ISceneModule.hpp"
+#include "modules/ASceneModule.hpp"
 
 namespace engine
 {
 
     template <typename T>
-    concept SceneModule = std::is_base_of_v<ISceneModule, T>;
+    concept SceneModule = std::is_base_of_v<ASceneModule, T>;
 
     template <typename T, typename... Params>
-    concept ConstructibleGameModule = std::constructible_from<T, Params...>;
+    concept ConstructibleSceneModule = std::constructible_from<T, AScene&, Params...>;
 
 }
 
@@ -36,11 +37,7 @@ public:
     AScene(RestrictedSceneManager& manager, ecs::Registry& registry, const std::string& name) :
         _manager(manager), _registry(registry), _name(name) {}
 
-    virtual~AScene()
-    {
-        for (const auto module: this->_modules | std::views::values)
-            delete module;
-    }
+    virtual~AScene() = default;
 
     /**
      * @brief Called once at the start of the program
@@ -54,10 +51,13 @@ public:
     virtual void update(const double& deltaTime) = 0;
 
     template<engine::SceneModule T>
-    [[nodiscard]] T *getModule()
+    [[nodiscard]] std::shared_ptr<T> getModule()
     {
-        if (auto id = ecs::Family<T>::id();this->_modules.contains(id))
-            return dynamic_cast<T *>(this->_modules.at(id));
+        for (auto module: this->_modules) {
+            auto cast = std::dynamic_pointer_cast<T>(module);
+            if (cast != nullptr)
+                return cast;
+        }
         return nullptr;
     }
 
@@ -139,20 +139,19 @@ public:
     }
 
     template <engine::SceneModule T, typename... Params>
-        requires engine::ConstructibleGameModule<T, Params...>
-    T* addModule(Params&&... params)
+        requires engine::ConstructibleSceneModule<T, Params...>
+    std::shared_ptr<T> addModule(Params&&... params)
     {
-        auto id = ecs::Family<T>::id();
-        auto module = new T(std::forward<Params>(params)...);
-        this->_modules[id] = module;
+        auto module = std::make_shared<T>(*this, std::forward(params)...);
+        this->_modules.push_back(module);
         return module;
     }
 
 
 protected:
+    ecs::Registry& _registry;
 
 protected:
-    ecs::Registry& _registry;
     RestrictedSceneManager& _manager;
 
     std::vector<std::unique_ptr<AUpdateSystem>> _updateSystems;
@@ -186,7 +185,7 @@ protected:
 
 
 private:
-    std::map<std::uint32_t, ISceneModule *> _modules = {};
+    std::vector<std::shared_ptr<ASceneModule>> _modules = {};
     const std::string& _name = "";
 };
 

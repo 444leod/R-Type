@@ -9,32 +9,29 @@
 
 #include "RestrictedGame.hpp"
 
-#include "modules/IGameModule.hpp"
+#include "modules/AGameModule.hpp"
 
 #include "ecs/Registry.hpp"
 #include "ecs/EventDispatcher.hpp"
 #include "SceneManager.hpp"
 
+#include <memory>
 #include <thread>
 
 namespace game
 {
 
     template <typename T>
-    concept GameModule = std::is_base_of_v<IGameModule, T>;
+    concept GameModule = std::is_base_of_v<AGameModule, T>;
 
     template <typename T, typename... Params>
-    concept ConstructibleGameModule = std::constructible_from<T, Params...>;
+    concept ConstructibleGameModule = std::constructible_from<T, RestrictedGame&, Params...>;
 
     class Game final : public RestrictedGame
     {
     public:
         Game() = default;
-        ~Game() override
-        {
-            for (const auto module: this->_modules)
-                delete module;
-        }
+        ~Game() override = default;
 
         [[nodiscard]] const ecs::Registry& registry() const override { return this->_registry; }
         [[nodiscard]] ecs::Registry& registry() override { return this->_registry; }
@@ -47,9 +44,9 @@ namespace game
 
         template <GameModule Module, typename... Params>
             requires ConstructibleGameModule<Module, Params...>
-        Module* addModule(Params&&... params)
+        std::shared_ptr<Module> addModule(Params&&... params)
         {
-            auto module = new Module(std::forward<Params>(params)...);
+            auto module = std::make_shared<Module>(*this, std::forward<Params>(params)...);
             this->_modules.push_back(module);
             return module;
         }
@@ -60,8 +57,9 @@ namespace game
             return this->_sceneManager.registerScene<T>(name, this->_registry);
         }
 
-        void run() {
-                this->run(this->_sceneManager.loaded());
+        void run()
+        {
+            this->run(this->_sceneManager.loaded());
         }
 
         void run(const std::string& scene) {
@@ -75,9 +73,11 @@ namespace game
 
             while (_running)
             {
-                this->_sceneManager.update();
+                if (this->_sceneManager.update())
+                    for (const auto module: this->_modules)
+                        module->refresh(this->_sceneManager.current());
                 for (const auto module: this->_modules)
-                    module->update(*this);
+                    module->update();
                 this->_sceneManager.current().update(deltaTime);
                 this->_registry.flush();
 
@@ -103,7 +103,7 @@ namespace game
         }
 
     private:
-        std::vector<IGameModule *> _modules;
+        std::vector<std::shared_ptr<AGameModule>> _modules;
         ecs::Registry _registry;
         ecs::EventDispatcher _events;
         SceneManager _sceneManager;

@@ -5,13 +5,12 @@
 ** Game.cpp
 */
 
+#include "Level1.hpp"
+
 #include <algorithm>
 #include <iostream>
 #include <thread>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include "Level1.hpp"
-#include "../WaitingRoom/WaitingRoom.hpp"
+
 #include "Components.hpp"
 #include "BaseComponents.hpp"
 #include "ecs/Registry.hpp"
