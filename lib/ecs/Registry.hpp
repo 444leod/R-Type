@@ -153,8 +153,10 @@ namespace ecs {
         void displaySparse() const
         {
             std::cout << "There is a sparse array for the following components: " << std::endl;
-            for (const auto &id : _sparse_sets | std::views::keys)
+            for (const auto [id, set] : _sparse_sets) {
                 std::cout << id << std::endl;
+                set->display();
+            }
         }
 
         /**

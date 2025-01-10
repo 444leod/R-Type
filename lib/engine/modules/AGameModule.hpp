@@ -10,6 +10,7 @@
 namespace ecs {
     class EventDispatcher;
 }
+
 namespace game
 {
     class RestrictedGame;

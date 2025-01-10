@@ -15,6 +15,7 @@
 #include "ecs/EventDispatcher.hpp"
 #include "SceneManager.hpp"
 
+#include <memory>
 #include <thread>
 
 namespace game
@@ -55,8 +56,9 @@ namespace game
             return this->_sceneManager.registerScene<T>(name, this->_registry);
         }
 
-        void run() {
-                this->run(this->_sceneManager.loaded());
+        void run()
+        {
+            this->run(this->_sceneManager.loaded());
         }
 
         void run(const std::string& scene) {

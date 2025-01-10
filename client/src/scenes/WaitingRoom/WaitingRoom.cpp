@@ -11,7 +11,8 @@
 
 #include "Components.hpp"
 
-#include <NetworkModules/ANetworkSceneModule.hpp>
+#include "NetworkModules/ANetworkSceneModule.hpp"
+#include "engine/modules/ASceneEventsModule.hpp"
 
 void WaitingRoom::initialize()
 {
@@ -104,6 +105,32 @@ void WaitingRoom::onEvent(sf::Event &event)
 
 void WaitingRoom::onEnter() {
     _registry.clear();
+
+    auto events = this->getModule<ASceneEventsModule>();
+    if (events != nullptr) {
+        events->addHandler(
+            [&] (sf::Event& e) {
+                return e.type == sf::Event::KeyPressed
+                    && e.key.code <= sf::Keyboard::Z
+                    && e.key.code >= sf::Keyboard::A;
+            },
+            [&] (sf::Event& e) {
+                std::cout << "Pressed key: " << (char)(e.key.code + 'A') << std::endl;
+            }
+        );
+    } else
+        std::cout << "No module for type ASceneEventsModule" << std::endl;
+
+    const auto enttext = _registry.create();
+    _registry.addComponent(enttext, Text {
+        .message = "Connecting to the server...",
+        .font = "./assets/arial.ttf",
+        .fontSize = 30,
+        .color = { 255, 255, 255 }
+    });
+    _registry.addComponent(enttext, Position { .x = 10, .y = 10 });
+
+    //_manager.send(SERVER, packet); //dead code
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene)
@@ -116,7 +143,6 @@ void WaitingRoom::onExit()
 
 void WaitingRoom::onExit(const AScene& nextScene)
 {
-    std::cout << "\nSuccessfully connected to the server!" << std::endl;
 }
 
 /*

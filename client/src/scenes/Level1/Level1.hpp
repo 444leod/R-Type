@@ -8,6 +8,13 @@
 #ifndef LEVEL_1_HPP
 #define LEVEL_1_HPP
 
+#include <chrono>
+#include <memory>
+
+#include "engine/AScene.hpp"
+#include "ecs/Registry.hpp"
+#include "ecs/EventDispatcher.hpp"
+
 // From Game Engine
 #include "BaseSystems/Update/ParalaxSystem.hpp"
 #include "BaseSystems/Update/MovementSystem.hpp"
@@ -15,9 +22,6 @@
 #include "BaseSystems/Render/DrawSpritesSystem.hpp"
 
 // Level1 specific
-#include "engine/AScene.hpp"
-#include "ecs/Registry.hpp"
-#include "ecs/EventDispatcher.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
 #include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
@@ -64,13 +68,13 @@ public:
 private:
     void addProjectile(const Transform& transform);
     void addBug(const Transform& transform);
-    void _handleYourShip(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
-    void _handleNewShip(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
-    void _handleDisconnect(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
-    void _handleShipMovement(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
-    void _handleNewProjectile(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
-    void _handleNewMonster(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
-    void _handleMonsterKilled(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    // void _handleYourShip(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    // void _handleNewShip(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    // void _handleDisconnect(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    // void _handleShipMovement(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    // void _handleNewProjectile(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    // void _handleNewMonster(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
+    // void _handleMonsterKilled(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet);
 
 
 public:

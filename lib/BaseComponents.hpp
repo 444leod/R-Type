@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 #include <functional>
+#include <string>
 #include "ecs/Entity.hpp"
 
 // TODO: Decide how to organize the components in the lib
@@ -45,7 +46,7 @@ struct Position {
 /**
  * @struct Animation
  * @brief Represents an animation component.
- * 
+ *
  * This struct holds the properties and behaviors of an animation, including
  * frame size, duration, and looping behavior.
  */
@@ -83,7 +84,7 @@ struct Animation {
     /**
      * @brief The function to call when the animation ends (if loop is false).
      * @param entity The Entity that the animation is attached to.
-     * 
+     *
      * This function takes an Entity as a parameter and is called when the
      * animation completes.
      */
@@ -97,7 +98,14 @@ struct Enemy {
 // UI Components
 
 struct Text {
-    sf::Text text;
+    std::string message;
+    std::string font;
+    std::uint32_t fontSize;
+    struct {
+        std::uint32_t r;
+        std::uint32_t g;
+        std::uint32_t b;
+    } color;
 };
 
 struct RectangleButton {
