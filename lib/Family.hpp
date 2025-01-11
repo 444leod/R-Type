@@ -176,11 +176,11 @@ template <typename T> struct GENERATOR_API type {
      */
     static constexpr std::size_t id() { return final_type<Type>::id(); }
 
-    static constexpr std::string name() {
-        std::string_view name = final_type<Type>::name();
-        name.remove_prefix(30);
-        name.remove_suffix(48);
-        return std::string{name};
+    static std::string name() {
+        std::string result = final_type<Type>::name();
+        result.erase(0, 30);
+        result.erase(result.size() - 48);
+        return result;
     }
 };
 
