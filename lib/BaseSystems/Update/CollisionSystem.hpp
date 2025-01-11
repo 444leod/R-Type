@@ -15,9 +15,6 @@
 #include <algorithm>
 #include <cmath>
 
-using Circle = shape::Circle;
-using Rectangle = shape::Rectangle;
-
 inline bool pointInRectangle(const float& px, const float& py, const float& rx, const float& ry, const float& rw, const float& rh, const float& cosAngle, const float& sinAngle)
 {
     const float localX = px - rx;
@@ -54,19 +51,19 @@ public:
 private:
     static bool checkCollision(const Hitbox& hitbox1, const Transform& transform1, const Hitbox& hitbox2, const Transform& transform2)
     {
-        if (std::holds_alternative<Rectangle>(hitbox1.shape) && std::holds_alternative<Rectangle>(hitbox2.shape)) {
-            return checkRectangleCollision(std::get<Rectangle>(hitbox1.shape), transform1, std::get<Rectangle>(hitbox2.shape), transform2);
-        } else if (std::holds_alternative<Circle>(hitbox1.shape) && std::holds_alternative<Circle>(hitbox2.shape)) {
-            return checkCircleCollision(std::get<Circle>(hitbox1.shape), transform1, std::get<Circle>(hitbox2.shape), transform2);
-        } else if (std::holds_alternative<Circle>(hitbox1.shape) && std::holds_alternative<Rectangle>(hitbox2.shape)) {
-            return checkCircleRectangleCollision(std::get<Circle>(hitbox1.shape), transform1, std::get<Rectangle>(hitbox2.shape), transform2);
-        } else if (std::holds_alternative<Rectangle>(hitbox1.shape) && std::holds_alternative<Circle>(hitbox2.shape)) {
-            return checkCircleRectangleCollision(std::get<Circle>(hitbox2.shape), transform2, std::get<Rectangle>(hitbox1.shape), transform1);
+        if (std::holds_alternative<shape::Rectangle>(hitbox1.shape) && std::holds_alternative<shape::Rectangle>(hitbox2.shape)) {
+            return checkRectangleCollision(std::get<shape::Rectangle>(hitbox1.shape), transform1, std::get<shape::Rectangle>(hitbox2.shape), transform2);
+        } else if (std::holds_alternative<shape::Circle>(hitbox1.shape) && std::holds_alternative<shape::Circle>(hitbox2.shape)) {
+            return checkCircleCollision(std::get<shape::Circle>(hitbox1.shape), transform1, std::get<shape::Circle>(hitbox2.shape), transform2);
+        } else if (std::holds_alternative<shape::Circle>(hitbox1.shape) && std::holds_alternative<shape::Rectangle>(hitbox2.shape)) {
+            return checkCircleRectangleCollision(std::get<shape::Circle>(hitbox1.shape), transform1, std::get<shape::Rectangle>(hitbox2.shape), transform2);
+        } else if (std::holds_alternative<shape::Rectangle>(hitbox1.shape) && std::holds_alternative<shape::Circle>(hitbox2.shape)) {
+            return checkCircleRectangleCollision(std::get<shape::Circle>(hitbox2.shape), transform2, std::get<shape::Rectangle>(hitbox1.shape), transform1);
         }
         return false;
     }
 
-    static bool checkRectangleCollision(const Rectangle& rect1, const Transform& transform1, const Rectangle& rect2, const Transform& transform2)
+    static bool checkRectangleCollision(const shape::Rectangle& rect1, const Transform& transform1, const shape::Rectangle& rect2, const Transform& transform2)
     {
     if (transform1.rotation == 0 && transform2.rotation == 0) {
         return (transform1.x < transform2.x + rect2.width &&
@@ -114,7 +111,7 @@ private:
     return false;
 }
 
-    static bool checkCircleCollision(const Circle& circle1, const Transform& transform1, const Circle& circle2, const Transform& transform2)
+    static bool checkCircleCollision(const shape::Circle& circle1, const Transform& transform1, const shape::Circle& circle2, const Transform& transform2)
     {
         float dx = transform1.x - transform2.x;
         float dy = transform1.y - transform2.y;
@@ -122,7 +119,7 @@ private:
         return distance < (circle1.radius + circle2.radius);
     }
 
-    static bool checkCircleRectangleCollision(const Circle& circle, const Transform& circleTransform, const Rectangle& rect, const Transform& rectTransform)
+    static bool checkCircleRectangleCollision(const shape::Circle& circle, const Transform& circleTransform, const shape::Rectangle& rect, const Transform& rectTransform)
     {
         const float angle = rectTransform.rotation * (M_PI / 180.0f);
 
