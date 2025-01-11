@@ -9,15 +9,14 @@
 #define BASE_COMPONENTS_HPP_
 
 #include <cstdint>
-#include <SFML/Graphics.hpp>
 #include <functional>
 #include <string>
 #include <utility>
 #include <filesystem>
 #include <bits/fs_ops.h>
-#include <iostream>
-#include "ecs/Entity.hpp"
+#include <variant>
 
+#include "ecs/Entity.hpp"
 #include "Config.hpp"
 
 // TODO: Decide how to organize the components in the lib
