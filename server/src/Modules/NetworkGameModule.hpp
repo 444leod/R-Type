@@ -8,7 +8,7 @@
 #ifndef NETWORK_GAME_MODULE_HPP
 #define NETWORK_GAME_MODULE_HPP
 
-#include "ANetworkGameModule.hpp"
+#include "NetworkModules/ANetworkGameModule.hpp"
 
 /**
 * @class NetworkGameModule
@@ -17,7 +17,7 @@
 */
 class NetworkGameModule final : public ANetworkGameModule {
 public:
-    explicit NetworkGameModule(const std::uint32_t& port = 25565) : ANetworkGameModule(port) {}
+    explicit NetworkGameModule(game::RestrictedGame& game, const std::uint32_t& port = 25565) : ANetworkGameModule(game, port) {}
     ~NetworkGameModule() override = default;
 
 private:

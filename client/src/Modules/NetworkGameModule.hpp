@@ -8,7 +8,7 @@
 #ifndef NETWORK_GAME_MODULE_HPP
 #define NETWORK_GAME_MODULE_HPP
 
-#include "ANetworkGameModule.hpp"
+#include "NetworkModules/ANetworkGameModule.hpp"
 #include "PacketTypes.hpp"
 
 /**
@@ -18,7 +18,7 @@
 */
 class NetworkGameModule final : public ANetworkGameModule {
 public:
-    explicit NetworkGameModule(const std::string& ip, const std::uint32_t& port) : ANetworkGameModule() {
+    explicit NetworkGameModule(game::RestrictedGame& game, const std::string& ip, const std::uint32_t& port) : ANetworkGameModule(game) {
         const auto addr = asio::ip::address::from_string(ip);
         auto server = asio::ip::udp::endpoint(addr, port);
 

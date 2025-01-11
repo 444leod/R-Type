@@ -20,7 +20,7 @@ class AScene;
 class AGameModule
 {
 public:
-    AGameModule(game::RestrictedGame& game): _game(game) {}
+    explicit AGameModule(game::RestrictedGame& game): _game(game) {}
     virtual ~AGameModule() = default;
 
     virtual void start() = 0;
