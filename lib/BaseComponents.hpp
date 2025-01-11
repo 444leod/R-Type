@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <bits/fs_ops.h>
 #include <iostream>
+#include "ecs/Entity.hpp"
 
 #include "Config.hpp"
 
@@ -32,7 +33,13 @@ struct Velocity {
 
 struct Self {};
 
-struct Hitbox {};
+struct Color
+{
+    std::int8_t r;
+    std::int8_t g;
+    std::int8_t b;
+    std::int8_t a = static_cast<std::int8_t>(255);
+};
 
 struct Projectile {
     double range;
@@ -69,11 +76,7 @@ struct Text {
     std::string message;
     std::string font;
     std::uint32_t fontSize;
-    struct {
-        std::uint32_t r;
-        std::uint32_t g;
-        std::uint32_t b;
-    } color;
+    Color color;
 };
 
 class DrawSpritesSystem;
@@ -120,5 +123,31 @@ struct RectangleButton {
     std::string label;
     std::function<void()> onClick;
 };
+
+struct Circle
+{
+    float radius;
+    Color fillColor;
+    Color outlineColor;
+    float outlineThickness;
+};
+
+struct Rectangle
+{
+    float width;
+    float height;
+    Color fillColor = {0, 0, 0};
+    Color outlineColor = {0, 0, 0};
+    float outlineThickness = 0;
+    float rotation = 0;
+};
+
+struct Hitbox
+{
+    std::variant<Rectangle, Circle> shape;
+    std::function<void(const Entity& other)> onCollision;
+};
+
+struct Debug {};
 
 #endif /* !BASECOMPONENTS_HPP_ */

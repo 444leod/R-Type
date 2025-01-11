@@ -16,7 +16,7 @@
 #include "BaseSystems/Update/ParalaxSystem.hpp"
 #include "BaseSystems/Update/MovementSystem.hpp"
 #include "BaseSystems/Update/AnimateSystem.hpp"
-#include "BaseSystems/Render/DrawSpritesSystem.hpp"
+#include "BaseSystems/Update/CollisionSystem.hpp"
 
 // Level1 specific
 #include "Components.hpp"
@@ -32,17 +32,13 @@
 class Level1 final : public AScene {
 public:
     Level1(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n) {
-//        _eventDispatcher.link<movement_event>(&_playerMovement);
-        _eventDispatcher.link<PacketInformation>(&_packetHandler);
-        // systems
         // update systems
         this->_updateSystems.push_back(std::make_unique<ParallaxSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<MovementSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<AnimateSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<BugsMovementSystem>(_registry));
-        // render systems
-        this->_renderSystems.push_back(std::make_unique<DrawSpritesSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
     }
 
     void initialize() override;

@@ -21,13 +21,13 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include "BaseSystems/Update/CollisionSystem.hpp"
 
 class WaitingRoom final : public AScene {
 public:
     WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
     {
-        this->_renderSystems.push_back(std::make_unique<DrawTextsSystem>(_registry));
-        this->_renderSystems.push_back(std::make_unique<DrawMenuButtonsSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
     }
 
     void initialize() override;

@@ -16,9 +16,14 @@
 #include "engine/AScene.hpp"
 #include "BaseComponents.hpp"
 
+#include <BaseSystems/Update/CollisionSystem.hpp>
+
 class WaitingRoom final : public AScene {
 public:
-    WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n) {}
+    WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
+    {
+        _updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
+    }
 
     void initialize() override;
 

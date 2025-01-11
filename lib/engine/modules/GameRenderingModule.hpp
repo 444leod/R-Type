@@ -14,6 +14,7 @@
 
 #include "BaseSystems/Render/DrawSpritesSystem.hpp"
 #include "BaseSystems/Render/DrawTextsSystem.hpp"
+#include "BaseSystems/Render/DebugDrawSystem.hpp"
 #include "../AScene.hpp"
 #include "AGameModule.hpp"
 #include "ASceneEventsModule.hpp"
@@ -33,7 +34,8 @@ namespace engine
             _title(std::move(title)),
             _mode(width, height),
             _spritesSystem(game.registry()),
-            _textsSystem(game.registry())
+            _textsSystem(game.registry()),
+            _debugDrawSystem(game.registry())
         {}
         ~GameRenderingModule() override = default;
 
@@ -47,11 +49,13 @@ namespace engine
             // Dumbly deactivate / reactivate modules to avoid redering dumb stuff when uneeded
             this->_spritesSystem.disable();
             this->_textsSystem.disable();
+            this->_debugDrawSystem.disable();
             this->_target = scene.getModule<ASceneEventsModule>();
             if (this->_target == nullptr)
                 return;
             this->_spritesSystem.enable();
             this->_textsSystem.enable();
+            this->_debugDrawSystem.enable();
         }
 
         void stop() override
@@ -75,6 +79,7 @@ namespace engine
             this->_window.clear();
             this->_spritesSystem.execute(this->_window);
             this->_textsSystem.execute(this->_window);
+            this->_debugDrawSystem.execute(this->_window);
             this->_window.display();
         }
 
@@ -88,6 +93,7 @@ namespace engine
 
         DrawSpritesSystem _spritesSystem;
         DrawTextsSystem _textsSystem;
+        DebugDrawSystem _debugDrawSystem;
     };
 
 }

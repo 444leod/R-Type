@@ -26,6 +26,7 @@ void WaitingRoom::initialize()
 
 void WaitingRoom::update(const double& deltaTime)
 {
+    this->_executeUpdateSystems(deltaTime);
 }
 
 /*
@@ -82,30 +83,6 @@ void WaitingRoom::onEvent(sf::Event &event)
 */
 
 void WaitingRoom::onEnter() {
-    /*std::cout << "Game is running..." << std::endl;
-
-    std::cout << "Ip of the host (enter for localhost): " << std::flush;
-    std::string ip;
-    std::getline(std::cin, ip);
-    if (ip.empty())
-        ip = "127.0.0.1";
-
-    std::cout << "Port of the host (enter for 25565): " << std::flush;
-    std::uint32_t port;
-    std::string port_str;
-    std::getline(std::cin, port_str);
-    if (port_str.empty())
-        port = 25565;
-    else
-        port = std::stoi(port_str);
-
-    const auto addr = asio::ip::address::from_string(ip);
-    //SERVER = asio::ip::udp::endpoint(addr, port); //dead code
-
-    ntw::UDPPacket packet;
-    packet << PACKET_TYPE::CONNECT;
-    packet << "ClientName";*/
-
     auto events = this->getModule<ASceneEventsModule>();
     if (events != nullptr) {
         events->addHandler(
@@ -126,7 +103,7 @@ void WaitingRoom::onEnter() {
         .message = "Connecting to the server...",
         .font = "./assets/arial.ttf",
         .fontSize = 30,
-        .color = { 255, 255, 255 }
+        .color = Color( 255, 255, 255 )
     });
     _registry.addComponent(enttext, Position { .x = 10, .y = 10 });
 
@@ -144,53 +121,3 @@ void WaitingRoom::onExit()
 void WaitingRoom::onExit(const AScene& nextScene)
 {
 }
-
-/*
-void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
-{
-    const auto payload = packet.payload;
-
-    // std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
-    //           << ", ack: " << packet.ack_number << ")" << std::endl;
-
-    PACKET_TYPE packet_type{};
-    packet >> packet_type;
-    if (_packet_handlers.contains(packet_type))
-        _packet_handlers.at(packet_type)(packet);
-} */
-
-/*
-void WaitingRoom::send(const ntw::UDPPacket& packet)
-{
-    _manager.send(SERVER, packet);
-}
- */
-
-/* void WaitingRoom::_onConnect(ntw::UDPPacket& packet)
-{
-
-    std::uint32_t id;
-    packet >> id;
-
-    this->_id = id;
-    std::cout << "Connected to the server" << std::endl;
-}
-
-void WaitingRoom::_onDisconnect(ntw::UDPPacket& packet)
-{
-    std::cout << "Disconnection from the server" << std::endl;
-    _manager.stop();
-}
-
-void WaitingRoom::_onMessage(ntw::UDPPacket& packet)
-{
-    std::string message;
-    packet >> message;
-    std::cout << "Message from " << SERVER << ": " << message << std::endl;
-}
-
-void WaitingRoom::_onStart(ntw::UDPPacket& packet)
-{
-    std::cout << "Game starting..." << std::endl;
-    _manager.load("Level1");
-} */
