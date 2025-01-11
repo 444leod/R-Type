@@ -25,8 +25,8 @@ public:
         auto view = _registry.view<Debug, Hitbox, Transform>();
 
         view.each([&] (const Entity& entity, const Debug&, const Hitbox& hitbox, const Transform& transform) {
-            if (std::holds_alternative<Rectangle>(hitbox.shape)) {
-                const auto&[width, height, fillColor, outlineColor, outlineThickness, rotation] = std::get<Rectangle>(hitbox.shape);
+            if (std::holds_alternative<shape::Rectangle>(hitbox.shape)) {
+                const auto&[width, height, fillColor, outlineColor, outlineThickness, rotation] = std::get<shape::Rectangle>(hitbox.shape);
                 sf::RectangleShape shape(sf::Vector2f(width, height));
                 shape.setPosition(transform.x + width / 2, transform.y + height / 2);
                 shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b));
@@ -35,8 +35,8 @@ public:
                 shape.setRotation(transform.rotation);
                 shape.setOrigin(width / 2, height / 2);
                 window.draw(shape);
-            } else if (std::holds_alternative<Circle>(hitbox.shape)) {
-                const auto&[radius, fillColor, outlineColor, outlineThickness] = std::get<Circle>(hitbox.shape);
+            } else if (std::holds_alternative<shape::Circle>(hitbox.shape)) {
+                const auto&[radius, fillColor, outlineColor, outlineThickness] = std::get<shape::Circle>(hitbox.shape);
                 sf::CircleShape shape(radius);
                 shape.setPosition(transform.x, transform.y);
                 shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b));
