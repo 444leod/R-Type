@@ -45,7 +45,7 @@ pipeline {
         stage('Parallel Builds') {
             failFast false
             parallel {
-                stage('Format & Tidy') {
+                stage('Format') {
                     agent {
                         docker {
                             image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
@@ -53,33 +53,12 @@ pipeline {
                         }
                     }
                     stages {
-                        stage('Setup') {
-                            steps {
-                                sh '''#!/bin/bash
-                                    make clean
-                                    make conan_ci
-                                    source rtype_venv/bin/activate
-                                    make deps
-                                    cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-                                '''
-                            }
-                        }
-                        stage('Format') {
+                        stage('Check Format') {
                             steps {
                                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                                     sh '''
                                         chmod +x ./scripts/check_format.sh
                                         ./scripts/check_format.sh
-                                    '''
-                                }
-                            }
-                        }
-                        stage('Tidy') {
-                            steps {
-                                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                                    sh '''
-                                        chmod +x ./scripts/check_tidy.sh
-                                        ./scripts/check_tidy.sh
                                     '''
                                 }
                             }
@@ -293,6 +272,65 @@ pipeline {
                     post {
                         always {
                             sh 'rm -rf ./* ./.git*'
+                        }
+                    }
+                }
+            }
+        }
+        stage('Parallel Tidy Checks') {
+            failFast false
+            parallel {
+                stage('Tidy Client') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            args '-u root'
+                        }
+                    }
+                    steps {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            sh '''
+                                chmod +x ./scripts/prepare_tidy.sh
+                                chmod +x ./scripts/check_tidy_path.sh
+                                ./scripts/prepare_tidy.sh
+                                ./scripts/check_tidy_path.sh client
+                            '''
+                        }
+                    }
+                }
+                stage('Tidy Server') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            args '-u root'
+                        }
+                    }
+                    steps {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            sh '''
+                                chmod +x ./scripts/prepare_tidy.sh
+                                chmod +x ./scripts/check_tidy_path.sh
+                                ./scripts/prepare_tidy.sh
+                                ./scripts/check_tidy_path.sh server
+                            '''
+                        }
+                    }
+                }
+                stage('Tidy Commons') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            args '-u root'
+                        }
+                    }
+                    steps {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            sh '''
+                                chmod +x ./scripts/prepare_tidy.sh
+                                chmod +x ./scripts/check_tidy_path.sh
+                                ./scripts/prepare_tidy.sh
+                                ./scripts/check_tidy_path.sh lib
+                            '''
                         }
                     }
                 }
