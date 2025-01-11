@@ -9,6 +9,7 @@
 #define SPARSESET_HPP
 
 #include "Entity.hpp"
+#include "Family.hpp"
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
