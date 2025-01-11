@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "NetworkAgent.hpp"
 #include "BaseComponents.hpp"
+#include "NetworkAgent.hpp"
 #include <asio.hpp>
 #include <functional>
 #include <iostream>
