@@ -123,6 +123,8 @@ struct RectangleButton {
     std::function<void()> onClick;
 };
 
+namespace shape
+{
 struct Circle
 {
     float radius;
@@ -140,10 +142,11 @@ struct Rectangle
     float outlineThickness = 0;
     float rotation = 0;
 };
+}
 
 struct Hitbox
 {
-    std::variant<Rectangle, Circle> shape;
+    std::variant<shape::Rectangle, shape::Circle> shape;
     std::function<void(const Entity& other)> onCollision;
 };
 

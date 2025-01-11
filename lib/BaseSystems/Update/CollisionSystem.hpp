@@ -8,12 +8,15 @@
 #ifndef COLLISION_SYSTEM_HPP
 #define COLLISION_SYSTEM_HPP
 
-#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "BaseComponents.hpp"
+#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "Config.hpp"
 
 #include <algorithm>
 #include <cmath>
+
+using Circle = shape::Circle;
+using Rectangle = shape::Rectangle;
 
 inline bool pointInRectangle(const float& px, const float& py, const float& rx, const float& ry, const float& rw, const float& rh, const float& cosAngle, const float& sinAngle)
 {
