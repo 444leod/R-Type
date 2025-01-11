@@ -24,14 +24,14 @@ public:
     explicit ASceneEventsModule(AScene& scene): ASceneModule(scene) {}
     ~ASceneEventsModule() override = default;
 
-    virtual void trigger(sf::Event &event)
+    void trigger(sf::Event &event)
     {
         for (const auto& [predicate, handler]: this->_handlers)
             if (predicate(event))
                 handler(event);
     }
 
-    virtual void addHandler(const std::function<bool(sf::Event &)>& predicate, const std::function<void(sf::Event &)>& handler)
+    void addHandler(const std::function<bool(sf::Event &)>& predicate, const std::function<void(sf::Event &)>& handler)
     {
         this->_handlers.push_back(PredicateHandler { predicate, handler });
     }

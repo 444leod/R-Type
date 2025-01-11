@@ -48,6 +48,7 @@ void WaitingRoom::update(const double& deltaTime)
             std::cout << "\rConnecting to the server" << std::string(_pointNumber, '.') << std::string(3 - _pointNumber, ' ') << std::flush;
         }
     }
+    this->_executeUpdateSystems(deltaTime);
 }
 
 /*
@@ -126,7 +127,7 @@ void WaitingRoom::onEnter() {
         .message = "Connecting to the server...",
         .font = "./assets/arial.ttf",
         .fontSize = 30,
-        .color = { 255, 255, 255 }
+        .color = Color( 255, 255, 255 )
     });
     _registry.addComponent(enttext, Position { .x = 10, .y = 10 });
 
@@ -144,53 +145,3 @@ void WaitingRoom::onExit()
 void WaitingRoom::onExit(const AScene& nextScene)
 {
 }
-
-/*
-void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
-{
-    const auto payload = packet.payload;
-
-    // std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
-    //           << ", ack: " << packet.ack_number << ")" << std::endl;
-
-    PACKET_TYPE packet_type{};
-    packet >> packet_type;
-    if (_packet_handlers.contains(packet_type))
-        _packet_handlers.at(packet_type)(packet);
-} */
-
-/*
-void WaitingRoom::send(const ntw::UDPPacket& packet)
-{
-    _manager.send(SERVER, packet);
-}
- */
-
-/* void WaitingRoom::_onConnect(ntw::UDPPacket& packet)
-{
-
-    std::uint32_t id;
-    packet >> id;
-
-    this->_id = id;
-    std::cout << "Connected to the server" << std::endl;
-}
-
-void WaitingRoom::_onDisconnect(ntw::UDPPacket& packet)
-{
-    std::cout << "Disconnection from the server" << std::endl;
-    _manager.stop();
-}
-
-void WaitingRoom::_onMessage(ntw::UDPPacket& packet)
-{
-    std::string message;
-    packet >> message;
-    std::cout << "Message from " << SERVER << ": " << message << std::endl;
-}
-
-void WaitingRoom::_onStart(ntw::UDPPacket& packet)
-{
-    std::cout << "Game starting..." << std::endl;
-    _manager.load("Level1");
-} */

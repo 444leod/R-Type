@@ -7,22 +7,14 @@
 
 #include "Level1.hpp"
 
-#include <algorithm>
-#include <iostream>
-#include <thread>
-#include "Level1.hpp"
-#include "../WaitingRoom/WaitingRoom.hpp"
-
 #include "Components.hpp"
 #include "BaseComponents.hpp"
 #include "ecs/Registry.hpp"
-#include "network/NetworkAgent.hpp"
 #include "Config.hpp"
 #include "PacketTypes.hpp"
 
 #include "NetworkModules/ANetworkGameModule.hpp"
-
-#include <NetworkModules/ANetworkSceneModule.hpp>
+#include "NetworkModules/ANetworkSceneModule.hpp"
 
 void Level1::initialize()
 {
@@ -111,10 +103,6 @@ void Level1::onEnter() {
     /*
     const auto spaceship = _registry.create();
 
-    auto spaceshipSprite = sf::Sprite(_spaceshipTex);
-    spaceshipSprite.setOrigin(0, 0);
-    spaceshipSprite.setScale(SCALE, SCALE);
-
     _registry.addComponent(spaceship, spaceshipSprite);
     _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
     _registry.addComponent(spaceship, Self{});
@@ -128,9 +116,6 @@ void Level1::onEnter() {
 
     const auto background = _registry.create();
 
-    auto backgroundSprite = sf::Sprite(_backgroundTex);
-    backgroundSprite.setScale(SCALE, SCALE);
-
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
@@ -141,8 +126,6 @@ void Level1::onEnter(const AScene& lastScene)
     _registry.clear();
 
     const auto background = _registry.create();
-    auto backgroundSprite = sf::Sprite(_backgroundTex);
-    backgroundSprite.setScale(SCALE, SCALE);
 
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
@@ -179,13 +162,8 @@ void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& pac
 void Level1::addProjectile(const Transform& transform){
     const auto projectile = _registry.create();
 
-    auto projectileSprite = sf::Sprite(_projectileTex);
-    projectileSprite.setOrigin(0, 0);
-    projectileSprite.setScale(SCALE, SCALE);
-    projectileSprite.setPosition(transform.x, transform.y);
-    projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
-    _registry.addComponent(projectile, Hitbox{});
     _registry.addComponent(projectile, projectileSprite);
+    // _registry.addComponent(projectile, Hitbox{});
     _registry.addComponent(projectile, transform);
     _registry.addComponent(projectile, Projectile{});
     _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = .020, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
@@ -198,10 +176,6 @@ void Level1::addProjectile(const Transform& transform){
 
 void Level1::addBug(const Transform& transform) {
     const auto bug = _registry.create();
-    auto bugSprite = sf::Sprite(_bugTex);
-    bugSprite.setOrigin(16, 13);
-    bugSprite.setScale(SCALE, SCALE);
-    bugSprite.setPosition(transform.x, transform.y);
     _registry.addComponent(bug, bugSprite);
     _registry.addComponent(bug, Bug{});
     _registry.addComponent(bug, Enemy{});

@@ -19,7 +19,7 @@ public:
     explicit BugsMovementSystem(ecs::Registry &registry) : AUpdateSystem(registry, "BugsMovementSystem") {}
 
     void execute(const double& deltaTime) override {
-        _registry.view<Bug, sf::Sprite, Transform>().each([&](const Entity& entity, Bug& bug, sf::Sprite& sprite, Transform& transform) {
+        _registry.view<Bug, Transform>().each([&](const Entity& entity, const Bug& bug, Transform& transform) {
             const auto movementFactor = std::sin(bug.clock.getElapsedTime().asSeconds() / .2);
             transform.y += movementFactor * 8;
             transform.rotation = 90 - 45 * movementFactor;

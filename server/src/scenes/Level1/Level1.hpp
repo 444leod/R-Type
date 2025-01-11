@@ -16,7 +16,7 @@
 #include "BaseSystems/Update/ParalaxSystem.hpp"
 #include "BaseSystems/Update/MovementSystem.hpp"
 #include "BaseSystems/Update/AnimateSystem.hpp"
-#include "BaseSystems/Render/DrawSpritesSystem.hpp"
+#include "BaseSystems/Update/CollisionSystem.hpp"
 
 // Level1 specific
 #include "Components.hpp"
@@ -24,26 +24,20 @@
 #include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
 #include "Systems/BugsMovementSystem.hpp"
 
+#include "Sprites/Level1.hpp"
+
 #include <chrono>
 
 class Level1 final : public AScene {
 public:
     Level1(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n) {
-        _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
-        _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
-        _backgroundTex.loadFromFile("assets/rtype-background.png", sf::IntRect(0, 243, 3072, 205));
-        _bugTex.loadFromFile("assets/r-typesheet8.gif");
-        _explosionTex.loadFromFile("assets/r-typesheet44.gif", sf::IntRect(131, 0, 192, 32));
-//        _eventDispatcher.link<movement_event>(&_playerMovement);
-        // systems
         // update systems
         this->_updateSystems.push_back(std::make_unique<ParallaxSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<MovementSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<AnimateSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<BugsMovementSystem>(_registry));
-        // render systems
-        this->_renderSystems.push_back(std::make_unique<DrawSpritesSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
     }
 
     void initialize() override;

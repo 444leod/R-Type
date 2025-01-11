@@ -64,59 +64,9 @@ void WaitingRoom::update(const double& deltaTime)
 
         std::cout << "> " << std::flush;
     }
-}
 
-/*
-void WaitingRoom::render(sf::RenderWindow& window)
-{
-    _executeRenderSystems(window);
+    this->_executeUpdateSystems(deltaTime);
 }
-
-void WaitingRoom::onEvent(sf::Event &event)
-{
-    //! Will not refactor this part, not supposed to have a system here
-    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left)
-    {
-        sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
-        _registry.view<Position, RectangleButton>().each([&](const auto &entity, auto &pos, auto &button)
-                                                         {
-            if (button.shape.getGlobalBounds().contains(mousePos)) {
-                button.onClick();
-                return;
-            } });
-    }
-
-    switch (event.type)
-    {
-    case sf::Event::KeyPressed:
-        switch (event.key.code)
-        {
-        case sf::Keyboard::Space:
-            break;
-        case sf::Keyboard::B:
-        {
-            break;
-        }
-        default:
-            // _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = true});
-            break;
-        }
-        break;
-    case sf::Event::KeyReleased:
-        switch (event.key.code)
-        {
-        default:
-            // _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = false});
-            break;
-        }
-        break;
-    case sf::Event::MouseButtonPressed:
-        break;
-    default:
-        break;
-    }
-}
-*/
 
 void WaitingRoom::onEnter()
 {
@@ -176,26 +126,8 @@ void WaitingRoom::onExit(const AScene& nextScene)
     std::cout << "Exiting to " << nextScene.name() << std::endl;
 }
 
-//
-// void WaitingRoom::_onConnect(const ntw::ClientInformation& src, ntw::UDPPacket& packet)
-// {
-//     std::string name;
-//     packet >> name;
-//     std::cout << "Client connected: " << name << std::endl;
-//
-//     /* ntw::UDPPacket response;
-//     response << PACKET_TYPE::CONNECT;
-//     response << src.id;
-//
-//     _manager.send(src.endpoint, response); */
-//
-//     const auto entity = _registry.create();
-//     const Text clientText {
-//         .message = "Client " + std::to_string(src.id),
-//         .font = "./assets/arial.ttf",
-//         .fontSize = 20,
-//         .color = { 255, 255, 255 }
-//     };
-//     _registry.addComponent<Text>(entity, clientText);
-//     //_registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * CLIENTS.size()}); //TODO: update this
-// }
+void WaitingRoom::_startGame(const std::vector<std::string> &)
+{
+    std::cout << "Starting the game..." << std::endl;
+    game::RestrictedGame::instance().scenes().load("game");
+}

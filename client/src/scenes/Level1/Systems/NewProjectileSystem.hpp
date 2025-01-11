@@ -13,7 +13,8 @@
 #include "../Components.hpp"
 #include "Config.hpp"
 #include "../Events/PacketInformation.hpp"
-#include <SFML/Graphics.hpp>
+
+#include "Sprites/Level1.hpp"
 
 class NewProjectileSystem final : public ASystem
 {
@@ -53,4 +54,4 @@ public:
 };
 
 
-#endif /* !NEWPROJECTILESYSTEM_HPP_ */
+#endif /* !NEW_PROJECTILE_SYSTEM_HPP_ */

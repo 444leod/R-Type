@@ -5,8 +5,8 @@
 ** PacketHandler.hpp
 */
 
-#ifndef PACKETHANDLER_HPP
-#define PACKETHANDLER_HPP
+#ifndef PACKET_HANDLER_HPP
+#define PACKET_HANDLER_HPP
 
 #include "../Components.hpp"
 #include "ecs/EventDispatcher.hpp"
@@ -20,6 +20,8 @@
 #include "../Systems/NewProjectileSystem.hpp"
 #include "../Systems/MonsterKilledSystem.hpp"
 #include "PacketTypes.hpp"
+
+#include "Sprites/Level1.hpp"
 
 class PacketHandler final : public ecs::EventHandler<PacketInformation>
 {
@@ -39,27 +41,12 @@ public:
 
     void receive(const PacketInformation &event) override
     {
-        switch (event.type)
-        {
-        case PACKET_TYPE::DISCONNECT:
-        {
-            _manager.stop();
-            return;
-        }
-        default:
-            break;
-        }
     }
 
 private:
     Entity _generateSpaceship(const Transform &transform) const
     {
         const auto spaceship = _registry.create();
-
-        auto spaceshipSprite = sf::Sprite(_spaceshipTex);
-        spaceshipSprite.setOrigin(0, 0);
-        spaceshipSprite.setScale(SCALE, SCALE);
-        spaceshipSprite.setPosition(transform.x, transform.y);
 
         _registry.addComponent(spaceship, spaceshipSprite);
         _registry.addComponent(spaceship, transform);
@@ -82,4 +69,4 @@ private:
     MonsterKilledSystem _monsterKilledSystem;
 };
 
-#endif // PACKETHANDLER_HPP
+#endif // PACKET_HANDLER_HPP

@@ -19,24 +19,25 @@
 int main() {
     auto game = game::Game();
 
-    game.addModule<engine::GameRenderingModule>(800, 600, "R-Type - Client");
+    game.addModule<engine::GameRenderingModule>(1700, 900, "R-Type - Client");
 
     const auto networkGameModule = game.addModule<NetworkGameModule>();
 
     const auto main = game.registerScene<WaitingRoom>("main");
+    main->addModule<ASceneEventsModule>();
     {
-        main->addModule<SceneRenderingModule>();
         const auto net = main->addModule<ANetworkSceneModule>(*networkGameModule);
         main->addModule<waiting_room::PacketHandlerSceneModule>(game.registry(), game.scenes(), net);
         main->addModule<ASceneEventsModule>();
+        // main->addModule<SceneRenderingModule>();
     }
 
 
     const auto level1 = game.registerScene<Level1>("game");
     {
-        level1->addModule<SceneRenderingModule>();
         const auto net = level1->addModule<ANetworkSceneModule>(*networkGameModule);
         level1->addModule<level1::PacketHandlerSceneModule>(game.registry(), game.scenes(), net);
+        // level1->addModule<SceneRenderingModule>();
         //  level1->addModule<Level1Events>();
     }
 

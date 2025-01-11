@@ -21,13 +21,15 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include "BaseSystems/Update/CollisionSystem.hpp"
+
+#include <engine/RestrictedGame.hpp>
 
 class WaitingRoom final : public AScene {
 public:
     WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
     {
-        this->_renderSystems.push_back(std::make_unique<DrawTextsSystem>(_registry));
-        this->_renderSystems.push_back(std::make_unique<DrawMenuButtonsSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
     }
 
     void initialize() override;
@@ -43,6 +45,7 @@ public:
     void onExit(const AScene& nextScene) override;
 
 private:
+    void _startGame(const std::vector<std::string>& args);
 
 public:
 private:
@@ -50,8 +53,8 @@ private:
     ecs::EventDispatcher _eventDispatcher;
 
     std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
-        {"exit",    [this](const std::vector<std::string>& args) { this->_onExit(args); }},
-        {"start",   [this](const std::vector<std::string>& args) { this->_onStart(args); }},
+        {"exit",    [this](const std::vector<std::string>& args) { game::RestrictedGame::instance().stop(); }},
+        {"start",   [this](const std::vector<std::string>& args) { this->_startGame(args); }},
         {"",        [this](const std::vector<std::string>& args) { }}
     };
 
