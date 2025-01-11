@@ -191,7 +191,7 @@ class Registry {
         const auto set = dynamic_cast<SparseSet<T>*>(this->_sparse_sets.at(id));
 
         if (!set->contains(entity)) {
-            throw std::out_of_range(entity + " does not have the component " + type<T>::name());
+            throw std::out_of_range(std::to_string(entity) + " does not have the component " + type<T>::name());
         }
         return set->at(entity);
     }
