@@ -19,9 +19,10 @@ int main() {
     game.addModule<NetworkGameModule>("127.0.0.1", 25565);
 
     const auto main = game.registerScene<WaitingRoom>("main");
+    main->addModule<ASceneEventsModule>();
 
     const auto level1 = game.registerScene<Level1>("game");
-    level1->addModule<SceneRenderingModule>();
+//  level1->addModule<Level1Events>();
 
     game.run();
     return 0;

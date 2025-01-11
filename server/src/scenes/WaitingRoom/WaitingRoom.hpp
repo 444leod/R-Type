@@ -26,7 +26,6 @@ class WaitingRoom final : public AScene {
 public:
     WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
     {
-        this->_font.loadFromFile("assets/arial.ttf");
         this->_renderSystems.push_back(std::make_unique<DrawTextsSystem>(_registry));
         this->_renderSystems.push_back(std::make_unique<DrawMenuButtonsSystem>(_registry));
     }
@@ -59,8 +58,6 @@ public:
 private:
     ecs::Registry _registry;
     ecs::EventDispatcher _eventDispatcher;
-
-    sf::Font _font;
 
     /* std::map<PACKET_TYPE, std::function<void(const ClientInformation& client, ntw::UDPPacket& packet)>> _packet_handlers = {
         {PACKET_TYPE::CONNECT,      [this](const ClientInformation& src, ntw::UDPPacket& packet)   { this->_onConnect(src, packet); }},

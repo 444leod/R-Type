@@ -13,6 +13,7 @@ class SceneManager;
 #include <map>
 #include <vector>
 #include <memory>
+
 #include "RestrictedSceneManager.hpp"
 #include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include "BaseSystems/Abstracts/ARenderSystem.hpp"

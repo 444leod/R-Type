@@ -8,24 +8,17 @@
 #ifndef WAITING_ROOM_HPP
 #define WAITING_ROOM_HPP
 
+#include <chrono>
+#include <optional>
+
 #include "ecs/Registry.hpp"
 #include "ecs/EventDispatcher.hpp"
 #include "engine/AScene.hpp"
 #include "BaseComponents.hpp"
-#include <chrono>
-#include <optional>
-
-inline sf::Font get_default_font() {
-    sf::Font font;
-    font.loadFromFile("assets/arial.ttf");
-    return font;
-}
 
 class WaitingRoom final : public AScene {
 public:
-    WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
-    {
-    }
+    WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n) {}
 
     void initialize() override;
 
@@ -49,11 +42,8 @@ private:
 
 public:
 private:
-    sf::Font _font = get_default_font();
-
     std::optional<std::uint32_t> _id = std::nullopt;
 
-    ecs::Registry _registry;
     ecs::EventDispatcher _eventDispatcher;
 
 //    std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
