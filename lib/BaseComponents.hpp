@@ -15,6 +15,7 @@
 #include <filesystem>
 #include <bits/fs_ops.h>
 #include <variant>
+#include <optional>
 
 #include "ecs/Entity.hpp"
 #include "Config.hpp"
