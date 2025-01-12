@@ -6,21 +6,19 @@
 */
 
 #include "ShipMovedSystem.hpp"
-#include "BaseComponents.hpp"
 #include "../Components.hpp"
+#include "BaseComponents.hpp"
 
-#include "NetworkAgent.hpp"
 #include "Global.hpp"
+#include "NetworkAgent.hpp"
 #include <SFML/Graphics.hpp>
 
-void ShipMovedSystem::execute(const PacketInformations &event, const UserInput &input) {
-    for (auto [ship_id, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>())
-    {
+void ShipMovedSystem::execute(const PacketInformations& event, const UserInput& input) {
+    for (auto [ship_id, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>()) {
         if (ship.id != event.source.id)
             continue;
 
-        switch (input.key)
-        {
+        switch (input.key) {
         case sf::Keyboard::Key::Up:
             vel.y += input.pressed ? -75 : 75;
             break;
@@ -39,8 +37,7 @@ void ShipMovedSystem::execute(const PacketInformations &event, const UserInput &
 
         UDPPacket packet;
         packet << PACKET_TYPE::SHIP_MOVEMENT << event.source.id << vel << pos;
-        for (const auto &client : CLIENTS)
-        {
+        for (const auto& client : CLIENTS) {
             _manager.send(client.endpoint, packet);
         }
     }

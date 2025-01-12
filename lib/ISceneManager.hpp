@@ -8,17 +8,17 @@
 #ifndef ISCENEMANAGER_HPP
 #define ISCENEMANAGER_HPP
 
-#include <string>
-#include <asio.hpp>
-#include "UDPPacket.hpp"
 #include "NetworkAgent.hpp"
+#include "UDPPacket.hpp"
+#include <asio.hpp>
+#include <string>
 
 /**
  * @class ISceneManager
  * @brief Interface for managing scenes in the application.
  */
 class ISceneManager {
-public:
+  public:
     ISceneManager() = default;
     virtual ~ISceneManager() = default;
 
@@ -36,4 +36,4 @@ public:
     virtual void send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet) = 0;
 };
 
-#endif //ISCENEMANAGER_HPP
+#endif // ISCENEMANAGER_HPP

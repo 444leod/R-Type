@@ -5,49 +5,51 @@
 ** Game.cpp
 */
 
+#include "Level1.hpp"
+#include "../WaitingRoom/WaitingRoom.hpp"
+#include "BaseComponents.hpp"
+#include "Components.hpp"
+#include "NetworkAgent.hpp"
+#include "Registry.hpp"
+#include <SFML/Graphics.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <algorithm>
 #include <iostream>
 #include <thread>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include "Level1.hpp"
-#include "Registry.hpp"
-#include "NetworkAgent.hpp"
-#include "../WaitingRoom/WaitingRoom.hpp"
-#include "Components.hpp"
-#include "BaseComponents.hpp"
 
-void Level1::initialize()
-{
-}
+void Level1::initialize() {}
 
-void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
+void Level1::update(const double deltaTime, const sf::RenderWindow& window) {
     _executeUpdateSystems(deltaTime);
 
-/*
-    _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&, const sf::Sprite& sprite, const Transform& transform)  {
-        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&, const Transform& projectile_transform) {
-            if (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16)))
-                return;
+    /*
+        _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity&
+       enemy, const Enemy&, const sf::Sprite& sprite, const Transform&
+       transform) { _registry.view<Projectile, Transform>().each([&](const
+       Entity& projectile, const Projectile&, const Transform&
+       projectile_transform) { if
+       (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x,
+       projectile_transform.y, 16, 16))) return;
 
-            const auto explosion = _registry.create();
-            auto explosionSprite = sf::Sprite(_explosionTex);
-            explosionSprite.setOrigin(16, 16);
-            explosionSprite.setScale(SCALE, SCALE);
-            explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
-            explosionSprite.setPosition(projectile_transform.x, projectile_transform.y);
-            _registry.addComponent(explosion, explosionSprite);
-            _registry.addComponent(explosion, Transform{.x = projectile_transform.x, .y = projectile_transform.y, .z = 1, .rotation = 0});
-            _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
-            #if DEBUG
-                _registry.addComponent(explosion, Debug{});
-            #endif
+                const auto explosion = _registry.create();
+                auto explosionSprite = sf::Sprite(_explosionTex);
+                explosionSprite.setOrigin(16, 16);
+                explosionSprite.setScale(SCALE, SCALE);
+                explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+                explosionSprite.setPosition(projectile_transform.x,
+       projectile_transform.y); _registry.addComponent(explosion,
+       explosionSprite); _registry.addComponent(explosion, Transform{.x =
+       projectile_transform.x, .y = projectile_transform.y, .z = 1, .rotation =
+       0}); _registry.addComponent(explosion, Animation{.frameSize = {32, 32},
+       .speed = 100, .frameCount = 6, .loop = false}); #if DEBUG
+                    _registry.addComponent(explosion, Debug{});
+                #endif
 
-            _registry.remove(enemy);
-            _registry.remove(projectile);
+                _registry.remove(enemy);
+                _registry.remove(projectile);
+            });
         });
-    });
-*/
+    */
     // auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
     // explosions.displaySets();
 }
@@ -55,8 +57,8 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
 void Level1::render(sf::RenderWindow& window) {
     _executeRenderSystems(window);
 
-
-    // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sprite) {
+    // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const
+    // sf::Sprite& sprite) {
     //     auto bounds = sprite.getGlobalBounds();
     //     sf::RectangleShape hitbox(sf::Vector2f(bounds.width, bounds.height));
     //     hitbox.setPosition(sprite.getPosition());
@@ -68,7 +70,7 @@ void Level1::render(sf::RenderWindow& window) {
     //     window.draw(hitbox);
     // });
 
-    #if DEBUG
+#if DEBUG
     sf::Text text;
     text.setFont(font);
     text.setCharacterSize(30);
@@ -78,32 +80,33 @@ void Level1::render(sf::RenderWindow& window) {
         text.setPosition(transform.x, transform.y);
         window.draw(text);
     });
-    #endif
+#endif
 }
 
-void Level1::onEvent(sf::Event &event) {
+void Level1::onEvent(sf::Event& event) {
     switch (event.type) {
-        case sf::Event::KeyPressed:
-            switch (event.key.code) {
-                case sf::Keyboard::B: {
-                     addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
-                     break;
-                }
-                default:
-                    _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = true});
-                    break;
-            }
+    case sf::Event::KeyPressed:
+        switch (event.key.code) {
+        case sf::Keyboard::B: {
+            addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
             break;
-        case sf::Event::KeyReleased:
-            switch (event.key.code) {
-                default:
-                    _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = false});
-                    break;
-            }
+        }
+        default:
+            _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = true});
             break;
-        case sf::Event::MouseButtonPressed:
+        }
+        break;
+    case sf::Event::KeyReleased:
+        switch (event.key.code) {
+        default:
+            _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = false});
             break;
-        default:break;
+        }
+        break;
+    case sf::Event::MouseButtonPressed:
+        break;
+    default:
+        break;
     }
 }
 
@@ -120,9 +123,9 @@ void Level1::onEnter() {
     _registry.addComponent(spaceship, Self{});
     _registry.addComponent(spaceship, Hitbox{});
     _registry.addComponent(spaceship, Velocity{.x = 0, .y = 0});
-    #if DEBUG
-        _registry.addComponent(spaceship, Debug{});
-    #endif
+#if DEBUG
+    _registry.addComponent(spaceship, Debug{});
+#endif
 
     const auto background = _registry.create();
 
@@ -134,8 +137,7 @@ void Level1::onEnter() {
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 }
 
-void Level1::onEnter(const AScene& lastScene)
-{
+void Level1::onEnter(const AScene& lastScene) {
     _registry.clear();
 
     const auto background = _registry.create();
@@ -147,30 +149,27 @@ void Level1::onEnter(const AScene& lastScene)
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 }
 
-void Level1::onExit()
-{
+void Level1::onExit() {
     UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 
     _manager.send(this->_server, packet);
 }
 
-void Level1::onExit(const AScene& nextScene)
-{
-}
+void Level1::onExit(const AScene& nextScene) {}
 
 void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
-        auto type = PACKET_TYPE{};
-        packet >> type;
+    auto type = PACKET_TYPE{};
+    packet >> type;
 
-        _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet});
+    _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet});
 
-//    auto spaceshipSprite = sf::Sprite(_spaceshipTex);
-//    spaceshipSprite.setOrigin(0, 0);
-//    spaceshipSprite.setScale(SCALE, SCALE);
+    //    auto spaceshipSprite = sf::Sprite(_spaceshipTex);
+    //    spaceshipSprite.setOrigin(0, 0);
+    //    spaceshipSprite.setScale(SCALE, SCALE);
 }
 
-void Level1::addProjectile(const Transform& transform){
+void Level1::addProjectile(const Transform& transform) {
     const auto projectile = _registry.create();
 
     auto projectileSprite = sf::Sprite(_projectileTex);
@@ -182,12 +181,10 @@ void Level1::addProjectile(const Transform& transform){
     _registry.addComponent(projectile, projectileSprite);
     _registry.addComponent(projectile, transform);
     _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = .020, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
-        _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
-    }});
-    #if DEBUG
-        _registry.addComponent(projectile, Debug{});
-    #endif
+    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = .020, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }});
+#if DEBUG
+    _registry.addComponent(projectile, Debug{});
+#endif
 }
 
 void Level1::addBug(const Transform& transform) {
@@ -202,7 +199,7 @@ void Level1::addBug(const Transform& transform) {
     _registry.addComponent(bug, transform);
     _registry.addComponent(bug, Velocity{.x = -100, .y = 0});
     _registry.addComponent(bug, Hitbox{});
-    #if DEBUG
-        _registry.addComponent(bug, Debug{});
-    #endif
+#if DEBUG
+    _registry.addComponent(bug, Debug{});
+#endif
 }

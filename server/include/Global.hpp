@@ -8,10 +8,11 @@
 #ifndef GLOBAL_HPP
 #define GLOBAL_HPP
 
-//WILL HAVE TO MOVE THIS FILE TO INCLUDE, SORRY
+// WILL HAVE TO MOVE THIS FILE TO INCLUDE, SORRY
 
+#include "NetworkAgent.hpp"
 #include <asio.hpp>
 
 inline std::vector<ClientInformations> CLIENTS{};
 
-#endif //GLOBAL_HPP
+#endif // GLOBAL_HPP

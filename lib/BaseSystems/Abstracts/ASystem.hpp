@@ -12,9 +12,9 @@
 #include <string>
 
 class ASystem {
-public:
+  public:
     ASystem(Registry& registry, const std::string name) : _registry(registry), _name(name) {}
-    virtual~ASystem() = default;
+    virtual ~ASystem() = default;
 
     /**
      * @brief Disables the system
@@ -38,11 +38,10 @@ public:
      */
     const std::string name() const { return _name; }
 
-protected:
+  protected:
     Registry& _registry;
     bool _enabled = true;
     const std::string _name;
 };
 
-#endif //ASYSTEM_HPP
-
+#endif // ASYSTEM_HPP

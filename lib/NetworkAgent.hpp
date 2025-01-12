@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <asio.hpp>
-#include <iostream>
-#include "UDPPacket.hpp"
 #include "Events.hpp"
-#include <cstdint>
+#include "UDPPacket.hpp"
 #include <SFML/Graphics.hpp>
+#include <asio.hpp>
+#include <cstdint>
+#include <iostream>
 /**
  * @brief This enum will describe what the packet is for.
  *
@@ -21,35 +21,16 @@
  *  - DISCONNECT: Disconnection packet
  *  - MESSAGE: Message packet (temporary
  *  - POSITION: Position packet (temporary)
-*/
-enum class PACKET_TYPE {
-    NONE = 0,
-    CONNECT,
-    DISCONNECT,
-    MESSAGE,
-    POSITION,
-    START,
-    YOUR_SHIP,
-    NEW_SHIP,
-    SHIP_MOVEMENT,
-    USER_INPUT,
-    NEW_PROJECTILE,
-    NEW_MONSTER,
-    MONSTER_KILLED
-};
+ */
+enum class PACKET_TYPE { NONE = 0, CONNECT, DISCONNECT, MESSAGE, POSITION, START, YOUR_SHIP, NEW_SHIP, SHIP_MOVEMENT, USER_INPUT, NEW_PROJECTILE, NEW_MONSTER, MONSTER_KILLED };
 
 struct ClientInformations {
     asio::ip::udp::endpoint endpoint;
-    enum class Type {
-        VIEWER,
-        PLAYER
-    } type;
+    enum class Type { VIEWER, PLAYER } type;
     std::string name;
     std::uint32_t id = 0;
 
-    ClientInformations(asio::ip::udp::endpoint endpoint, Type type, std::uint32_t id, std::string name = "") :
-        endpoint(endpoint), type(type), id(id)
-    {}
+    ClientInformations(asio::ip::udp::endpoint endpoint, Type type, std::uint32_t id, std::string name = "") : endpoint(endpoint), type(type), id(id) {}
 
     ClientInformations(const ClientInformations&) = default;
 
@@ -62,26 +43,24 @@ struct UserInput : public IEvent {
 };
 
 /**
- * @brief Class representation of an object connected via socket, that can receive and send packets.
+ * @brief Class representation of an object connected via socket, that can
+ * receive and send packets.
  */
-class NetworkAgent
-{
-public:
+class NetworkAgent {
+  public:
     /**
      * @brief Constructor for the NetworkAgent class
      * @param ctx The io_context
      * @param port The port to create the agent at
      */
-    NetworkAgent(asio::io_context& ctx, std::uint32_t port = 0) :
-        _socket(ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
-    {
+    NetworkAgent(asio::io_context& ctx, std::uint32_t port = 0) : _socket(ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)) {
         this->_port = this->_socket.local_endpoint().port();
         this->_receivePacket();
         std::cout << "NetworkAgent started, listening on port: " << this->_socket.local_endpoint().address().to_string() << ":" << this->_port << "..." << std::endl;
     }
     virtual ~NetworkAgent() = default;
 
-protected:
+  protected:
     /**
      * @brief Virtual method called when a packet was successfully received
      * @param src Where the packet was received from
@@ -92,54 +71,34 @@ protected:
     /**
      * @brief Stops any asio work from this agent
      */
-    void _stop()
-    {
-        this->_socket.close();
-    }
+    void _stop() { this->_socket.close(); }
 
     /**
      * @brief Try to send a message to an endpoint
      * @param dest The endpoint to send to
      * @param packet The packet to send
      */
-    void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet)
-    {
+    void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet) {
         auto serialized = packet.serialize();
-        // std::cout << "Sending packet to " << dest << " (" << serialized.size() << " bytes)" << std::endl;
-        // std::cout << "Payload: " << packet.payload << std::endl;
-        this->_socket.async_send_to(
-            asio::buffer(serialized), dest,
-            std::bind(
-                &NetworkAgent::_handleSend, this,
-                asio::placeholders::error,
-                asio::placeholders::bytes_transferred
-            )
-        );
+        // std::cout << "Sending packet to " << dest << " (" <<
+        // serialized.size() << " bytes)" << std::endl; std::cout << "Payload: "
+        // << packet.payload << std::endl;
+        this->_socket.async_send_to(asio::buffer(serialized), dest, std::bind(&NetworkAgent::_handleSend, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
     }
 
-private:
+  private:
     /**
      * @brief Private method used to start receiving a packet
      */
-    void _receivePacket()
-    {
-        this->_socket.async_receive_from(
-            asio::buffer(this->_buffer), this->_client,
-            std::bind(
-                &NetworkAgent::_handleReceive, this,
-                asio::placeholders::error,
-                asio::placeholders::bytes_transferred
-            )
-        );
-    }
+    void _receivePacket() { this->_socket.async_receive_from(asio::buffer(this->_buffer), this->_client, std::bind(&NetworkAgent::_handleReceive, this, asio::placeholders::error, asio::placeholders::bytes_transferred)); }
 
     /**
-     * @brief Handler used when receiving a packet, will determined if all went according to plan
+     * @brief Handler used when receiving a packet, will determined if all went
+     * according to plan
      * @param e Error code linked to the reception
      * @param bytes The amount of bytes received
      */
-    void _handleReceive(const std::error_code& e, std::size_t bytes)
-    {
+    void _handleReceive(const std::error_code& e, std::size_t bytes) {
         if (e)
             return;
 
@@ -160,12 +119,12 @@ private:
      * @param e Error code linked to the sending
      * @param bytes The amount of bytes sent
      */
-    void _handleSend(const std::error_code& e, std::size_t bytes)
-    {}
+    void _handleSend(const std::error_code& e, std::size_t bytes) {}
 
-protected:
+  protected:
     std::uint32_t _port = 0;
-private:
+
+  private:
     asio::ip::udp::socket _socket;
     asio::ip::udp::endpoint _client;
     std::array<char, 1024> _buffer;

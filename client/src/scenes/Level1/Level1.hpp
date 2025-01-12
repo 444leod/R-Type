@@ -10,26 +10,25 @@
 
 // From Game Engine
 #include "AScene.hpp"
-#include "Registry.hpp"
-#include "EventDispatcher.hpp"
-#include "BaseSystems/Update/ParalaxSystem.hpp"
-#include "BaseSystems/Update/MovementSystem.hpp"
-#include "BaseSystems/Update/AnimateSystem.hpp"
 #include "BaseSystems/Render/DrawSpritesSystem.hpp"
+#include "BaseSystems/Update/AnimateSystem.hpp"
+#include "BaseSystems/Update/MovementSystem.hpp"
+#include "BaseSystems/Update/ParalaxSystem.hpp"
+#include "EventDispatcher.hpp"
+#include "Registry.hpp"
 
 // Level1 specific
 #include "Components.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
-#include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
 #include "Systems/BugsMovementSystem.hpp"
+#include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
 
 #include <chrono>
 #include <memory>
 
-
 class Level1 final : public AScene {
-public:
+  public:
     Level1(ISceneManager& m, const std::string& n) : AScene(m, n) {
         _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
@@ -51,11 +50,11 @@ public:
 
     void initialize() override;
 
-    void update(double deltaTime, const sf::RenderWindow &window) override;
+    void update(double deltaTime, const sf::RenderWindow& window) override;
 
-    void render(sf::RenderWindow &window) override;
+    void render(sf::RenderWindow& window) override;
 
-    void onEvent(sf::Event &event) override;
+    void onEvent(sf::Event& event) override;
 
     void onEnter() override;
 
@@ -67,12 +66,12 @@ public:
 
     void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
 
-private:
+  private:
     void addProjectile(const Transform& transform);
     void addBug(const Transform& transform);
 
-public:
-private:
+  public:
+  private:
     EventDispatcher _eventDispatcher;
 
     asio::ip::udp::endpoint _server{};
@@ -82,7 +81,8 @@ private:
 
     std::vector<ClientInformations> _clients;
 
-    //this is temporary, if this texture get deleted, then the sprite will not be able to render
+    // this is temporary, if this texture get deleted, then the sprite will not
+    // be able to render
     sf::Texture _spaceshipTex;
     sf::Texture _projectileTex;
     sf::Texture _backgroundTex;
@@ -90,6 +90,4 @@ private:
     sf::Texture _explosionTex;
 };
 
-
-
-#endif //GAME_HPP
+#endif // GAME_HPP

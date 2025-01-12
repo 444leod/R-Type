@@ -7,25 +7,20 @@
 
 #include "WaitingRoom.hpp"
 #include "Registry.hpp"
+#include <SFML/Graphics.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <algorithm>
 #include <cmath>
 #include <config.h>
 #include <iostream>
 #include <ranges>
 #include <thread>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window/Keyboard.hpp>
 
-void WaitingRoom::initialize()
-{
-}
+void WaitingRoom::initialize() {}
 
-void WaitingRoom::update(const double deltaTime, const sf::RenderWindow &window)
-{
-}
+void WaitingRoom::update(const double deltaTime, const sf::RenderWindow& window) {}
 
-void WaitingRoom::render(sf::RenderWindow& window)
-{
+void WaitingRoom::render(sf::RenderWindow& window) {
     if (this->_id.has_value()) {
         sf::Text text;
         text.setFont(font);
@@ -45,31 +40,33 @@ void WaitingRoom::render(sf::RenderWindow& window)
     }
 }
 
-void WaitingRoom::onEvent(sf::Event &event)
-{
+void WaitingRoom::onEvent(sf::Event& event) {
     switch (event.type) {
-        case sf::Event::KeyPressed:
-            switch (event.key.code) {
-                case sf::Keyboard::Space:
-                    break;
-                case sf::Keyboard::B: {
-                     break;
-                }
-                default:
-                    // _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = true});
-                    break;
-            }
+    case sf::Event::KeyPressed:
+        switch (event.key.code) {
+        case sf::Keyboard::Space:
             break;
-        case sf::Event::KeyReleased:
-            switch (event.key.code) {
-                default:
-                    // _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = false});
-                    break;
-            }
+        case sf::Keyboard::B: {
             break;
-        case sf::Event::MouseButtonPressed:
+        }
+        default:
+            // _eventDispatcher.broadcast(movement_event{.key = event.key.code,
+            // .pressed = true});
             break;
-        default:break;
+        }
+        break;
+    case sf::Event::KeyReleased:
+        switch (event.key.code) {
+        default:
+            // _eventDispatcher.broadcast(movement_event{.key = event.key.code,
+            // .pressed = false});
+            break;
+        }
+        break;
+    case sf::Event::MouseButtonPressed:
+        break;
+    default:
+        break;
     }
 }
 
@@ -103,23 +100,17 @@ void WaitingRoom::onEnter() {
     _manager.send(SERVER, packet);
 }
 
-void WaitingRoom::onEnter(const AScene& lastScene)
-{
-}
+void WaitingRoom::onEnter(const AScene& lastScene) {}
 
-void WaitingRoom::onExit()
-{
-}
+void WaitingRoom::onExit() {}
 
-void WaitingRoom::onExit(const AScene& nextScene)
-{
-}
+void WaitingRoom::onExit(const AScene& nextScene) {}
 
-void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet)
-{
+void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
     const auto payload = packet.payload;
 
-    // std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
+    // std::cout << "Received: " << payload << " (seq: " <<
+    // packet.sequence_number
     //           << ", ack: " << packet.ack_number << ")" << std::endl;
 
     PACKET_TYPE packet_type{};
@@ -128,13 +119,9 @@ void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket
         _packet_handlers.at(packet_type)(packet);
 }
 
-void WaitingRoom::send(const UDPPacket& packet)
-{
-    _manager.send(SERVER, packet);
-}
+void WaitingRoom::send(const UDPPacket& packet) { _manager.send(SERVER, packet); }
 
-void WaitingRoom::_onConnect(UDPPacket& packet)
-{
+void WaitingRoom::_onConnect(UDPPacket& packet) {
 
     std::uint32_t id;
     packet >> id;
@@ -143,21 +130,18 @@ void WaitingRoom::_onConnect(UDPPacket& packet)
     std::cout << "Connected to the server" << std::endl;
 }
 
-void WaitingRoom::_onDisconnect(UDPPacket& packet)
-{
+void WaitingRoom::_onDisconnect(UDPPacket& packet) {
     std::cout << "Disconnection from the server" << std::endl;
     _manager.stop();
 }
 
-void WaitingRoom::_onMessage(UDPPacket& packet)
-{
+void WaitingRoom::_onMessage(UDPPacket& packet) {
     std::string message;
     packet >> message;
     std::cout << "Message from " << SERVER << ": " << message << std::endl;
 }
 
-void WaitingRoom::_onStart(UDPPacket& packet)
-{
+void WaitingRoom::_onStart(UDPPacket& packet) {
     std::cout << "Game starting..." << std::endl;
     _manager.load("Level1");
 }

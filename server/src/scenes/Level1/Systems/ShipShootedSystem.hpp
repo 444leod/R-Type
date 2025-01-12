@@ -8,21 +8,19 @@
 #ifndef SHIPSHOOTEDSYSTEM_HPP_
 #define SHIPSHOOTEDSYSTEM_HPP_
 
-
+#include "../Events/PacketInformations.hpp"
 #include "BaseSystems/Abstracts/ASystem.hpp"
 #include "ISceneManager.hpp"
-#include "../Events/PacketInformations.hpp"
 #include <SFML/Graphics.hpp>
 
-class ShipShootedSystem final : public ASystem
-{
-public:
-    ShipShootedSystem(Registry &registry, ISceneManager &_manager) : ASystem(registry, "ShipShootedSystem"), _manager(_manager) {}
+class ShipShootedSystem final : public ASystem {
+  public:
+    ShipShootedSystem(Registry& registry, ISceneManager& _manager) : ASystem(registry, "ShipShootedSystem"), _manager(_manager) {}
 
-    void execute(const PacketInformations &event, const sf::Texture &_projectileTex);
-    
-private:
-    ISceneManager &_manager;
+    void execute(const PacketInformations& event, const sf::Texture& _projectileTex);
+
+  private:
+    ISceneManager& _manager;
 };
 
 #endif /* !SHIPSHOOTEDSYSTEM_HPP_ */

@@ -10,24 +10,20 @@
 
 #include "../Components.hpp"
 #include "EventDispatcher.hpp"
-#include "Registry.hpp"
 #include "NetworkAgent.hpp"
+#include "Registry.hpp"
 
 #include <SFML/Window/Keyboard.hpp>
 
 class InputHandler : public EventHandler<UserInput> {
-public:
+  public:
     explicit InputHandler(Registry& registry) : _registry(registry) {}
     ~InputHandler() override = default;
 
-    void receive(const UserInput& event) override {
-    }
+    void receive(const UserInput& event) override {}
 
-
-private:
+  private:
     Registry& _registry;
 };
 
-
-
-#endif //PLAYERMOVEMENT_HPP
+#endif // PLAYERMOVEMENT_HPP

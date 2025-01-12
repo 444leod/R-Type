@@ -8,13 +8,15 @@
 #ifndef SPARSESET_HPP
 #define SPARSESET_HPP
 
-#include <vector>
-#include <cstdint>
-#include <stdexcept>
 #include "Entity.hpp"
+#include "Family.hpp"
+#include <cstdint>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
 
 class ISparseSet {
-public:
+  public:
     virtual ~ISparseSet() = default;
 
     [[nodiscard]] virtual bool contains(const Entity& entity) const noexcept = 0;
@@ -31,33 +33,25 @@ public:
  * @brief Class representation of a Sparse Set
  * @tparam T The type of data to be held
  */
-template<typename T>
-class SparseSet final : public ISparseSet
-{
-public:
+template <typename T> class SparseSet final : public ISparseSet {
+  public:
     SparseSet() = default;
     ~SparseSet() override = default;
 
-public:
+  public:
     /**
      * @brief Check if the entity is contained in the set
      * @param entity The entity to check for
      * @return `true` if the entity is in the set. `false` otherwise
      */
-    [[nodiscard]] bool contains(const Entity& entity) const noexcept override
-    {
-        return entity < this->_sparse.size()
-            && this->_sparse[entity] < this->_dense.size()
-            && entity == this->_dense[this->_sparse[entity]];
-    }
+    [[nodiscard]] bool contains(const Entity& entity) const noexcept override { return entity < this->_sparse.size() && this->_sparse[entity] < this->_dense.size() && entity == this->_dense[this->_sparse[entity]]; }
 
     /**
      * @brief Gets the component linked to an entity
      * @param entity The entity to get the component of
      * @return A reference to an entiy
      */
-    [[nodiscard]] T& at(const Entity& entity)
-    {
+    [[nodiscard]] T& at(const Entity& entity) {
         if (!this->contains(entity))
             throw std::out_of_range("Entity " + std::to_string(entity) + " is not in the set");
         return this->_components[this->_sparse[entity]];
@@ -68,8 +62,7 @@ public:
      * @param entity The entity to set the component to
      * @param component The component
      */
-    void set(const Entity& entity, T component)
-    {
+    void set(const Entity& entity, T component) {
         if (this->contains(entity)) {
             this->_components[this->_sparse[entity]] = component;
         } else {
@@ -84,8 +77,7 @@ public:
      * @brief Remove an entity from a set
      * @param entity The entity to remove from the set
      */
-    void remove(const Entity& entity) override
-    {
+    void remove(const Entity& entity) override {
         if (!this->contains(entity))
             return;
 
@@ -104,8 +96,7 @@ public:
     /**
      * @brief Clears the entire set
      */
-    void clear() noexcept override
-    {
+    void clear() noexcept override {
         this->_sparse.clear();
         this->_dense.clear();
         this->_components.clear();
@@ -127,26 +118,24 @@ public:
      */
     [[nodiscard]] std::size_t capacity() const noexcept override { return this->_sparse.capacity(); }
 
-    void display() const override
-    {
-      if (this->_dense.empty()) {
-        return;
-      }
-      std::cout << type<T>::name() << " set:" << std::endl;
-      std::cout << "Index | Dense Index | Dense Content | Component" << std::endl;
-      for (std::size_t i = 0; i < this->_dense.size(); i++) {
-        std::cout << i << "    | sparse[" << i << "] = " << this->_sparse[i] << " | dense[" << i << "] = " << this->_dense[i] << " | component = " << &this->_components[i] << std::endl;
-      }
+    void display() const override {
+        if (this->_dense.empty()) {
+            return;
+        }
+        std::cout << type<T>::name() << " set:" << std::endl;
+        std::cout << "Index | Dense Index | Dense Content | Component" << std::endl;
+        for (std::size_t i = 0; i < this->_dense.size(); i++) {
+            std::cout << i << "    | sparse[" << i << "] = " << this->_sparse[i] << " | dense[" << i << "] = " << this->_dense[i] << " | component = " << &this->_components[i] << std::endl;
+        }
     }
 
-private:
+  private:
     /**
      * @brief Adds an entity in the Sparse if it can, resize otherwise
      * @param entity The entity to add to
      * @param value The value to set to the entity id
      */
-    void _add_in_sparse(const Entity& entity, std::size_t value)
-    {
+    void _add_in_sparse(const Entity& entity, std::size_t value) {
         if (this->_sparse.capacity() <= entity) {
             this->_sparse.resize(this->_compute_resize(entity));
         }
@@ -157,8 +146,7 @@ private:
      * @brief O1 method to compute the necessary size a vector should have (2^n)
      * @param k The minimum size
      */
-    [[nodiscard]] static std::size_t _compute_resize(std::size_t k)
-    {
+    [[nodiscard]] static std::size_t _compute_resize(std::size_t k) {
         if (k == 0)
             return 1;
         k |= k >> 1;
@@ -177,18 +165,16 @@ private:
      * @param a The first value to swap
      * @param b The second value to swap
      */
-    template<typename U>
-    static void _swap(U& a, U& b)
-    {
+    template <typename U> static void _swap(U& a, U& b) {
         U tmp = a;
         a = b;
         b = tmp;
     }
 
-private:
-    std::vector<std::size_t> _sparse = { };
+  private:
+    std::vector<std::size_t> _sparse = {};
     std::vector<Entity> _dense = {};
     std::vector<T> _components = {};
 };
 
-#endif //SPARSESET_HPP
+#endif // SPARSESET_HPP

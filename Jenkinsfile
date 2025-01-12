@@ -45,6 +45,26 @@ pipeline {
         stage('Parallel Builds') {
             failFast false
             parallel {
+                stage('Format') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            args '-u root'
+                        }
+                    }
+                    stages {
+                        stage('Check Format') {
+                            steps {
+                                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                                    sh '''
+                                        chmod +x ./scripts/check_format.sh
+                                        ./scripts/check_format.sh
+                                    '''
+                                }
+                            }
+                        }
+                    }
+                }
                 stage('Documentation') {
                     when {
                         branch 'main'
@@ -159,9 +179,6 @@ pipeline {
                             }
                         }
                         stage('Prepare Linux Release') {
-                            when {
-                                expression { releaseTag != null }
-                            }
                             steps {
                                 script {
                                     sh """
@@ -172,18 +189,22 @@ pipeline {
                             }
                         }
                         stage('Upload Linux Artifacts') {
-                            when {
-                                expression { releaseTag != null }
-                            }
                             steps {
                                 script {
-                                    sh """
-                                        chmod +x ./scripts/upload_artifacts.sh
-                                        RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
-                                    """
+                                    if (env.BRANCH_NAME == 'main' && releaseTag != null) {
+                                        sh """
+                                            chmod +x ./scripts/upload_artifacts.sh
+                                            RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
+                                        """
+                                    }
                                     archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
                                 }
                             }
+                        }
+                    }
+                    post {
+                        always {
+                            sh 'rm -rf ./* ./.git*'
                         }
                     }
                 }
@@ -225,9 +246,6 @@ pipeline {
                             }
                         }
                         stage('Prepare Windows Release') {
-                            when {
-                                expression { releaseTag != null }
-                            }
                             steps {
                                 script {
                                     sh """
@@ -238,18 +256,81 @@ pipeline {
                             }
                         }
                         stage('Upload Windows Artifacts') {
-                            when {
-                                expression { releaseTag != null }
-                            }
                             steps {
                                 script {
-                                    sh """
-                                        chmod +x ./scripts/upload_artifacts.sh
-                                        RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
-                                    """
+                                    if (env.BRANCH_NAME == 'main' && releaseTag != null) {
+                                        sh """
+                                            chmod +x ./scripts/upload_artifacts.sh
+                                            RELEASE_TAG='${releaseTag}' ./scripts/upload_artifacts.sh
+                                        """
+                                    }
                                     archiveArtifacts artifacts: 'r-type_*.tar.gz', fingerprint: true
                                 }
                             }
+                        }
+                    }
+                    post {
+                        always {
+                            sh 'rm -rf ./* ./.git*'
+                        }
+                    }
+                }
+            }
+        }
+        stage('Parallel Tidy Checks') {
+            failFast false
+            parallel {
+                stage('Tidy Client') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            args '-u root'
+                        }
+                    }
+                    steps {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            sh '''
+                                chmod +x ./scripts/prepare_tidy.sh
+                                chmod +x ./scripts/check_tidy_path.sh
+                                ./scripts/prepare_tidy.sh
+                                ./scripts/check_tidy_path.sh client
+                            '''
+                        }
+                    }
+                }
+                stage('Tidy Server') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            args '-u root'
+                        }
+                    }
+                    steps {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            sh '''
+                                chmod +x ./scripts/prepare_tidy.sh
+                                chmod +x ./scripts/check_tidy_path.sh
+                                ./scripts/prepare_tidy.sh
+                                ./scripts/check_tidy_path.sh server
+                            '''
+                        }
+                    }
+                }
+                stage('Tidy Commons') {
+                    agent {
+                        docker {
+                            image 'ghcr.io/a9ex/ubuntu-24-mingw:conan-deps'
+                            args '-u root'
+                        }
+                    }
+                    steps {
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                            sh '''
+                                chmod +x ./scripts/prepare_tidy.sh
+                                chmod +x ./scripts/check_tidy_path.sh
+                                ./scripts/prepare_tidy.sh
+                                ./scripts/check_tidy_path.sh lib
+                            '''
                         }
                     }
                 }
@@ -258,8 +339,7 @@ pipeline {
     }
     post {
         always {
-            sh 'sudo chmod -R 777 .'
-            cleanWs()
+            sh 'sudo rm -rf ./* ./.git*'
             echo "Pipeline OK"
         }
         failure {

@@ -10,32 +10,32 @@
 
 // From Game Engine
 #include "AScene.hpp"
-#include "Registry.hpp"
-#include "EventDispatcher.hpp"
 #include "BaseComponents.hpp"
-#include "BaseSystems/Update/ParalaxSystem.hpp"
-#include "BaseSystems/Update/MovementSystem.hpp"
-#include "BaseSystems/Update/AnimateSystem.hpp"
 #include "BaseSystems/Render/DrawSpritesSystem.hpp"
+#include "BaseSystems/Update/AnimateSystem.hpp"
+#include "BaseSystems/Update/MovementSystem.hpp"
+#include "BaseSystems/Update/ParalaxSystem.hpp"
+#include "EventDispatcher.hpp"
+#include "Registry.hpp"
 
 // Level1 specific
 #include "Components.hpp"
 #include "Events/InputHandler.hpp"
 #include "Events/PacketHandler.hpp"
-#include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
 #include "Systems/BugsMovementSystem.hpp"
+#include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
 
 #include <chrono>
 
 class Level1 final : public AScene {
-public:
+  public:
     Level1(ISceneManager& m, const std::string& n) : AScene(m, n) {
         _spaceshipTex.loadFromFile("assets/r-typesheet42.gif", sf::IntRect(0, 0, 34, 18));
         _projectileTex.loadFromFile("assets/r-typesheet1.gif", sf::IntRect(0, 91, 48, 16));
         _backgroundTex.loadFromFile("assets/rtype-background.png", sf::IntRect(0, 243, 3072, 205));
         _bugTex.loadFromFile("assets/r-typesheet8.gif");
         _explosionTex.loadFromFile("assets/r-typesheet44.gif", sf::IntRect(131, 0, 192, 32));
-//        _eventDispatcher.link<movement_event>(&_playerMovement);
+        //        _eventDispatcher.link<movement_event>(&_playerMovement);
         _eventDispatcher.link<PacketInformations>(&_packetHandler);
         // systems
         // update systems
@@ -50,11 +50,11 @@ public:
 
     void initialize() override;
 
-    void update(double deltaTime, const sf::RenderWindow &window) override;
+    void update(double deltaTime, const sf::RenderWindow& window) override;
 
-    void render(sf::RenderWindow &window) override;
+    void render(sf::RenderWindow& window) override;
 
-    void onEvent(sf::Event &event) override;
+    void onEvent(sf::Event& event) override;
 
     void onEnter() override;
 
@@ -66,11 +66,11 @@ public:
 
     void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
 
-private:
+  private:
     void addBug(const Transform& transform);
 
-public:
-private:
+  public:
+  private:
     float _bugTimer = 0.f;
     std::uint32_t _enemyId = 0;
     EventDispatcher _eventDispatcher;
@@ -78,7 +78,8 @@ private:
     InputHandler _inputHandler{_registry};
     PacketHandler _packetHandler{_registry, _manager};
 
-    //this is temporary, if this texture get deleted, then the sprite will not be able to render
+    // this is temporary, if this texture get deleted, then the sprite will not
+    // be able to render
     sf::Texture _spaceshipTex;
     sf::Texture _projectileTex;
     sf::Texture _backgroundTex;
@@ -86,6 +87,4 @@ private:
     sf::Texture _explosionTex;
 };
 
-
-
-#endif //GAME_HPP
+#endif // GAME_HPP

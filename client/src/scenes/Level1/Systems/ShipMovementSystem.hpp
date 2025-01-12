@@ -8,24 +8,22 @@
 #ifndef SHIPMOVEMENTSYSTEM_HPP_
 #define SHIPMOVEMENTSYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
 #include "../Components.hpp"
-#include <config.h>
 #include "../Events/PacketInformations.hpp"
+#include "BaseComponents.hpp"
+#include "BaseSystems/Abstracts/ASystem.hpp"
+#include <config.h>
 
-class ShipMovementSystem final : public ASystem
-{
-public:
-    ShipMovementSystem(Registry &registry) : ASystem(registry, "ShipMovementSystem") {}
+class ShipMovementSystem final : public ASystem {
+  public:
+    ShipMovementSystem(Registry& registry) : ASystem(registry, "ShipMovementSystem") {}
 
-    void execute(const PacketInformations &event) {
+    void execute(const PacketInformations& event) {
         std::uint32_t id;
         Velocity velocity{};
         Transform position{};
         event.packet >> id >> velocity >> position;
-        for (auto &[entity, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>().each())
-        {
+        for (auto& [entity, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>().each()) {
             if (ship.id != id)
                 continue;
             vel = velocity;

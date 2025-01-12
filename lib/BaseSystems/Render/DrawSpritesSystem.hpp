@@ -8,30 +8,27 @@
 #ifndef DRAWSPRITESSYSTEM_HPP_
 #define DRAWSPRITESSYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ARenderSystem.hpp"
 #include "BaseComponents.hpp"
+#include "BaseSystems/Abstracts/ARenderSystem.hpp"
 
-#include <algorithm>
 #include <SFML/Graphics.hpp>
+#include <algorithm>
 #include <ranges>
 
-class DrawSpritesSystem final : public ARenderSystem
-{
-public:
-    DrawSpritesSystem(Registry &registry, const std::string name = "DrawSpritesSystem") : ARenderSystem(registry, name) {}
+class DrawSpritesSystem final : public ARenderSystem {
+  public:
+    DrawSpritesSystem(Registry& registry, const std::string name = "DrawSpritesSystem") : ARenderSystem(registry, name) {}
 
-    void execute(sf::RenderWindow &window) override {
+    void execute(sf::RenderWindow& window) override {
         auto vec = std::vector<std::tuple<Entity, sf::Sprite, Transform>>{};
 
-        _registry.view<sf::Sprite, Transform>().each([&](const Entity& entity, sf::Sprite &sprite, Transform &transform) {
+        _registry.view<sf::Sprite, Transform>().each([&](const Entity& entity, sf::Sprite& sprite, Transform& transform) {
             vec.emplace_back(entity, sprite, transform);
             sprite.setPosition(transform.x, transform.y);
             sprite.setRotation(transform.rotation);
         });
 
-        std::ranges::sort(vec, [](const auto& a, const auto& b) {
-            return std::get<2>(a).z < std::get<2>(b).z;
-        });
+        std::ranges::sort(vec, [](const auto& a, const auto& b) { return std::get<2>(a).z < std::get<2>(b).z; });
 
         for (const auto& [entity, sprite, _] : vec) {
             window.draw(sprite);

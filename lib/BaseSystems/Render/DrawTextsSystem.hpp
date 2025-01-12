@@ -8,17 +8,16 @@
 #ifndef DRAWTEXTSSYSTEM_HPP_
 #define DRAWTEXTSSYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ARenderSystem.hpp"
 #include "BaseComponents.hpp"
+#include "BaseSystems/Abstracts/ARenderSystem.hpp"
 
 #include <SFML/Graphics.hpp>
 
-class DrawTextsSystem final : public ARenderSystem
-{
-public:
-    DrawTextsSystem(Registry &registry, const std::string name = "DrawTextsSystem") : ARenderSystem(registry, name) {}
+class DrawTextsSystem final : public ARenderSystem {
+  public:
+    DrawTextsSystem(Registry& registry, const std::string name = "DrawTextsSystem") : ARenderSystem(registry, name) {}
 
-    void execute(sf::RenderWindow &window) override {
+    void execute(sf::RenderWindow& window) override {
         _registry.view<Position, Text>().each([&](const auto& entity, auto& pos, auto& renderable) {
             renderable.text.setPosition(pos.x, pos.y);
             window.draw(renderable.text);

@@ -9,11 +9,11 @@
 #define WAITING_ROOM_HPP
 
 #include "AScene.hpp"
-#include "Registry.hpp"
-#include "EventDispatcher.hpp"
 #include "BaseComponents.hpp"
 #include "BaseSystems/Render/DrawTextsSystem.hpp"
+#include "EventDispatcher.hpp"
 #include "NetworkedScene.hpp"
+#include "Registry.hpp"
 
 #include "Systems/DrawMenuButtonsSystem.hpp"
 
@@ -28,20 +28,19 @@ inline sf::Font get_default_font() {
 }
 
 class WaitingRoom final : public AScene {
-public:
-    WaitingRoom(ISceneManager& m, const std::string& n) : AScene(m, n)
-    {
+  public:
+    WaitingRoom(ISceneManager& m, const std::string& n) : AScene(m, n) {
         this->_renderSystems.push_back(std::make_unique<DrawTextsSystem>(_registry));
         this->_renderSystems.push_back(std::make_unique<DrawMenuButtonsSystem>(_registry));
     }
 
     void initialize() override;
 
-    void update(double deltaTime, const sf::RenderWindow &window) override;
+    void update(double deltaTime, const sf::RenderWindow& window) override;
 
-    void render(sf::RenderWindow &window) override;
+    void render(sf::RenderWindow& window) override;
 
-    void onEvent(sf::Event &event) override;
+    void onEvent(sf::Event& event) override;
 
     void onEnter() override;
 
@@ -52,8 +51,8 @@ public:
     void onExit(const AScene& nextScene) override;
 
     void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
-private:
 
+  private:
     void _onConnect(const ClientInformations& src, UDPPacket& packet);
     void _onDisconnect(const ClientInformations& src, UDPPacket& packet);
     void _onMessage(const ClientInformations& src, UDPPacket& packet);
@@ -63,29 +62,20 @@ private:
 
     void _broadcast(const UDPPacket& packet);
 
-
-public:
-private:
+  public:
+  private:
     Registry _registry;
     EventDispatcher _eventDispatcher;
 
     sf::Font font = get_default_font();
 
-    std::map<PACKET_TYPE, std::function<void(const ClientInformations& client, UDPPacket& packet)>> _packet_handlers = {
-        {PACKET_TYPE::CONNECT,      [this](const ClientInformations& src, UDPPacket& packet)   { this->_onConnect(src, packet); }},
-        {PACKET_TYPE::DISCONNECT,   [this](const ClientInformations& src, UDPPacket& packet)   { this->_onDisconnect(src, packet); }},
-        {PACKET_TYPE::MESSAGE,      [this](const ClientInformations& src, UDPPacket& packet)   { this->_onMessage(src, packet); }}
-    };
+    std::map<PACKET_TYPE, std::function<void(const ClientInformations& client, UDPPacket& packet)>> _packet_handlers = {{PACKET_TYPE::CONNECT, [this](const ClientInformations& src, UDPPacket& packet) { this->_onConnect(src, packet); }},
+        {PACKET_TYPE::DISCONNECT, [this](const ClientInformations& src, UDPPacket& packet) { this->_onDisconnect(src, packet); }}, {PACKET_TYPE::MESSAGE, [this](const ClientInformations& src, UDPPacket& packet) { this->_onMessage(src, packet); }}};
 
     std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
-        {"exit",    [this](const std::vector<std::string>& args) { this->_onExit(args); }},
-        {"start",   [this](const std::vector<std::string>& args) { this->_onStart(args); }},
-        {"",        [this](const std::vector<std::string>& args) { }}
-    };
+        {"exit", [this](const std::vector<std::string>& args) { this->_onExit(args); }}, {"start", [this](const std::vector<std::string>& args) { this->_onStart(args); }}, {"", [this](const std::vector<std::string>& args) {}}};
 
     // PlayerMovement _playerMovement{_registry};
 };
 
-
-
-#endif //GAME_HPP
+#endif // GAME_HPP

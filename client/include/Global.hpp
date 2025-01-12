@@ -12,4 +12,4 @@
 
 inline asio::ip::udp::endpoint SERVER{};
 
-#endif //GLOBAL_HPP
+#endif // GLOBAL_HPP

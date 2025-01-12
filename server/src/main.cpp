@@ -8,19 +8,15 @@
 #include <thread>
 // #include "Server.hpp"
 #include "SceneManager.hpp"
-#include "scenes/WaitingRoom/WaitingRoom.hpp"
 #include "scenes/Level1/Level1.hpp"
+#include "scenes/WaitingRoom/WaitingRoom.hpp"
 
-int main(void)
-{
+int main(void) {
     asio::io_context ctx;
     std::unique_ptr<std::thread> t;
-    try
-    {
+    try {
         SceneManager sceneManager(ctx, 25565);
-        t = std::make_unique<std::thread>([&ctx](){
-            ctx.run();
-        });
+        t = std::make_unique<std::thread>([&ctx]() { ctx.run(); });
         sceneManager.registerScene<WaitingRoom>("WaitingRoom");
         sceneManager.registerScene<Level1>("Level1");
         sceneManager.load("WaitingRoom");

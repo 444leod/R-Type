@@ -8,15 +8,14 @@
 #ifndef MOVEMENTBUGSSYSTEM_HPP_
 #define MOVEMENTBUGSSYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
-#include "BaseComponents.hpp"
 #include "../Components.hpp"
+#include "BaseComponents.hpp"
+#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 #include <cmath>
 
-class BugsMovementSystem final : public AUpdateSystem
-{
-public:
-    BugsMovementSystem(Registry &registry) : AUpdateSystem(registry, "BugsMovementSystem") {}
+class BugsMovementSystem final : public AUpdateSystem {
+  public:
+    BugsMovementSystem(Registry& registry) : AUpdateSystem(registry, "BugsMovementSystem") {}
 
     void execute(const double deltaTime) override {
         _registry.view<Bug, sf::Sprite, Transform>().each([&](const Entity& entity, Bug& bug, sf::Sprite& sprite, Transform& transform) {

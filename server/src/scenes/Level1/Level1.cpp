@@ -5,35 +5,35 @@
 ** Game.cpp
 */
 
+#include "Level1.hpp"
+#include "Global.hpp"
+#include "NetworkAgent.hpp"
+#include "Registry.hpp"
+#include <SFML/Graphics.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <algorithm>
 #include <cmath>
 #include <config.h>
 #include <iostream>
 #include <ranges>
 #include <thread>
-#include <SFML/Graphics.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include "Level1.hpp"
-#include "Registry.hpp"
-#include "NetworkAgent.hpp"
-#include "Global.hpp"
 
 void Level1::initialize() {}
 
-void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
+void Level1::update(const double deltaTime, const sf::RenderWindow& window) {
     _executeUpdateSystems(deltaTime);
 
     // HandleEnemyProjectileCollisionSystem
     // RTYPE SPECIFIC
     //! USES _manager but manager should not be passed to systems
-    _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy&e_enemy, const sf::Sprite& sprite, const Transform& transform)  {
-        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&p_projectile, const Transform& projectile_transform) {
+    _registry.view<Enemy, sf::Sprite, Transform>().each([&](const Entity& enemy, const Enemy& e_enemy, const sf::Sprite& sprite, const Transform& transform) {
+        _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile& p_projectile, const Transform& projectile_transform) {
             if (!sprite.getGlobalBounds().intersects(sf::FloatRect(projectile_transform.x, projectile_transform.y, 16, 16)))
                 return;
 
             UDPPacket packet;
             packet << PACKET_TYPE::MONSTER_KILLED << e_enemy.id << p_projectile.id;
-            for (auto client: CLIENTS)
+            for (auto client : CLIENTS)
                 _manager.send(client.endpoint, packet);
 
             const auto explosion = _registry.create();
@@ -44,12 +44,10 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
             explosionSprite.setPosition(projectile_transform.x, projectile_transform.y);
             _registry.addComponent(explosion, explosionSprite);
             _registry.addComponent(explosion, Transform{.x = projectile_transform.x, .y = projectile_transform.y, .z = 1, .rotation = 0});
-            _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .frameDuration = 0.1, .frameCount = 6, .loop = false, .onEnd = [&](Entity entity){
-                _registry.remove(entity);
-            }});
-            #if DEBUG
-                _registry.addComponent(explosion, Debug{});
-            #endif
+            _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .frameDuration = 0.1, .frameCount = 6, .loop = false, .onEnd = [&](Entity entity) { _registry.remove(entity); }});
+#if DEBUG
+            _registry.addComponent(explosion, Debug{});
+#endif
 
             _registry.remove(enemy);
             _registry.remove(projectile);
@@ -57,8 +55,7 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
     });
 
     this->_bugTimer -= deltaTime;
-    if (this->_bugTimer < 0)
-    {
+    if (this->_bugTimer < 0) {
         this->_bugTimer = 5.f;
         this->addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
     }
@@ -70,7 +67,8 @@ void Level1::update(const double deltaTime, const sf::RenderWindow &window) {
 void Level1::render(sf::RenderWindow& window) {
     _executeRenderSystems(window);
 
-    // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const sf::Sprite& sprite) {
+    // _registry.view<Hitbox, sf::Sprite>().each([&](const Hitbox&, const
+    // sf::Sprite& sprite) {
     //     auto bounds = sprite.getGlobalBounds();
     //     sf::RectangleShape hitbox(sf::Vector2f(bounds.width, bounds.height));
     //     hitbox.setPosition(sprite.getPosition());
@@ -82,7 +80,7 @@ void Level1::render(sf::RenderWindow& window) {
     //     window.draw(hitbox);
     // });
 
-    #if DEBUG
+#if DEBUG
     sf::Text text;
     text.setFont(font);
     text.setCharacterSize(30);
@@ -92,28 +90,29 @@ void Level1::render(sf::RenderWindow& window) {
         text.setPosition(transform.x, transform.y);
         window.draw(text);
     });
-    #endif
+#endif
 }
 
-void Level1::onEvent(sf::Event &event) {
+void Level1::onEvent(sf::Event& event) {
     switch (event.type) {
-        case sf::Event::KeyPressed:
-            switch (event.key.code) {
-                default:
-                    _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = true});
-                    break;
-            }
+    case sf::Event::KeyPressed:
+        switch (event.key.code) {
+        default:
+            _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = true});
             break;
-        case sf::Event::KeyReleased:
-            switch (event.key.code) {
-                default:
-                    _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = false});
-                    break;
-            }
+        }
+        break;
+    case sf::Event::KeyReleased:
+        switch (event.key.code) {
+        default:
+            _eventDispatcher.broadcast(UserInput{.key = event.key.code, .pressed = false});
             break;
-        case sf::Event::MouseButtonPressed:
-            break;
-        default:break;
+        }
+        break;
+    case sf::Event::MouseButtonPressed:
+        break;
+    default:
+        break;
     }
 }
 
@@ -130,9 +129,9 @@ void Level1::onEnter() {
     _registry.addComponent(spaceship, Self{});
     _registry.addComponent(spaceship, Hitbox{});
     _registry.addComponent(spaceship, Velocity{.x = 0, .y = 0});
-    #if DEBUG
-        _registry.addComponent(spaceship, Debug{});
-    #endif
+#if DEBUG
+    _registry.addComponent(spaceship, Debug{});
+#endif
 
     const auto background = _registry.create();
 
@@ -144,8 +143,7 @@ void Level1::onEnter() {
     _registry.addComponent(background, Parallax{});
 }
 
-void Level1::onEnter(const AScene& lastScene)
-{
+void Level1::onEnter(const AScene& lastScene) {
     for (const auto& client : CLIENTS) {
         std::cout << "Client " << client.id << " connected" << std::endl;
         std::cout << "Endpoint: " << client.endpoint << std::endl;
@@ -163,12 +161,12 @@ void Level1::onEnter(const AScene& lastScene)
         const auto spaceship = _registry.create();
         _registry.addComponent(spaceship, spaceshipSprite);
         _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
-        _registry.addComponent(spaceship, Ship{ .id = client.id });
+        _registry.addComponent(spaceship, Ship{.id = client.id});
         _registry.addComponent(spaceship, Hitbox{});
         _registry.addComponent(spaceship, Velocity{.x = 0, .y = 0});
-        #if DEBUG
-            _registry.addComponent(spaceship, Debug{});
-        #endif
+#if DEBUG
+        _registry.addComponent(spaceship, Debug{});
+#endif
 
         {
             UDPPacket packet;
@@ -195,8 +193,7 @@ void Level1::onEnter(const AScene& lastScene)
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 }
 
-void Level1::onExit()
-{
+void Level1::onExit() {
     UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 
@@ -205,28 +202,26 @@ void Level1::onExit()
     }
 }
 
-void Level1::onExit(const AScene& nextScene)
-{
-}
+void Level1::onExit(const AScene& nextScene) {}
 
 void Level1::onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) {
-        auto type = PACKET_TYPE{};
-        packet >> type;
+    auto type = PACKET_TYPE{};
+    packet >> type;
 
-        auto begin = CLIENTS.begin();
+    auto begin = CLIENTS.begin();
 
-        while (begin != CLIENTS.end()) {
-            if (begin->endpoint == src) {
-                break;
-            }
-            begin++;
+    while (begin != CLIENTS.end()) {
+        if (begin->endpoint == src) {
+            break;
         }
+        begin++;
+    }
 
-        if (begin == CLIENTS.end()) {
-            return;
-        }
+    if (begin == CLIENTS.end()) {
+        return;
+    }
 
-        _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet, .source = *begin});
+    _eventDispatcher.broadcast(PacketInformations{.type = type, .packet = packet, .source = *begin});
 }
 
 void Level1::addBug(const Transform& transform) {
@@ -238,17 +233,17 @@ void Level1::addBug(const Transform& transform) {
     bugSprite.setPosition(transform.x, transform.y);
     _registry.addComponent(bug, bugSprite);
     _registry.addComponent(bug, Bug{});
-    _registry.addComponent(bug, Enemy{ .id = _enemyId });
+    _registry.addComponent(bug, Enemy{.id = _enemyId});
     _registry.addComponent(bug, transform);
     _registry.addComponent(bug, Velocity{.x = -100, .y = 0});
     _registry.addComponent(bug, Hitbox{});
-    #if DEBUG
-        _registry.addComponent(bug, Debug{});
-    #endif
+#if DEBUG
+    _registry.addComponent(bug, Debug{});
+#endif
 
     UDPPacket packet;
     packet << PACKET_TYPE::NEW_MONSTER << _enemyId << transform;
-    for (auto client: CLIENTS)
-        _manager.send(client.endpoint,  packet);
+    for (auto client : CLIENTS)
+        _manager.send(client.endpoint, packet);
     _enemyId++;
 }

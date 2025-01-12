@@ -5,26 +5,26 @@
 ** Client
 */
 
-#include <iostream>
+#include "NetworkAgent.hpp"
 #include <SFML/Graphics.hpp>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <optional>
-#include "NetworkAgent.hpp"
 
 #pragma once
 
 /**
- * @brief Client representation of a network Client, receives updates from a Server and sends it some
+ * @brief Client representation of a network Client, receives updates from a
+ * Server and sends it some
  */
-class Client: public NetworkAgent
-{
-public:
+class Client : public NetworkAgent {
+  public:
     /**
      * @brief Constructor for the Client class
      * @param ctx The io_context to add the client's work to
      */
-    Client(asio::io_context& ctx): NetworkAgent(ctx) {}
+    Client(asio::io_context& ctx) : NetworkAgent(ctx) {}
     ~Client() override = default;
 
     /**
@@ -32,8 +32,7 @@ public:
      * @param host The server's address
      * @param port The server's port
      */
-    void run(const std::string& host, std::uint32_t port)
-    {
+    void run(const std::string& host, std::uint32_t port) {
         this->_running = true;
         const auto addr = asio::ip::address::from_string(host);
         this->_server = asio::ip::udp::endpoint(addr, port);
@@ -50,8 +49,7 @@ public:
     /**
      * @brief Stops the client
      */
-    void stop()
-    {
+    void stop() {
         this->_stop();
         this->_window.close();
     }
@@ -60,7 +58,7 @@ public:
      * @brief Gets the Client's window
      * @return A reference to the game window
      */
-    sf::RenderWindow &window() noexcept { return this->_window; }
+    sf::RenderWindow& window() noexcept { return this->_window; }
 
     /**
      * @brief Check if the Client is still running
@@ -72,8 +70,7 @@ public:
      * @brief Send a string message to the server
      * @param msg The message to send
      */
-    void sendMessage(const std::string& msg)
-    {
+    void sendMessage(const std::string& msg) {
         UDPPacket packet;
         packet << PACKET_TYPE::MESSAGE;
         packet << msg;
@@ -84,65 +81,46 @@ public:
      * @brief Send a UDP Packet to the server
      * @param packet The packet to send
      */
-    void send(const UDPPacket& packet)
-    {
-        this->_send(this->_server, packet);
-    }
+    void send(const UDPPacket& packet) { this->_send(this->_server, packet); }
 
-private:
-     void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override
-    {
+  private:
+    void _onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override {
         std::cout << "Received packet from " << src.address().to_string() << ":" << src.port() << std::endl;
         const auto payload = packet.payload;
 
-        std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
-                  << ", ack: " << packet.ack_number << ")" << std::endl;
+        std::cout << "Received: " << payload << " (seq: " << packet.sequence_number << ", ack: " << packet.ack_number << ")" << std::endl;
 
         PACKET_TYPE packet_type{};
         packet >> packet_type;
         if (_packet_handlers.contains(packet_type))
             _packet_handlers.at(packet_type)(packet);
-
     }
 
-protected:
-private:
+  protected:
+  private:
     asio::ip::udp::endpoint _server;
     bool _running = false;
     sf::RenderWindow _window;
-    std::map<PACKET_TYPE, std::function<void(UDPPacket&)>> _packet_handlers = {
-        {
-            PACKET_TYPE::CONNECT, [&](UDPPacket& packet)
-            {
-                std::cout << "Received CONNECT packet." << std::endl;
-                std::uint32_t client_id;
-                packet >> client_id;
-                this->_client_id = client_id;
-                std::cout << "Client ID: " << client_id << std::endl;
-            }
-        },
-        {
-            PACKET_TYPE::DISCONNECT, [&](UDPPacket& packet)
-            {
+    std::map<PACKET_TYPE, std::function<void(UDPPacket&)>> _packet_handlers = {{PACKET_TYPE::CONNECT,
+                                                                                   [&](UDPPacket& packet) {
+                                                                                       std::cout << "Received CONNECT packet." << std::endl;
+                                                                                       std::uint32_t client_id;
+                                                                                       packet >> client_id;
+                                                                                       this->_client_id = client_id;
+                                                                                       std::cout << "Client ID: " << client_id << std::endl;
+                                                                                   }},
+        {PACKET_TYPE::DISCONNECT,
+            [&](UDPPacket& packet) {
                 std::cout << "Received DISCONNECT packet." << std::endl;
                 this->_running = false;
-            }
-        },
-        {
-            PACKET_TYPE::MESSAGE, [&](UDPPacket& packet)
-            {
+            }},
+        {PACKET_TYPE::MESSAGE,
+            [&](UDPPacket& packet) {
                 std::string msg;
                 packet >> msg;
                 std::cout << "Received message: " << msg << std::endl;
-            }
-        },
-        {
-            PACKET_TYPE::START, [&](UDPPacket& packet)
-            {
-                std::cout << "Received START packet." << std::endl;
-            }
-        }
-    };
+            }},
+        {PACKET_TYPE::START, [&](UDPPacket& packet) { std::cout << "Received START packet." << std::endl; }}};
 
     std::optional<std::uint32_t> _client_id;
 };
