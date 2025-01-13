@@ -5,15 +5,16 @@
 ** NewProjectileSystem
 */
 
-#ifndef NEWPROJECTILESYSTEM_HPP_
-#define NEWPROJECTILESYSTEM_HPP_
+#ifndef NEW_PROJECTILE_SYSTEM_HPP_
+#define NEW_PROJECTILE_SYSTEM_HPP_
 
 #include "BaseSystems/Abstracts/ASystem.hpp"
 #include "BaseComponents.hpp"
 #include "../Components.hpp"
 #include "Config.hpp"
 #include "../Events/PacketInformation.hpp"
-#include <SFML/Graphics.hpp>
+
+#include "Sprites/Level1.hpp"
 
 class NewProjectileSystem final : public ASystem
 {
@@ -30,11 +31,6 @@ public:
                 continue;
             const auto projectile = _registry.create();
             const auto shootTransform = Transform{.x = transform.x + 33 * SCALE, .y = transform.y + 2 * SCALE, .z = 1, .rotation = 0};
-            auto projectileSprite = sf::Sprite(projectileTex);
-            projectileSprite.setOrigin(0, 0);
-            projectileSprite.setScale(SCALE, SCALE);
-            projectileSprite.setPosition(shootTransform.x, shootTransform.y);
-            projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
             _registry.addComponent(projectile, Hitbox{});
             _registry.addComponent(projectile, projectileSprite);
             _registry.addComponent(projectile, shootTransform);
@@ -45,4 +41,4 @@ public:
 };
 
 
-#endif /* !NEWPROJECTILESYSTEM_HPP_ */
+#endif /* !NEW_PROJECTILE_SYSTEM_HPP_ */

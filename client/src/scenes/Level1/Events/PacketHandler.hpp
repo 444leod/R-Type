@@ -5,8 +5,8 @@
 ** PacketHandler.hpp
 */
 
-#ifndef PACKETHANDLER_HPP
-#define PACKETHANDLER_HPP
+#ifndef PACKET_HANDLER_HPP
+#define PACKET_HANDLER_HPP
 
 #include "../Components.hpp"
 #include "ecs/EventDispatcher.hpp"
@@ -20,6 +20,8 @@
 #include "../Systems/NewProjectileSystem.hpp"
 #include "../Systems/MonsterKilledSystem.hpp"
 #include "PacketTypes.hpp"
+
+#include "Sprites/Level1.hpp"
 
 class PacketHandler final : public ecs::EventHandler<PacketInformation>
 {
@@ -80,11 +82,11 @@ public:
             Transform transform{};
             event.packet >> id >> transform;
             const auto bug = _registry.create();
-            auto bugSprite = sf::Sprite(_bugTex);
-            bugSprite.setOrigin(16, 13);
-            bugSprite.setScale(SCALE, SCALE);
-            bugSprite.setPosition(transform.x, transform.y);
-            _registry.addComponent(bug, bugSprite);
+            _registry.addComponent(bug, Sprite {
+                "assets/r-typesheet8.gif",
+                { 1, 1 },
+                { 16, 13 }
+            });
             _registry.addComponent(bug, Bug{});
             _registry.addComponent(bug, Enemy{ .id = id });
             _registry.addComponent(bug, transform);
@@ -106,11 +108,6 @@ private:
     Entity _generateSpaceship(const Transform &transform) const
     {
         const auto spaceship = _registry.create();
-
-        auto spaceshipSprite = sf::Sprite(_spaceshipTex);
-        spaceshipSprite.setOrigin(0, 0);
-        spaceshipSprite.setScale(SCALE, SCALE);
-        spaceshipSprite.setPosition(transform.x, transform.y);
 
         _registry.addComponent(spaceship, spaceshipSprite);
         _registry.addComponent(spaceship, transform);
@@ -134,4 +131,4 @@ private:
     MonsterKilledSystem _monsterKilledSystem;
 };
 
-#endif // PACKETHANDLER_HPP
+#endif // PACKET_HANDLER_HPP
