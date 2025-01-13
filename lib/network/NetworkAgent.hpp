@@ -150,6 +150,8 @@ namespace ntw
                 UDPPacket packet(this->_buffer.data(), bytes);
                 if (packet.calculateChecksum() == packet.checksum) {
                     this->_onPacketReceived(this->_client, packet);
+                } else {
+                    std::cerr << "Checksum mismatch for uncompressed packet" << std::endl;
                 }
             } else {
                 uint32_t compressedSize;
@@ -160,6 +162,8 @@ namespace ntw
                     reinterpret_cast<const std::byte*>(this->_buffer.data() + sizeof(magicNumber) + sizeof(compressedSize)), compressedSize)) {
                     if (packet.calculateChecksum() == packet.checksum) {
                         this->_onPacketReceived(this->_client, packet);
+                    } else {
+                        std::cerr << "Checksum mismatch for compressed packet" << std::endl;
                     }
                 }
             }
