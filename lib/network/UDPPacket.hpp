@@ -353,6 +353,67 @@ namespace ntw {
             return this->payload_length - this->_pos;
         }
 
+        /**
+         * @brief Compresses the packet payload using RLE compression
+         * @return Vector containing the compressed data
+         */
+        std::vector<std::byte> compress() const {
+            if (payload.empty())
+                return {};
+
+            std::vector<std::byte> compressed;
+            compressed.reserve(payload.size());
+
+            std::byte current = payload[0];
+            std::uint8_t count = 1;
+
+            for (size_t i = 1; i < payload.size(); ++i) {
+                if (payload[i] == current && count < 255) {
+                    count++;
+                } else {
+                    compressed.push_back(std::byte{count});
+                    compressed.push_back(current);
+                    current = payload[i];
+                    count = 1;
+                }
+            }
+            // Handle last sequence
+            compressed.push_back(std::byte{count});
+            compressed.push_back(current);
+
+            // Only return compressed data if it's actually smaller
+            return compressed.size() < payload.size() ? compressed : std::vector<std::byte>{};
+        }
+
+        /**
+         * @brief Decompresses RLE compressed data
+         * @param compressed The compressed data
+         * @param compressedSize Size of the compressed data
+         * @return True if decompression was successful
+         */
+        bool decompress(const std::byte* compressed, size_t compressedSize) {
+            if (compressedSize == 0)
+                return true;
+
+            payload.clear();
+            payload.reserve(compressedSize * 2);
+
+            for (size_t i = 0; i < compressedSize; i += 2) {
+                if (i + 1 >= compressedSize)
+                    return false;
+
+                std::uint8_t count = std::to_integer<std::uint8_t>(compressed[i]);
+                std::byte value = compressed[i + 1];
+
+                for (std::uint8_t j = 0; j < count; ++j) {
+                    payload.push_back(value);
+                }
+            }
+
+            payload_length = payload.size();
+            return true;
+        }
+
     private:
         /**
          * @brief Deserialize raw data into the packet.
@@ -520,4 +581,3 @@ namespace ntw {
     };
 
 }
-
