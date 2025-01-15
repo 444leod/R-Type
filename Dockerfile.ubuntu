@@ -13,7 +13,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     mingw-w64 \
     libasound2-dev \
+    wget \
+    lsb-release \
+    software-properties-common \
+    gnupg \
     && apt-get clean
+
+RUN wget https://apt.llvm.org/llvm.sh \
+    && chmod +x llvm.sh \
+    && ./llvm.sh 19
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    clang-19 \
+    clang-format-19 \
+    clang-tidy-19 \
+    && apt-get clean \
+    && alias clang-format=clang-format-19 \
+    && alias clang-tidy=clang-tidy-19
 
 RUN (type -p wget >/dev/null || (apt update && apt-get install wget -y)) \
     && mkdir -p -m 755 /etc/apt/keyrings \
