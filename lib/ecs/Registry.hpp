@@ -230,6 +230,7 @@ namespace ecs {
             {
                 throw std::out_of_range(entity + " does not have the component " + Family<T>::name());
             }
+
             return set->at(entity);
         }
 

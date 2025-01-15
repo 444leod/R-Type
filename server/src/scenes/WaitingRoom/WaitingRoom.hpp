@@ -15,7 +15,6 @@
 #include "BaseComponents.hpp"
 #include "BaseSystems/Render/DrawTextsSystem.hpp"
 
-#include "Systems/DrawMenuButtonsSystem.hpp"
 #include "PacketTypes.hpp"
 
 #include <chrono>
@@ -50,15 +49,12 @@ private:
 public:
 private:
     ecs::Registry _registry;
-    ecs::EventDispatcher _eventDispatcher;
 
     std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
         {"exit",    [this](const std::vector<std::string>& args) { game::RestrictedGame::instance().stop(); }},
         {"start",   [this](const std::vector<std::string>& args) { this->_startGame(args); }},
         {"",        [this](const std::vector<std::string>& args) { }}
     };
-
-    // PlayerMovement _playerMovement{_registry};
 };
 
 

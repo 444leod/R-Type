@@ -51,59 +51,6 @@ void WaitingRoom::update(const double& deltaTime)
     this->_executeUpdateSystems(deltaTime);
 }
 
-/*
-void WaitingRoom::render(sf::RenderWindow& window)
-{
-    if (this->_id.has_value()) {
-        sf::Text text;
-        text.setFont(_font);
-        text.setCharacterSize(30);
-        text.setFillColor(sf::Color::White);
-        text.setString("Connected to the server");
-        text.setPosition(10, 10);
-        window.draw(text);
-    } else {
-        sf::Text text;
-        text.setFont(_font);
-        text.setCharacterSize(30);
-        text.setFillColor(sf::Color::White);
-        text.setString("Connecting to the server...");
-        text.setPosition(10, 10);
-        window.draw(text);
-    }
-}
-*/
-
-/*
-void WaitingRoom::onEvent(sf::Event &event)
-{
-    switch (event.type) {
-        case sf::Event::KeyPressed:
-            switch (event.key.code) {
-                case sf::Keyboard::Space:
-                    break;
-                case sf::Keyboard::B: {
-                     break;
-                }
-                default:
-                    // _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = true});
-                    break;
-            }
-            break;
-        case sf::Event::KeyReleased:
-            switch (event.key.code) {
-                default:
-                    // _eventDispatcher.broadcast(movement_event{.key = event.key.code, .pressed = false});
-                    break;
-            }
-            break;
-        case sf::Event::MouseButtonPressed:
-            break;
-        default:break;
-    }
-}
-*/
-
 void WaitingRoom::onEnter() {
     _registry.clear();
 
@@ -124,14 +71,28 @@ void WaitingRoom::onEnter() {
 
     const auto enttext = _registry.create();
     _registry.addComponent(enttext, Text {
-        .message = "Connecting to the server...",
         .font = "./assets/arial.ttf",
-        .fontSize = 30,
+        .message = "Connecting to the server...",
+        .fontSize = 30u,
         .color = Color( 255, 255, 255 )
     });
     _registry.addComponent(enttext, Position { .x = 10, .y = 10 });
 
-    //_manager.send(SERVER, packet); //dead code
+
+
+    const auto button = _registry.create();
+    _registry.addComponent<Button>(button, Button {
+        .shape = shape::Rectangle(200, 50, Color(100, 100, 100), Color(0, 0, 0), 2),
+        .onClick = [] () { std::cout << "Button clicked" << std::endl; },
+        .label = Text{
+            .font = "./assets/arial.ttf",
+            .message = "Click me",
+           .fontSize = 30u,
+           .color = Color(255, 255, 255)
+        }
+    });
+
+    _registry.addComponent(button, Transform { .x = 100, .y = 100, .rotation = 20 });
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene)

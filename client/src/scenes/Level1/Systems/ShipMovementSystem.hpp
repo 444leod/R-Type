@@ -11,7 +11,6 @@
 #include "BaseSystems/Abstracts/ASystem.hpp"
 #include "BaseComponents.hpp"
 #include "../Components.hpp"
-#include "../Events/PacketInformation.hpp"
 
 class ShipMovementSystem final : public ASystem
 {

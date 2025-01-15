@@ -85,10 +85,10 @@ static constexpr std::size_t hash(const char* str) {
 }
 
 static constexpr std::string get_type_name(const char* pretty_function) {
-    std::string_view name = pretty_function;
-    name.remove_prefix(67);
-    name.remove_suffix(48);
-    return std::string{name};
+    const std::string_view name = pretty_function;
+    const auto start = name.find("Type = ") + 7;
+    const auto end = name.find(';', start);
+    return std::string{name.substr(start, end - start)};
 }
 
 namespace ecs {
@@ -187,9 +187,7 @@ namespace ecs {
         }
 
         static constexpr std::string name() {
-            std::string_view name = final_type<Type>::name();
-            name.remove_prefix(30);
-            name.remove_suffix(48);
+            const std::string_view name = final_type<Type>::name();
             return std::string{name};
         }
     };

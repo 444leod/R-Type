@@ -38,15 +38,6 @@ public:
     void onExit(const AScene& nextScene) override;
 
 private:
-/*     void _onConnect(ntw::UDPPacket& packet);
-    void _onDisconnect(ntw::UDPPacket& packet);
-    void _onMessage(ntw::UDPPacket& packet);
-    void _onStart(ntw::UDPPacket& packet);
-
-    void send(const UDPPacket& packet); */
-
-public:
-private:
     std::optional<std::uint32_t> _id = std::nullopt;
 
     ecs::EventDispatcher _eventDispatcher;
@@ -55,15 +46,6 @@ private:
     std::uint8_t _connectionAttempts = 0;
     double _pointTimer = 0;
     std::uint8_t _pointNumber = 0;
-
-//    std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
-//        {"exit",    [this](const std::vector<std::string>& args) { this->_onExit(args); }},
-//        {"start",   [this](const std::vector<std::string>& args) { this->_onStart(args); }},
-//        {"",        [this](const std::vector<std::string>& args) { }}
-//    };
-
-    // PlayerMovement _playerMovement{_registry};
-
 };
 
 

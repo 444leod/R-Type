@@ -11,6 +11,7 @@
 class SceneManager;
 
 #include <map>
+#include <utility>
 #include <vector>
 #include <memory>
 #include "RestrictedSceneManager.hpp"
@@ -33,8 +34,8 @@ namespace engine
 
 class AScene {
 public:
-    AScene(RestrictedSceneManager& manager, ecs::Registry& registry, const std::string& name) :
-        _manager(manager), _registry(registry), _name(name) {}
+    AScene(RestrictedSceneManager& manager, ecs::Registry& registry, std::string  name) :
+        _manager(manager), _registry(registry), _name(std::move(name)) {}
 
     virtual~AScene() = default;
 
@@ -187,7 +188,7 @@ protected:
 
 private:
     std::vector<std::shared_ptr<ASceneModule>> _modules;
-    const std::string& _name = "";
+    const std::string _name;
 };
 
 #endif //ASCENE_HPP

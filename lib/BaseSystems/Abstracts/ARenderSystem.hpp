@@ -5,8 +5,8 @@
 ** ARenderSystem
 */
 
-#ifndef ARENDERSYSTEM_HPP_
-#define ARENDERSYSTEM_HPP_
+#ifndef A_RENDER_SYSTEM_HPP_
+#define A_RENDER_SYSTEM_HPP_
 
 #include "ASystem.hpp"
 #include "ecs/Registry.hpp"
@@ -25,4 +25,4 @@ public:
     virtual void execute(sf::RenderWindow &window) = 0;
 };
 
-#endif /* !ARENDERSYSTEM_HPP_ */
+#endif /* !A_RENDER_SYSTEM_HPP_ */

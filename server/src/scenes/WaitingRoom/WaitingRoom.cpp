@@ -86,15 +86,15 @@ void WaitingRoom::onEnter()
     _registry.addComponent<Position>(exitButtonEntity, {20.0f, 20.0f});
     sf::RectangleShape exitButtonShape({100.0f, 40.0f});
     exitButtonShape.setFillColor(sf::Color::Red);
-    _registry.addComponent<RectangleButton>(exitButtonEntity, {exitButtonShape, "Exit", [this](){ game::RestrictedGame::instance().stop(); }});
+    // _registry.addComponent<Button>(exitButtonEntity, {.shape exitButtonShape, "Exit", [this](){ game::RestrictedGame::instance().stop(); }});
 
     auto startButtonEntity = _registry.create();
     _registry.addComponent<Position>(startButtonEntity, {140.0f, 20.0f});
     sf::RectangleShape startButtonShape({100.0f, 40.0f});
     startButtonShape.setFillColor(sf::Color::Green);
-    _registry.addComponent<RectangleButton>(startButtonEntity, {startButtonShape, "Start", [this](){
-       //TODO: start the game
-    }});
+    // _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){
+    //    //TODO: start the game
+    // }});
 
     const auto net = this->getModule<ANetworkSceneModule>();
     if (net == nullptr)
@@ -124,10 +124,24 @@ void WaitingRoom::onExit()
 void WaitingRoom::onExit(const AScene& nextScene)
 {
     std::cout << "Exiting to " << nextScene.name() << std::endl;
+    // std::cout << "zeajkh" << std::endl;
 }
 
 void WaitingRoom::_startGame(const std::vector<std::string> &)
 {
+    auto net = this->getModule<ANetworkSceneModule>();
+
+    if (net->clients().size() < 1)
+    {
+        std::cout << "Not enough players to start the game" << std::endl;
+        return;
+    }
+
     std::cout << "Starting the game..." << std::endl;
     game::RestrictedGame::instance().scenes().load("game");
+
+    ntw::UDPPacket packet;
+    packet << PACKET_TYPE::START;
+
+    net->sendPacket(packet);
 }

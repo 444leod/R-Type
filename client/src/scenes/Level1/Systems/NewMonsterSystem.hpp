@@ -12,7 +12,6 @@
 #include "BaseComponents.hpp"
 #include "../Components.hpp"
 #include "Config.hpp"
-#include "../Events/PacketInformation.hpp"
 
 class NewMonsterSystem final : public ASystem
 {

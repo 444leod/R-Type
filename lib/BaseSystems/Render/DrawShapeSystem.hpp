@@ -2,11 +2,11 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** DebugDrawSystem
+** DrawShapeSystem
 */
 
-#ifndef DEBUG_DRAW_SYSTEM_HPP_
-#define DEBUG_DRAW_SYSTEM_HPP_
+#ifndef DRAW_SHAPE_SYSTEM_HPP_
+#define DRAW_SHAPE_SYSTEM_HPP_
 
 #include "BaseSystems/Abstracts/ARenderSystem.hpp"
 #include "BaseComponents.hpp"
@@ -15,18 +15,19 @@
 #include <SFML/Graphics.hpp>
 #include <ranges>
 
-class DebugDrawSystem final : public ARenderSystem
+class DrawShapeSystem final : public ARenderSystem
 {
 public:
-    explicit DebugDrawSystem(ecs::Registry &registry) : ARenderSystem(registry, "DebugDrawSystem") {}
+    explicit DrawShapeSystem(ecs::Registry &registry) : ARenderSystem(registry, "DrawShapeSystem") {}
 
     void execute(sf::RenderWindow &window) override {
 
-        auto view = _registry.view<Debug, Hitbox, Transform>();
+        auto view = _registry.view<shape::Circle, Transform>();
 
-        view.each([&] (const Entity& entity, const Debug&, const Hitbox& hitbox, const Transform& transform) {
-            if (std::holds_alternative<shape::Rectangle>(hitbox.shape)) {
-                const auto&[width, height, fillColor, outlineColor, outlineThickness] = std::get<shape::Rectangle>(hitbox.shape);
+        _registry.view<shape::Rectangle, Transform>().each(
+            [&] (const Entity& entity, const shape::Rectangle& rect, const Transform& transform)
+            {
+                const auto&[width, height, fillColor, outlineColor, outlineThickness] = rect;
                 sf::RectangleShape shape(sf::Vector2f(width, height));
                 shape.setPosition(transform.x + width / 2, transform.y + height / 2);
                 shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b, fillColor.a));
@@ -35,17 +36,22 @@ public:
                 shape.setRotation(transform.rotation);
                 shape.setOrigin(width / 2, height / 2);
                 window.draw(shape);
-            } else if (std::holds_alternative<shape::Circle>(hitbox.shape)) {
-                const auto&[radius, fillColor, outlineColor, outlineThickness] = std::get<shape::Circle>(hitbox.shape);
+            }
+        );
+
+        _registry.view<shape::Circle, Transform>().each(
+            [&] (const Entity& entity, const shape::Circle& circle, const Transform& transform)
+            {
+                const auto&[radius, fillColor, outlineColor, outlineThickness] = circle;
                 sf::CircleShape shape(radius);
                 shape.setPosition(transform.x, transform.y);
                 shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b, fillColor.a));
                 shape.setOutlineColor(sf::Color(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a));
                 shape.setOutlineThickness(outlineThickness);
-                shape.setOrigin(radius, radius);
+                shape.setOrigin(radius / 2, radius / 2);
                 window.draw(shape);
             }
-        });
+        );
 
     }
 
@@ -53,4 +59,4 @@ private:
     ecs::SparseSet<sf::Texture> _textures;
 };
 
-#endif /* !DEBUG_DRAW_SYSTEM_HPP_ */
+#endif /* !DRAW_SHAPE_SYSTEM_HPP_ */

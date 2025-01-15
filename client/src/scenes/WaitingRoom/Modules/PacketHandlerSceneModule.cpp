@@ -15,7 +15,8 @@ namespace waiting_room
 
 void handleGameStart(ecs::Registry&, RestrictedSceneManager& manager, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket&)
 {
-    manager.load("game");
+    std::cout << "start!" << std::endl;
+    game::RestrictedGame::instance().scenes().load("game");
 }
 
 void handleDisconnect(ecs::Registry&, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket&)
