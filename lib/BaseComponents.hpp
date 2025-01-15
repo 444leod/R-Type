@@ -41,11 +41,11 @@ struct Color
     std::int8_t a = static_cast<std::int8_t>(255);
 
     Color() = default;
-    Color(std::int8_t r, std::int8_t g, std::int8_t b, std::int8_t a = 255)
+    Color(const std::int8_t& r, const std::int8_t& g, const std::int8_t& b, const std::int8_t& a = static_cast<std::int8_t>(255))
         : r(r), g(g), b(b), a(a)
     {
     }
-    Color(int r, int g, int b, int a = 255)
+    Color(const int& r, const int& g, const int& b, const int& a = 255)
         : r(static_cast<std::int8_t>(r)), g(static_cast<std::int8_t>(g)), b(static_cast<std::int8_t>(b)), a(static_cast<std::int8_t>(a))
     {
     }

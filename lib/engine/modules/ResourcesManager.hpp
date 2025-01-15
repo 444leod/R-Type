@@ -8,6 +8,8 @@
 #ifndef RESOURCES_MANAGER_HPP
 #define RESOURCES_MANAGER_HPP
 
+#include <map>
+
 namespace engine
 {
   class ResourcesManager

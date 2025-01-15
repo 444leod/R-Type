@@ -187,8 +187,7 @@ namespace ecs {
         }
 
         static constexpr std::string name() {
-            const std::string_view name = final_type<Type>::name();
-            return std::string{name};
+            return final_type<Type>::name();
         }
     };
 

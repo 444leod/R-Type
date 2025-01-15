@@ -228,7 +228,7 @@ namespace ecs {
 
             if (!set->contains(entity))
             {
-                throw std::out_of_range(entity + " does not have the component " + Family<T>::name());
+                throw std::out_of_range(std::to_string(entity) + " does not have the component " + Family<T>::name());
             }
 
             return set->at(entity);
