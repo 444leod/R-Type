@@ -12,4 +12,4 @@
 
 using Entity = std::size_t;
 
-#endif //ENTITY_HPP
+#endif // ENTITY_HPP
