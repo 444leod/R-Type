@@ -60,22 +60,9 @@ namespace engine
 
         void refresh(AScene& scene) override
         {
-            // Dumbly deactivate / reactivate modules to avoid redering dumb stuff when uneeded
-            this->_spritesSystem.disable();
-            this->_textsSystem.disable();
-            this->_debugDrawSystem.disable();
-            this->_buttonSystem.disable();
-            this->_buttonClickedSystem.disable();
-            this->_shapeSystem.disable();
             this->_target = scene.getModule<ASceneRenderingModule>();
             if (this->_target == nullptr)
                 return;
-            this->_spritesSystem.enable();
-            this->_textsSystem.enable();
-            this->_debugDrawSystem.enable();
-            this->_buttonSystem.enable();
-            this->_buttonClickedSystem.enable();
-            this->_shapeSystem.enable();
         }
 
         void stop() override
@@ -106,7 +93,8 @@ namespace engine
             this->_debugDrawSystem.execute(this->_window);
             this->_shapeSystem.execute(this->_window);
             // Execute additional scene systems
-            this->_target->executeSystems(this->_window);
+            if (this->_target != nullptr)
+                this->_target->executeSystems(this->_window);
             this->_window.display();
         }
 
