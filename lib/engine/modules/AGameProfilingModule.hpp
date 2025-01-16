@@ -20,9 +20,9 @@ namespace engine
     class GameProfilingModule final: public AGameModule
     {
     public:
-        GameProfilingModule(game::RestrictedGame& game, uint32_t updateJumps, const std::string& path): AGameModule(game)
+        GameProfilingModule(game::RestrictedGame& game, uint32_t updateJumps, const std::string& path): AGameModule(game), _jumps(updateJumps)
         {
-            this->_jumps = updateJumps;
+            this->_lastUpdate = std::chrono::high_resolution_clock::now();
             if (!this->_font.loadFromFile(path))
                 throw std::runtime_error("Failed to load font for Profiler.");
         }
@@ -50,6 +50,11 @@ namespace engine
             if (!this->_window.isOpen())
                 return;
 
+            const auto now = std::chrono::high_resolution_clock::now();
+            const auto delta = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::milli>>(now - this->_lastUpdate).count();
+            this->_tickUpdates.push_back(delta);
+            this->_lastUpdate = now;
+
             this->_ticks++;
             if (this->_ticks < this->_jumps)
                 return;
@@ -61,6 +66,7 @@ namespace engine
 
             // Draw Content
             this->_runtime();
+            this->_updates();
             this->_scene();
             this->_entities();
             //
@@ -108,7 +114,7 @@ namespace engine
 
     private:
 
-    // Runtime
+        // Runtime
         std::chrono::_V2::system_clock::time_point _startTime = std::chrono::high_resolution_clock::now();
         void _runtime() {
             const auto now = std::chrono::high_resolution_clock::now();
@@ -116,16 +122,36 @@ namespace engine
             this->_drawKeyValue("Runtime", P_STR(duration) + "ms", 0, 0);
         }
 
-    // Entities
+        // Updates
+        void _updates() {
+            double fastestUpdate = 0.f;
+            double slowestUpdate = 0.f;
+            double avg = 0.f;
+            for (auto time: this->_tickUpdates) {
+                if (time < fastestUpdate || fastestUpdate <= 0.f)
+                    fastestUpdate = time;
+                if (time > slowestUpdate)
+                    slowestUpdate = time;
+                avg += time;
+            }
+            avg /= (double)this->_tickUpdates.size();
+            this->_tickUpdates.clear();
+            this->_drawKeyValue("Updates",
+                std::string("~") + P_STR((int)avg) + "ms, -" + P_STR((int)fastestUpdate) + "ms, +" + P_STR((int)slowestUpdate) + "ms",
+                0, 20);
+        }
+
+        // Entities
         void _entities() {
             const auto& reg = _game.registry();
             const auto& ents = _game.registry().entities();
             this->_drawKeyValue("Entities",
                 P_STR(ents.size()) + "/" + P_STR(ents.capacity()) +
-                " (+" + P_STR(reg.instances()) + " -" + P_STR(reg.deletions()) + ")", 0, 20);
+                " (+" + P_STR(reg.instances()) + " -" + P_STR(reg.deletions()) + ")",
+                0, 40);
         }
 
-    // Scene
+        // Scene
         void _scene() {
             const auto& scene = _game.scenes().current();
             scene.name();
@@ -133,9 +159,12 @@ namespace engine
         }
 
     private:
-        uint32_t _ticks;
-        uint32_t _jumps;
         sf::Font _font;
         sf::RenderWindow _window;
+
+        uint32_t _ticks;
+        const uint32_t _jumps;
+        std::chrono::_V2::system_clock::time_point _lastUpdate;
+        std::vector<double> _tickUpdates = {};
     };
 }
