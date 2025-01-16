@@ -9,6 +9,7 @@
 #include "scenes/Level1/Level1.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
 #include "engine/modules/GameRenderingModule.hpp"
+#include "engine/modules/AGameProfilingModule.hpp"
 #include "Modules/NetworkGameModule.hpp"
 
 #include "scenes/WaitingRoom/Modules/PacketHandlerSceneModule.hpp"
@@ -16,12 +17,14 @@
 
 #include "NetworkModules/ANetworkSceneModule.hpp"
 
+
 #include "Config.hpp"
 
 int main() {
     auto game = game::Game();
 
     game.addModule<engine::GameRenderingModule>(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "R-Type - Client");
+    game.addModule<engine::GameProfilingModule>(10, "assets/arial.ttf");
 
     const auto networkGameModule = game.addModule<NetworkGameModule>();
 
@@ -32,7 +35,6 @@ int main() {
         main->addModule<waiting_room::PacketHandlerSceneModule>(game.registry(), game.scenes(), net);
         main->addModule<ASceneEventsModule>();
     }
-
 
     const auto level1 = game.registerScene<Level1>("game");
     {

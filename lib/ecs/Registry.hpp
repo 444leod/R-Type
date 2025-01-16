@@ -53,6 +53,7 @@ namespace ecs {
         {
             const auto entity = Registry::_get_new_entity_id();
 
+            _instances++;
             _entities.emplace_back(entity);
             return entity;
         }
@@ -63,6 +64,7 @@ namespace ecs {
          */
         void remove(const Entity entity)
         {
+            _deletions++;
             _queue_remove.push_back(entity);
         }
 
@@ -234,6 +236,10 @@ namespace ecs {
             return set->at(entity);
         }
 
+        const std::vector<Entity>& entities() const noexcept { return this->_entities; }
+        uint32_t instances() const noexcept { return this->_instances; }
+        uint32_t deletions() const noexcept { return this->_deletions; }
+
     private:
         /**
          * @brief Gets a new available Entity ID
@@ -248,6 +254,9 @@ namespace ecs {
         std::vector<Entity> _queue_remove = {};
         std::vector<Entity> _entities = {};
         std::map<std::size_t, ISparseSet *> _sparse_sets = {};
+
+        uint32_t _instances = 0;
+        uint32_t _deletions = 0;
     };
 }
 
