@@ -5,35 +5,67 @@
 ** DrawSpritesSystem
 */
 
-#ifndef DRAWSPRITESSYSTEM_HPP_
-#define DRAWSPRITESSYSTEM_HPP_
+#ifndef DRAW_SPRITES_SYSTEM_HPP_
+#define DRAW_SPRITES_SYSTEM_HPP_
 
-#include "BaseComponents.hpp"
 #include "BaseSystems/Abstracts/ARenderSystem.hpp"
+#include "BaseComponents.hpp"
+#include "engine/modules/ResourcesManager.hpp"
 
-#include <SFML/Graphics.hpp>
 #include <algorithm>
+#include <SFML/Graphics.hpp>
 #include <ranges>
 
-class DrawSpritesSystem final : public ARenderSystem {
-  public:
-    DrawSpritesSystem(Registry& registry, const std::string name = "DrawSpritesSystem") : ARenderSystem(registry, name) {}
+class DrawSpritesSystem final : public ARenderSystem
+{
+public:
+    explicit DrawSpritesSystem(ecs::Registry &registry, engine::ResourcesManager& resourceManager) : ARenderSystem(registry, "DrawSpritesSystem"), _textures(resourceManager.textures()) {}
 
-    void execute(sf::RenderWindow& window) override {
-        auto vec = std::vector<std::tuple<Entity, sf::Sprite, Transform>>{};
+    void execute(sf::RenderWindow &window) override
+    {
+        sf::Sprite sp{};
+        auto vec = std::vector<std::tuple<Entity, Sprite, Transform>>{};
 
-        _registry.view<sf::Sprite, Transform>().each([&](const Entity& entity, sf::Sprite& sprite, Transform& transform) {
+        auto view = _registry.view<Sprite, Transform>();
+        vec.reserve(view.size());
+
+        view.each([&](const Entity& entity, Sprite &sprite, const Transform &transform) {
+            if (!_textures.contains(sprite.texture))
+            {
+                sf::Texture texture;
+                if (!texture.loadFromFile(sprite.texture))
+                    std::cerr << "Failed to load texture: " << sprite.texture << std::endl;
+                _textures[sprite.texture] = texture;
+            }
+
+            const auto tex = _textures.at(sprite.texture);
+
+            if (!sprite.textureRect.has_value())
+            {
+                sprite.textureRect = sf::IntRect(0, 0, tex.getSize().x, tex.getSize().y);
+            }
             vec.emplace_back(entity, sprite, transform);
-            sprite.setPosition(transform.x, transform.y);
-            sprite.setRotation(transform.rotation);
         });
 
-        std::ranges::sort(vec, [](const auto& a, const auto& b) { return std::get<2>(a).z < std::get<2>(b).z; });
+        std::ranges::sort(vec, [](const auto& a, const auto& b) {
+            return std::get<2>(a).z < std::get<2>(b).z;
+        });
 
-        for (const auto& [entity, sprite, _] : vec) {
-            window.draw(sprite);
+        for (const auto& [entity, sprite, transform] : vec) {
+            sp.setTexture(_textures.at(sprite.texture));
+            sp.setScale(sprite.scale.first, sprite.scale.second);
+            sp.setOrigin(sprite.origin.first, sprite.origin.second);
+            sp.setPosition(transform.x, transform.y);
+            sp.setRotation(transform.rotation);
+            if (sprite.textureRect.has_value()) {
+                sp.setTextureRect(sprite.textureRect.value());
+            }
+            window.draw(sp);
         }
     }
+
+private:
+    std::map<std::string, sf::Texture>& _textures;
 };
 
-#endif /* !DRAWSPRITESSYSTEM_HPP_ */
+#endif /* !DRAW_SPRITES_SYSTEM_HPP_ */

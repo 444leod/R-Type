@@ -5,25 +5,27 @@
 ** InputHandler.hpp
 */
 
-#ifndef PLAYERMOVEMENT_HPP
-#define PLAYERMOVEMENT_HPP
+#ifndef INPUT_HANDLER_HPP
+#define INPUT_HANDLER_HPP
 
-#include "../Components.hpp"
-#include "EventDispatcher.hpp"
-#include "NetworkAgent.hpp"
-#include "Registry.hpp"
+#include "ecs/EventDispatcher.hpp"
+#include "ecs/Registry.hpp"
 
-#include <SFML/Window/Keyboard.hpp>
+#include "Structures/UserInput.hpp"
 
-class InputHandler : public EventHandler<UserInput> {
-  public:
-    explicit InputHandler(Registry& registry) : _registry(registry) {}
+class InputHandler final : public ecs::EventHandler<UserInput> {
+public:
+    explicit InputHandler(ecs::Registry& registry) : _registry(registry) {}
     ~InputHandler() override = default;
 
-    void receive(const UserInput& event) override {}
+    void receive(const UserInput& event) override {
+    }
 
-  private:
-    Registry& _registry;
+
+private:
+    ecs::Registry& _registry;
 };
 
-#endif // PLAYERMOVEMENT_HPP
+
+
+#endif //INPUT_HANDLER_HPP

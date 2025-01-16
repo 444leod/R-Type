@@ -19,11 +19,11 @@ The goal of this section is to explain the implementation of the Scene and Scene
 class SceneManager;
 
 #include <SFML/Graphics.hpp>
-#include "ISceneManager.hpp"
+#include "RestrictedSceneManager.hpp"
 
 class AScene {
 public:
-    AScene(ISceneManager& manager, const std::string& name):
+    AScene(RestrictedSceneManager& manager, const std::string& name):
         _manager(manager), _name(name) {}
     virtual~AScene() = default;
 
@@ -79,7 +79,7 @@ public:
     virtual void onExit(const AScene& nextScene) = 0;
 
 protected:
-    ISceneManager& _manager;
+    RestrictedSceneManager& _manager;
 
 private:
     const std::string& _name = "";
@@ -97,11 +97,11 @@ private:
 class SceneManager;
 
 #include <SFML/Graphics.hpp>
-#include "ISceneManager.hpp"
+#include "RestrictedSceneManager.hpp"
 
 class AScene {
 public:
-    AScene(ISceneManager& manager, const std::string& name):
+    AScene(RestrictedSceneManager& manager, const std::string& name):
         _manager(manager), _name(name) {}
     virtual~AScene() = default;
 
@@ -157,7 +157,7 @@ public:
     virtual void onExit(const AScene& nextScene) = 0;
 
 protected:
-    ISceneManager& _manager;
+    RestrictedSceneManager& _manager;
 
 private:
     const std::string& _name = "";
@@ -187,7 +187,7 @@ private:
 ```cpp
 class GameScene : public AScene {
 public:
-    GameScene(ISceneManager& manager) : AScene(manager, "GameScene") {}
+    GameScene(RestrictedSceneManager& manager) : AScene(manager, "GameScene") {}
 
     void initialize() override {
         // Load game resources

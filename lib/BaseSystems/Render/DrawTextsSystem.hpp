@@ -5,24 +5,43 @@
 ** DrawTextsSystem
 */
 
-#ifndef DRAWTEXTSSYSTEM_HPP_
-#define DRAWTEXTSSYSTEM_HPP_
+#ifndef DRAW_TEXTS_SYSTEM_HPP_
+#define DRAW_TEXTS_SYSTEM_HPP_
 
-#include "BaseComponents.hpp"
+#include <map>
 #include "BaseSystems/Abstracts/ARenderSystem.hpp"
+#include "BaseComponents.hpp"
+#include "engine/modules/ResourcesManager.hpp"
 
 #include <SFML/Graphics.hpp>
 
-class DrawTextsSystem final : public ARenderSystem {
-  public:
-    DrawTextsSystem(Registry& registry, const std::string name = "DrawTextsSystem") : ARenderSystem(registry, name) {}
+class DrawTextsSystem final : public ARenderSystem
+{
+public:
+    explicit DrawTextsSystem(ecs::Registry &registry, engine::ResourcesManager& resourceManager) : ARenderSystem(registry, "DrawTextsSystem"), _fonts(resourceManager.fonts()) {}
 
-    void execute(sf::RenderWindow& window) override {
-        _registry.view<Position, Text>().each([&](const auto& entity, auto& pos, auto& renderable) {
-            renderable.text.setPosition(pos.x, pos.y);
-            window.draw(renderable.text);
+    void execute(sf::RenderWindow &window) override
+    {
+        this->_registry.view<Transform, Text>().each([&](const auto &, auto &transform, auto &text) {
+            if (!this->_fonts.contains(text.font)) {
+                auto font = sf::Font{};
+                if (!font.loadFromFile(text.font))
+                    std::cerr << "Failed to load font: " << text.font << std::endl;
+                this->_fonts[text.font] = font;
+                return;
+            }
+            this->_text.setString(text.message);
+            this->_text.setFont(this->_fonts.at(text.font));
+            this->_text.setPosition(transform.x, transform.y);
+            this->_text.setCharacterSize(text.fontSize);
+            this->_text.setFillColor(sf::Color(text.color.r, text.color.g, text.color.b, text.color.a));
+            window.draw(this->_text);
         });
     }
+
+private:
+    sf::Text _text;
+    std::map<std::string, sf::Font>& _fonts;
 };
 
-#endif /* !DRAWTEXTSSYSTEM_HPP_ */
+#endif /* !DRAW_TEXTS_SYSTEM_HPP_ */

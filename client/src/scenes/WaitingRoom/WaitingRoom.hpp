@@ -8,33 +8,26 @@
 #ifndef WAITING_ROOM_HPP
 #define WAITING_ROOM_HPP
 
-#include "BaseComponents.hpp"
-#include "EventDispatcher.hpp"
-#include "Global.hpp"
-#include "NetworkedScene.hpp"
-#include "Registry.hpp"
-#include "UDPPacket.hpp"
 #include <chrono>
-#include <functional>
 #include <optional>
 
-inline sf::Font get_default_font() {
-    sf::Font font;
-    font.loadFromFile("assets/arial.ttf");
-    return font;
-}
+#include "ecs/Registry.hpp"
+#include "ecs/EventDispatcher.hpp"
+#include "engine/AScene.hpp"
+#include "BaseComponents.hpp"
+
+#include <BaseSystems/Update/CollisionSystem.hpp>
 
 class WaitingRoom final : public AScene {
-  public:
-    WaitingRoom(ISceneManager& m, const std::string& n) : AScene(m, n) {}
+public:
+    WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
+    {
+        _updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
+    }
 
     void initialize() override;
 
-    void update(double deltaTime, const sf::RenderWindow& window) override;
-
-    void render(sf::RenderWindow& window) override;
-
-    void onEvent(sf::Event& event) override;
+    void update(const double& deltaTime) override;
 
     void onEnter() override;
 
@@ -44,38 +37,17 @@ class WaitingRoom final : public AScene {
 
     void onExit(const AScene& nextScene) override;
 
-    void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
-
-  private:
-    void _onConnect(UDPPacket& packet);
-    void _onDisconnect(UDPPacket& packet);
-    void _onMessage(UDPPacket& packet);
-    void _onStart(UDPPacket& packet);
-
-    void send(const UDPPacket& packet);
-
-  public:
-  private:
-    sf::Font font = get_default_font();
-
+private:
     std::optional<std::uint32_t> _id = std::nullopt;
 
-    Registry _registry;
-    EventDispatcher _eventDispatcher;
+    ecs::EventDispatcher _eventDispatcher;
 
-    std::map<PACKET_TYPE, std::function<void(UDPPacket& packet)>> _packet_handlers = {{PACKET_TYPE::CONNECT, [this](UDPPacket& packet) { this->_onConnect(packet); }}, {PACKET_TYPE::DISCONNECT, [this](UDPPacket& packet) { this->_onDisconnect(packet); }},
-        {PACKET_TYPE::MESSAGE, [this](UDPPacket& packet) { this->_onMessage(packet); }}, {PACKET_TYPE::START, [this](UDPPacket& packet) { this->_onStart(packet); }}};
-
-    //    std::map<std::string, std::function<void(const
-    //    std::vector<std::string>&)>> _command_handlers = {
-    //        {"exit",    [this](const std::vector<std::string>& args) {
-    //        this->_onExit(args); }},
-    //        {"start",   [this](const std::vector<std::string>& args) {
-    //        this->_onStart(args); }},
-    //        {"",        [this](const std::vector<std::string>& args) { }}
-    //    };
-
-    // PlayerMovement _playerMovement{_registry};
+    double _connectionTimer = 0;
+    std::uint8_t _connectionAttempts = 0;
+    double _pointTimer = 0;
+    std::uint8_t _pointNumber = 0;
 };
 
-#endif // GAME_HPP
+
+
+#endif //WAITING_ROOM_HPP

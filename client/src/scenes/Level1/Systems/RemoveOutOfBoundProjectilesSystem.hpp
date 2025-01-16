@@ -8,19 +8,21 @@
 #ifndef REMOVEOUTOFBOUNDPROJECTILESSYSTEM_HPP_
 #define REMOVEOUTOFBOUNDPROJECTILESSYSTEM_HPP_
 
-#include "BaseComponents.hpp"
 #include "BaseSystems/Abstracts/AUpdateSystem.hpp"
-#include <config.h>
+#include "BaseComponents.hpp"
+#include "Config.hpp"
 
-class RemoveOutOfBoundProjectilesSystem final : public AUpdateSystem {
-  public:
-    RemoveOutOfBoundProjectilesSystem(Registry& registry) : AUpdateSystem(registry, "RemoveOutOfBoundProjectilesSystem") {}
 
-    void execute(const double deltaTime) override {
-        _registry.view<Projectile, Transform>().each([&](const Entity& entity, const Projectile&, const Transform& transform) {
-            if (transform.x > SCREEN_WIDTH * SCALE) {
-                _registry.remove(entity);
-            }
+class RemoveOutOfBoundProjectilesSystem final : public AUpdateSystem
+{
+public:
+    explicit RemoveOutOfBoundProjectilesSystem(ecs::Registry &registry) : AUpdateSystem(registry, "RemoveOutOfBoundProjectilesSystem") {}
+
+    void execute(const double& deltaTime) override {
+        _registry.view<Projectile, Velocity, Transform>().each([&](const Entity& entity, Projectile& projectile, const Velocity& velocity, const Transform& transform) {
+        projectile.range -= velocity.x * SCALE * deltaTime;
+        if (projectile.range < 0)
+            _registry.remove(entity);
         });
     }
 };

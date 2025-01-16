@@ -8,39 +8,32 @@
 #ifndef WAITING_ROOM_HPP
 #define WAITING_ROOM_HPP
 
-#include "AScene.hpp"
+#include "engine/AScene.hpp"
+#include "ecs/Registry.hpp"
+#include "ecs/EventDispatcher.hpp"
+#include "network/NetworkAgent.hpp"
 #include "BaseComponents.hpp"
 #include "BaseSystems/Render/DrawTextsSystem.hpp"
-#include "EventDispatcher.hpp"
-#include "NetworkedScene.hpp"
-#include "Registry.hpp"
 
-#include "Systems/DrawMenuButtonsSystem.hpp"
+#include "PacketTypes.hpp"
 
 #include <chrono>
 #include <functional>
 #include <memory>
+#include "BaseSystems/Update/CollisionSystem.hpp"
 
-inline sf::Font get_default_font() {
-    sf::Font font;
-    font.loadFromFile("assets/arial.ttf");
-    return font;
-}
+#include <engine/RestrictedGame.hpp>
 
 class WaitingRoom final : public AScene {
-  public:
-    WaitingRoom(ISceneManager& m, const std::string& n) : AScene(m, n) {
-        this->_renderSystems.push_back(std::make_unique<DrawTextsSystem>(_registry));
-        this->_renderSystems.push_back(std::make_unique<DrawMenuButtonsSystem>(_registry));
+public:
+    WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
+    {
+        this->_updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
     }
 
     void initialize() override;
 
-    void update(double deltaTime, const sf::RenderWindow& window) override;
-
-    void render(sf::RenderWindow& window) override;
-
-    void onEvent(sf::Event& event) override;
+    void update(const double& deltaTime) override;
 
     void onEnter() override;
 
@@ -50,32 +43,20 @@ class WaitingRoom final : public AScene {
 
     void onExit(const AScene& nextScene) override;
 
-    void onPacketReceived(const asio::ip::udp::endpoint& src, UDPPacket& packet) override;
+private:
+    void _startGame(const std::vector<std::string>& args);
 
-  private:
-    void _onConnect(const ClientInformations& src, UDPPacket& packet);
-    void _onDisconnect(const ClientInformations& src, UDPPacket& packet);
-    void _onMessage(const ClientInformations& src, UDPPacket& packet);
-
-    void _onExit(const std::vector<std::string>& args);
-    void _onStart(const std::vector<std::string>& args);
-
-    void _broadcast(const UDPPacket& packet);
-
-  public:
-  private:
-    Registry _registry;
-    EventDispatcher _eventDispatcher;
-
-    sf::Font font = get_default_font();
-
-    std::map<PACKET_TYPE, std::function<void(const ClientInformations& client, UDPPacket& packet)>> _packet_handlers = {{PACKET_TYPE::CONNECT, [this](const ClientInformations& src, UDPPacket& packet) { this->_onConnect(src, packet); }},
-        {PACKET_TYPE::DISCONNECT, [this](const ClientInformations& src, UDPPacket& packet) { this->_onDisconnect(src, packet); }}, {PACKET_TYPE::MESSAGE, [this](const ClientInformations& src, UDPPacket& packet) { this->_onMessage(src, packet); }}};
+public:
+private:
+    ecs::Registry _registry;
 
     std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
-        {"exit", [this](const std::vector<std::string>& args) { this->_onExit(args); }}, {"start", [this](const std::vector<std::string>& args) { this->_onStart(args); }}, {"", [this](const std::vector<std::string>& args) {}}};
-
-    // PlayerMovement _playerMovement{_registry};
+        {"exit",    [this](const std::vector<std::string>& args) { game::RestrictedGame::instance().stop(); }},
+        {"start",   [this](const std::vector<std::string>& args) { this->_startGame(args); }},
+        {"",        [this](const std::vector<std::string>& args) { }}
+    };
 };
 
-#endif // GAME_HPP
+
+
+#endif //GAME_HPP

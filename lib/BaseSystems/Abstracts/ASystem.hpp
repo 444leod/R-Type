@@ -8,13 +8,13 @@
 #ifndef ASYSTEM_HPP
 #define ASYSTEM_HPP
 
-#include "Registry.hpp"
+#include "ecs/Registry.hpp"
 #include <string>
 
 class ASystem {
-  public:
-    ASystem(Registry& registry, const std::string name) : _registry(registry), _name(name) {}
-    virtual ~ASystem() = default;
+public:
+    ASystem(ecs::Registry& registry, const std::string& name) : _registry(registry), _name(name) {}
+    virtual~ASystem() = default;
 
     /**
      * @brief Disables the system
@@ -30,18 +30,19 @@ class ASystem {
      * @brief Returns whether the system is enabled
      * @return Whether the system is enabled
      */
-    bool isEnabled() const { return _enabled; }
+    [[nodiscard]] bool isEnabled() const { return _enabled; }
 
     /**
      * @brief Returns the system's name
      * @return The system's name
      */
-    const std::string name() const { return _name; }
+    [[nodiscard]] std::string name() const { return _name; }
 
-  protected:
-    Registry& _registry;
+protected:
+    ecs::Registry& _registry;
     bool _enabled = true;
     const std::string _name;
 };
 
-#endif // ASYSTEM_HPP
+#endif //ASYSTEM_HPP
+

@@ -8,32 +8,38 @@
 #ifndef ANIMATESYSTEM_HPP_
 #define ANIMATESYSTEM_HPP_
 
-#include "BaseComponents.hpp"
+
+
 #include "BaseSystems/Abstracts/AUpdateSystem.hpp"
-#include <config.h>
+#include "BaseComponents.hpp"
+#include "Config.hpp"
 
-class AnimateSystem final : public AUpdateSystem {
-  public:
-    AnimateSystem(Registry& registry, const std::string name = "AnimateSystem") : AUpdateSystem(registry, name) {}
 
-    void execute(const double deltaTime) override {
-        _registry.view<Animation, sf::Sprite>().each([&](const Entity& entity, Animation& animation, sf::Sprite& sprite) {
+class AnimateSystem final : public AUpdateSystem
+{
+public:
+    explicit AnimateSystem(ecs::Registry &registry) : AUpdateSystem(registry, "AnimateSystem") {}
+
+    void execute(const double& deltaTime) override {
+        _registry.view<Animation, Sprite>().each([&](const Entity& entity, Animation & animation, Sprite &sprite) {
             if (animation.currentFrame == animation.frameCount) {
                 if (animation.loop) {
                     animation.currentFrame = 0;
                 } else {
-                    animation.onEnd(entity);
-                    try {
-                        _registry.get<Animation>(entity);
-                    } catch (std::out_of_range) {
-                        return;
-                    }
+                    const std::function<void(Entity entity)> func = animation.onEnd;
+                    // try {
+                    //     _registry.get<Animation>(entity);
+                    // }
+                    // catch (std::out_of_range&) {
+                    //     return;
+                    // }
                     _registry.removeComponent<Animation>(entity);
+                    func(entity);
                     return;
                 }
             }
             if (animation.elapsedTime >= animation.frameDuration) {
-                sprite.setTextureRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
+                sprite.textureRect = sf::IntRect(animation.currentFrame * animation.frameSize.first, sprite.textureRect.value().top, animation.frameSize.first, animation.frameSize.second);
                 animation.currentFrame++;
                 animation.elapsedTime = 0;
             }
