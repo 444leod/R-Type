@@ -24,6 +24,14 @@ public:
     explicit ASceneRenderingModule(AScene& scene): ASceneModule(scene) {}
     ~ASceneRenderingModule() override = default;
 
+    void executeSystems(sf::RenderWindow& window) const noexcept
+    {
+        for (const auto& system : this->_systems) {
+            if (system->isEnabled())
+                system->execute(window);
+        }
+    }
+
     void trigger(sf::Event &event)
     {
         for (const auto& [predicate, handler]: this->_handlers)
@@ -36,6 +44,9 @@ public:
         this->_handlers.push_back(PredicateHandler { predicate, handler });
     }
 
+    std::vector<std::unique_ptr<ARenderSystem>>& systems() noexcept { return this->_systems; }
+
 private:
     std::vector<PredicateHandler> _handlers;
+    std::vector<std::unique_ptr<ARenderSystem>> _systems;
 };

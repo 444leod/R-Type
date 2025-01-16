@@ -99,11 +99,14 @@ namespace engine
             }
 
             this->_window.clear();
+            // TODO: Should find a cool way of letting the user decide on the ordering of those.
             this->_spritesSystem.execute(this->_window);
             this->_textsSystem.execute(this->_window);
             this->_buttonSystem.execute(this->_window);
             this->_debugDrawSystem.execute(this->_window);
             this->_shapeSystem.execute(this->_window);
+            // Execute additional scene systems
+            this->_target->executeSystems(this->_window);
             this->_window.display();
         }
 
