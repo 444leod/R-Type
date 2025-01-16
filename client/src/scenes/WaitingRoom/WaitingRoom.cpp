@@ -12,7 +12,7 @@
 #include "Components.hpp"
 
 #include "NetworkModules/ANetworkSceneModule.hpp"
-#include "engine/modules/ASceneEventsModule.hpp"
+#include "engine/modules/ASceneRenderingModule.hpp"
 
 void WaitingRoom::initialize()
 {
@@ -54,7 +54,7 @@ void WaitingRoom::update(const double& deltaTime)
 void WaitingRoom::onEnter() {
     _registry.clear();
 
-    auto events = this->getModule<ASceneEventsModule>();
+    auto events = this->getModule<ASceneRenderingModule>();
     if (events != nullptr) {
         events->addHandler(
             [&] (sf::Event& e) {
@@ -67,7 +67,7 @@ void WaitingRoom::onEnter() {
             }
         );
     } else
-        std::cout << "No module for type ASceneEventsModule" << std::endl;
+        std::cout << "No module for type ASceneRenderingModule" << std::endl;
 
     const auto enttext = _registry.create();
     _registry.addComponent(enttext, Text {

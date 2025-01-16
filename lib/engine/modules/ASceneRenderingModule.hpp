@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2024
 ** R-Type
 ** File description:
-** ASceneEventsModule
+** ASceneRenderingModule
 */
 
 #pragma once
@@ -12,7 +12,7 @@
 #include <functional>
 #include "ASceneModule.hpp"
 
-class ASceneEventsModule final : public ASceneModule
+class ASceneRenderingModule final : public ASceneModule
 {
 public:
     struct PredicateHandler {
@@ -21,8 +21,8 @@ public:
     };
 
 public:
-    explicit ASceneEventsModule(AScene& scene): ASceneModule(scene) {}
-    ~ASceneEventsModule() override = default;
+    explicit ASceneRenderingModule(AScene& scene): ASceneModule(scene) {}
+    ~ASceneRenderingModule() override = default;
 
     void trigger(sf::Event &event)
     {

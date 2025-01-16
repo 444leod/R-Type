@@ -28,7 +28,7 @@ namespace
 
 #include "../AScene.hpp"
 #include "AGameModule.hpp"
-#include "ASceneEventsModule.hpp"
+#include "ASceneRenderingModule.hpp"
 #include "engine/Game.hpp"
 
 namespace ecs {
@@ -67,7 +67,7 @@ namespace engine
             this->_buttonSystem.disable();
             this->_buttonClickedSystem.disable();
             this->_shapeSystem.disable();
-            this->_target = scene.getModule<ASceneEventsModule>();
+            this->_target = scene.getModule<ASceneRenderingModule>();
             if (this->_target == nullptr)
                 return;
             this->_spritesSystem.enable();
@@ -111,7 +111,7 @@ namespace engine
     private:
         ResourcesManager _resourcesManager;
 
-        std::shared_ptr<ASceneEventsModule> _target;
+        std::shared_ptr<ASceneRenderingModule> _target;
 
         std::string _title;
         sf::VideoMode _mode;
