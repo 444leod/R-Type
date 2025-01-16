@@ -11,9 +11,7 @@
 #include <cstdint>
 #include "BaseComponents.hpp"
 
-struct Monster
-{
-};
+
 
 
 #endif //GAME_COMPONENTS_HPP

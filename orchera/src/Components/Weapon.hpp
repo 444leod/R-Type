@@ -10,6 +10,8 @@
 
 #include "Bow.hpp"
 
+#include "BaseComponents.hpp"
+
 #include <variant>
 
 struct Weapon

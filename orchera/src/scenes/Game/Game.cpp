@@ -12,9 +12,13 @@
 #include "ecs/Registry.hpp"
 #include "Config.hpp"
 
-#include "Systems/PlayerShotSystem.hpp"
+//#include "Systems/PlayerShotSystem.hpp"
+#include "Systems/PlayerUpdateSystem.hpp"
 
 #include "../../Components/Weapon.hpp"
+#include "../../Components/DamageProtection.hpp"
+#include "../../Components/Border.hpp"
+#include "../../Components/Player.hpp"
 
 #include <engine/RestrictedGame.hpp>
 #include <engine/modules/ASceneEventsModule.hpp>
@@ -28,55 +32,6 @@ void Game::initialize()
 void Game::update(const double& deltaTime)
 {
     _executeUpdateSystems(deltaTime);
-
-    timeSinceLastSpawn -= deltaTime;
-
-    if (timeSinceLastSpawn < 0.0f)
-    {
-        timeSinceLastSpawn += delayBetweenSpawns;
-
-        const auto entity = _registry.create();
-        const auto randX = std::rand() % 600;
-        const auto randY = std::rand() % 1000;
-        // std::cout << "Spawning monster at " << randX << ", " << randY << std::endl;
-        _registry.addComponent(entity, Monster{});
-        _registry.addComponent(entity, Transform{
-            .x = static_cast<float>(randX),
-            .y = static_cast<float>(randY),
-            .z = 0,
-            .rotation = 0
-        });
-        _registry.addComponent(entity, Hitbox{
-            .shape = shape::Circle{
-                .radius = 30,
-                .fillColor = {0, 255, 255, 80}
-            },
-            .onCollision = [](const Entity&) {}
-        });
-        _registry.addComponent(entity, Debug{});
-    }
-
-    if (canShoot)
-    {
-        const auto [x, y, z, rotation] = _registry.get<Transform>(player);
-        std::optional<std::pair<std::pair<float, float>, double>> target = std::nullopt;
-        for (const auto& [monster, _, monsterPos] : _registry.view<Monster, Transform>().each())
-        {
-            if (!target.has_value())
-            {
-                target = {{monsterPos.x, monsterPos.y}, std::sqrt(std::pow(x - monsterPos.x, 2) + std::pow(y - monsterPos.y, 2))};
-                continue;
-            }
-            const auto dist = std::sqrt(std::pow(x - monsterPos.x, 2) + std::pow(y - monsterPos.y, 2));
-            if (dist < target->second)
-                target = {{monsterPos.x, monsterPos.y}, dist};
-        }
-        if (target.has_value())
-        {
-            // _weaponUseSystem->execute(player, {event.mouseButton.x, event.mouseButton.y});
-            _playerShotSystem->execute(player, target.value().first, canShoot);
-        }
-    }
 }
 
 void Game::onEnter()
@@ -90,9 +45,25 @@ void Game::onEnter(const AScene& lastScene)
     _registry.clear<Transform>();
     _registry.clear<Sprite>();
 
+    const auto topBorder = _registry.create();
+    _registry.addComponent(topBorder, Transform{.x = 0, .y = 0, .z = 0});
+    _registry.addComponent(topBorder, Border{.width = 598, .height = 155});
+
+    const auto bottomBorder = _registry.create();
+    _registry.addComponent(bottomBorder, Transform{.x = 0, .y = 1012 - 50 - 25, .z = 0});
+    _registry.addComponent(bottomBorder, Border{.width = 598, .height = 50 + 20});
+
+    const auto leftBorder = _registry.create();
+    _registry.addComponent(leftBorder, Transform{.x = 0, .y = 0, .z = 0});
+    _registry.addComponent(leftBorder, Border{.width = 50 + 30, .height = 1012});
+
+    const auto rightBorder = _registry.create();
+    _registry.addComponent(rightBorder, Transform{.x = 598 - 50 - 30, .y = 0, .z = 0});
+    _registry.addComponent(rightBorder, Border{.width = 50 + 30, .height = 1012});
+
     player = _registry.create();
     _registry.addComponent(player, Sprite("assets/orchera/Factions/Knights/Troops/Archer/Red/Archer_Red.png", {1, 1}, {192 / 2, 192 / 2}, sf::IntRect{0, 0, 192, 192}));
-    _registry.addComponent(player, Transform{.x = 0, .y = 0, .z = 0});
+    _registry.addComponent(player, Transform{.x = 322, .y = 736, .z = 0});
     _registry.addComponent(player, Animation{
         .elapsedTime = 0,
         .frameSize = {192, 192},
@@ -108,7 +79,14 @@ void Game::onEnter(const AScene& lastScene)
             .radius = 30,
             .fillColor = {100, 100, 100, 80}
         },
-        .onCollision = [] (Entity) {}
+        .onCollision = [this] (const Entity entity) {
+            if (_registry.has_any_of<Monster>(entity) && !_registry.has_any_of<DamageProtection>(entity))
+            {
+                std::cout << "Player hit by monster" << std::endl;
+                _registry.get<Health>(entity).health -= 10;
+                _registry.addComponent(entity, DamageProtection{.duration = 0.3f});
+            }
+        }
     });
     _registry.addComponent(player, shape::Circle{
         .radius = 5,
@@ -119,13 +97,23 @@ void Game::onEnter(const AScene& lastScene)
         .weapon = Bow{
             .shootDelay = 0.5f,
             .shootCooldown = 0,
+            .attackSpeed = 0.6f,
             .range = 2000,
-            .shoot = [](ecs::Registry& registry, const Entity& player, const std::pair<float, float>& target, Bow& bow)
-            {}
+            .pierce = 3,
+            .damage = 10
         }
     });
 
-    _registry.addComponent(player, Debug{});
+    _registry.addComponent(player, Health{.health = 100, .maxHealth = 100});
+    _registry.addComponent(player, Player{});
+
+    this->_updateSystems.push_back(std::make_unique<PlayerUpdateSystem>(_registry, player));
+
+    // _registry.addComponent(player, Debug{});
+
+    const auto map = _registry.create();
+    _registry.addComponent(map, Sprite("assets/orchera/map.png", {1.4375, 1.4375}));
+    _registry.addComponent(map, Transform{.x = 0, .y = 0, .z = -1});
 
     const auto events = this->getModule<ASceneEventsModule>();
     if (!events)
@@ -134,7 +122,7 @@ void Game::onEnter(const AScene& lastScene)
         std::cerr << "No events module found, exiting..." << std::endl;
     }
 
-    _playerShotSystem = std::make_unique<PlayerShotSystem>(_registry);
+//    _playerShotSystem = std::make_unique<PlayerShotSystem>(_registry);
 
     events->addHandler(
         [](const sf::Event& event)
@@ -167,8 +155,11 @@ void Game::onEnter(const AScene& lastScene)
             if (_pressedKeys.contains(sf::Keyboard::Right))
                 x += 1;
             const float norm = std::sqrt(x * x + y * y);
+            if (norm == 0)
+                return;
             x *= speed / norm;
             y *= speed / norm;
+            _registry.removeComponent<Animation>(player);
         }
     );
 }

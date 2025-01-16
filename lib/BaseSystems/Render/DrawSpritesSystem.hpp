@@ -38,7 +38,7 @@ public:
                 _textures[sprite.texture] = texture;
             }
 
-            const auto tex = _textures.at(sprite.texture);
+            const auto& tex = _textures.at(sprite.texture);
 
             if (!sprite.textureRect.has_value())
             {

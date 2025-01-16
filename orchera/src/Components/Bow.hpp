@@ -16,8 +16,10 @@ struct Bow
 {
     float shootDelay;
     float shootCooldown;
+    float attackSpeed;
     float range;
-    std::function<void(ecs::Registry&, const Entity&, const std::pair<float, float>&, Bow&)> shoot;
+    std::uint8_t pierce;
+    std::int32_t damage;
 };
 
 #endif //BOW_HPP

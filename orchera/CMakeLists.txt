@@ -1,7 +1,7 @@
 project(r-type_orchera VERSION 0.0.1)
 
 set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
-set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/client/include)
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/orchera/include)
 set(SHARED_DIR ${CMAKE_SOURCE_DIR}/shared)
 
 set(SRC_FILES

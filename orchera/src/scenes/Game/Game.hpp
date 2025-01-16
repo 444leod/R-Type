@@ -21,11 +21,12 @@
 #include "BaseSystems/Update/CollisionSystem.hpp"
 
 // Game specific
-#include "Systems/PlayerShotSystem.hpp"
 #include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
+#include "Systems/AttackSystem.hpp"
+#include "Systems/MonsterUpdateSystem.hpp"
+#include "Systems/BorderCollisionSystem.hpp"
+#include "Systems/DamageProtectionSystem.hpp"
 
-#include <chrono>
-#include <memory>
 #include <set>
 
 class Game final : public AScene {
@@ -36,6 +37,10 @@ public:
         this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<AnimateSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<AttackSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<MonsterUpdateSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<BorderCollisionSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<DamageProtectionSystem>(_registry));
     }
 
     void initialize() override;
@@ -56,7 +61,6 @@ private:
 public:
 private:
     bool canShoot = true;
-    std::unique_ptr<PlayerShotSystem> _playerShotSystem = nullptr;
     std::set<sf::Keyboard::Key> _pressedKeys;
     Entity player;
     const float delayBetweenSpawns = 0.25f;

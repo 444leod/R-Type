@@ -13,7 +13,7 @@
 int main() {
     auto game = game::Game();
 
-    game.addModule<engine::GameRenderingModule>(600, 1000, "Orchera");
+    game.addModule<engine::GameRenderingModule>(598, 1012, "Orchera");
 
     const auto homeScreen = game.registerScene<HomeScreen>("home screen");
     {
