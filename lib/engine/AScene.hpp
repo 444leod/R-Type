@@ -11,8 +11,26 @@
 class SceneManager;
 
 #include <map>
+#include <utility>
 #include <vector>
 #include <memory>
+#include "RestrictedSceneManager.hpp"
+#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
+#include "BaseSystems/Abstracts/ARenderSystem.hpp"
+#include "ecs/Registry.hpp"
+#include "ecs/Family.hpp"
+#include "modules/ASceneModule.hpp"
+
+namespace engine
+{
+
+    template <typename T>
+    concept SceneModule = std::is_base_of_v<ASceneModule, T>;
+
+    template <typename T, typename... Params>
+    concept ConstructibleSceneModule = std::constructible_from<T, AScene&, Params...>;
+
+}
 
 #include "RestrictedSceneManager.hpp"
 #include "BaseSystems/Abstracts/AUpdateSystem.hpp"
@@ -34,8 +52,8 @@ namespace engine
 
 class AScene {
 public:
-    AScene(RestrictedSceneManager& manager, ecs::Registry& registry, const std::string& name) :
-        _manager(manager), _registry(registry), _name(name) {}
+    AScene(RestrictedSceneManager& manager, ecs::Registry& registry, std::string  name) :
+        _manager(manager), _registry(registry), _name(std::move(name)) {}
 
     virtual~AScene() = default;
 
@@ -56,7 +74,9 @@ public:
         for (auto module: this->_modules) {
             auto cast = std::dynamic_pointer_cast<T>(module);
             if (cast != nullptr)
+            {
                 return cast;
+            }
         }
         return nullptr;
     }
@@ -142,16 +162,16 @@ public:
         requires engine::ConstructibleSceneModule<T, Params...>
     std::shared_ptr<T> addModule(Params&&... params)
     {
-        auto module = std::make_shared<T>(*this, std::forward(params)...);
+        auto module = std::make_shared<T>(*this, std::forward<Params>(params)...);
         this->_modules.push_back(module);
         return module;
     }
 
 
 protected:
-    ecs::Registry& _registry;
 
 protected:
+    ecs::Registry& _registry;
     RestrictedSceneManager& _manager;
 
     std::vector<std::unique_ptr<AUpdateSystem>> _updateSystems;
@@ -185,8 +205,8 @@ protected:
 
 
 private:
-    std::vector<std::shared_ptr<ASceneModule>> _modules = {};
-    const std::string& _name = "";
+    std::vector<std::shared_ptr<ASceneModule>> _modules;
+    const std::string _name;
 };
 
 #endif //ASCENE_HPP

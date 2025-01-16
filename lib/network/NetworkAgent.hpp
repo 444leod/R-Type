@@ -17,18 +17,22 @@
 
 namespace ntw
 {
-
-
     struct ClientInformation
     {
         asio::ip::udp::endpoint endpoint;
         std::string name;
         std::uint32_t id = 0;
 
-        ClientInformation(asio::ip::udp::endpoint endpoint, const std::uint32_t& id, const std::string& name = "") : endpoint(std::move(endpoint)), id(id) {}
+        explicit ClientInformation(asio::ip::udp::endpoint endpoint, std::string name = "") : endpoint(std::move(endpoint)), name(std::move(name)), id(_lastId++) {}
+        ClientInformation(asio::ip::udp::endpoint endpoint, const std::uint32_t& id, std::string name = "") : endpoint(std::move(endpoint)), name(std::move(name)), id(id) {}
         ClientInformation(const ClientInformation &) = default;
         ClientInformation &operator=(const ClientInformation &) = default;
+
+    private:
+        static std::uint32_t _lastId;
     };
+
+    inline std::uint32_t ClientInformation::_lastId = 0;
 
     /**
      * @brief Class representation of an object connected via socket, that can receive and send packets.

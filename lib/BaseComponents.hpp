@@ -13,8 +13,9 @@
 #include <string>
 #include <utility>
 #include <filesystem>
+#include <bits/fs_ops.h>
 #include <variant>
-#include <optional>
+#include <SFML/Graphics.hpp>
 
 #include "ecs/Entity.hpp"
 #include "Config.hpp"
@@ -38,6 +39,16 @@ struct Color
     std::int8_t g;
     std::int8_t b;
     std::int8_t a = static_cast<std::int8_t>(255);
+
+    Color() = default;
+    Color(std::int8_t r, std::int8_t g, std::int8_t b, std::int8_t a = 255)
+        : r(r), g(g), b(b), a(a)
+    {
+    }
+    Color(int r, int g, int b, int a = 255)
+        : r(static_cast<std::int8_t>(r)), g(static_cast<std::int8_t>(g)), b(static_cast<std::int8_t>(b)), a(static_cast<std::int8_t>(a))
+    {
+    }
 };
 
 struct Projectile {
@@ -54,15 +65,52 @@ struct Position {
     float x, y;
 };
 
+/**
+ * @struct Animation
+ * @brief Represents an animation component.
+ *
+ * This struct holds the properties and behaviors of an animation, including
+ * frame size, duration, and looping behavior.
+ */
 struct Animation {
-    sf::Clock clock = sf::Clock();
+    /**
+     * @brief The time elapsed since the last frame.
+     */
+    float elapsedTime = 0;
+
+    /**
+     * @brief The size of a frame (width, height).
+     */
     std::pair<int, int> frameSize{};
-    float speed{};
-    unsigned int currentFrame = 1;
+
+    /**
+     * @brief The duration of a frame in seconds.
+     */
+    float frameDuration{};
+
+    /**
+     * @brief The total number of frames in the animation.
+     */
     unsigned int frameCount{};
+
+    /**
+     * @brief Indicates whether the animation should loop.
+     */
     bool loop{};
-    // TODO: Refacto to not have nested components
-    Velocity velocity{};
+
+    /**
+     * @brief The index of the current frame (1-based).
+     */
+    unsigned int currentFrame = 1;
+
+    /**
+     * @brief The function to call when the animation ends (if loop is false).
+     * @param entity The Entity that the animation is attached to.
+     *
+     * This function takes an Entity as a parameter and is called when the
+     * animation completes.
+     */
+    std::function<void(Entity entity)> onEnd = [](Entity entity) {};
 };
 
 struct Enemy {
@@ -72,8 +120,9 @@ struct Enemy {
 // UI Components
 
 struct Text {
-    std::string message;
+public:
     std::string font;
+    std::string message;
     std::uint32_t fontSize;
     Color color;
 };
@@ -82,45 +131,11 @@ class DrawSpritesSystem;
 
 struct Sprite
 {
-private:
-    std::uint32_t pathId;
-    static std::unordered_map<std::string, std::uint32_t> loadedTextures;
-    friend class DrawSpritesSystem;
-
 public:
     std::string texture;
     std::pair<float, float> scale;
     std::pair<float, float> origin;
-    std::optional<sf::IntRect> textureRect;
-
-public:
-    explicit Sprite(
-        std::string texture,
-        const std::pair<double, double>& scale = {1.0, 1.0},
-        const std::pair<double, double>& origin = {0.0, 0.0},
-        const std::optional<sf::IntRect>& textureRect = std::nullopt)
-        : texture(std::move(texture)), scale({ scale.first * SCALE, scale.second * SCALE }), origin(origin), textureRect(textureRect)
-    {
-        const auto path = std::filesystem::weakly_canonical(this->texture).string();
-
-        if (auto it = loadedTextures.find(path); it == loadedTextures.end())
-        {
-            pathId = loadedTextures.size();
-            loadedTextures[path] = pathId;
-        }
-        else
-        {
-            pathId = it->second;
-        }
-    }
-};
-
-inline std::unordered_map<std::string, std::uint32_t> Sprite::loadedTextures;
-
-struct RectangleButton {
-    sf::RectangleShape shape;
-    std::string label;
-    std::function<void()> onClick;
+    std::optional<sf::IntRect> textureRect = std::nullopt;
 };
 
 namespace shape
@@ -140,14 +155,23 @@ struct Rectangle
     Color fillColor = {0, 0, 0};
     Color outlineColor = {0, 0, 0};
     float outlineThickness = 0;
-    float rotation = 0;
 };
-}
+
+};
 
 struct Hitbox
 {
     std::variant<shape::Rectangle, shape::Circle> shape;
     std::function<void(const Entity& other)> onCollision;
+};
+
+#include <iostream>
+
+struct Button {
+    std::variant<Sprite, shape::Rectangle> shape;
+    std::function<void()> onClick;
+    std::optional<Text> label = std::nullopt;
+
 };
 
 struct Debug {};

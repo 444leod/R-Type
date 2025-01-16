@@ -9,12 +9,13 @@
 #include "ecs/Registry.hpp"
 #include <algorithm>
 #include <cmath>
-#include "Config.hpp"
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Keyboard.hpp>
 #include "PacketTypes.hpp"
+#include "NetworkModules/ANetworkSceneModule.hpp"
+#include "Components.hpp"
+#include "../../Systems/RemoveClientSystem.hpp"
 
 inline bool isInputAvailable()
 {
@@ -85,15 +86,23 @@ void WaitingRoom::onEnter()
     _registry.addComponent<Position>(exitButtonEntity, {20.0f, 20.0f});
     sf::RectangleShape exitButtonShape({100.0f, 40.0f});
     exitButtonShape.setFillColor(sf::Color::Red);
-    _registry.addComponent<RectangleButton>(exitButtonEntity, {exitButtonShape, "Exit", [this]()
-                                                               { _onExit({}); }});
+    // _registry.addComponent<Button>(exitButtonEntity, {.shape exitButtonShape, "Exit", [this](){ game::RestrictedGame::instance().stop(); }});
 
     auto startButtonEntity = _registry.create();
     _registry.addComponent<Position>(startButtonEntity, {140.0f, 20.0f});
     sf::RectangleShape startButtonShape({100.0f, 40.0f});
     startButtonShape.setFillColor(sf::Color::Green);
-    _registry.addComponent<RectangleButton>(startButtonEntity, {startButtonShape, "Start", [this]()
-                                                                { _onStart({}); }});
+    // _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){
+    //    //TODO: start the game
+    // }});
+
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (net == nullptr)
+    {
+        std::cout << "No network module found, exiting..." << std::endl;
+        game::RestrictedGame::instance().stop();
+        return;
+    }
 }
 
 void WaitingRoom::onEnter(const AScene &lastScene)
@@ -105,110 +114,34 @@ void WaitingRoom::onExit()
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 
-    //this->_broadcast(packet);
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (net == nullptr)
+        return;
+
+    net->sendPacket(packet);
 }
 
 void WaitingRoom::onExit(const AScene &nextScene)
 {
+    std::cout << "Exiting to " << nextScene.name() << std::endl;
+    // std::cout << "zeajkh" << std::endl;
 }
 
-/* void WaitingRoom::onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
+void WaitingRoom::_startGame(const std::vector<std::string> &)
 {
+    auto net = this->getModule<ANetworkSceneModule>();
 
-    const auto payload = packet.payload;
-    // std::cout << "Received: " << payload << " (seq: " << packet.sequence_number
-    //     << ", ack: " << packet.ack_number << ")" << std::endl;
-
-    PACKET_TYPE packet_type{};
-    packet >> packet_type;
-
-    auto it = std::find_if(CLIENTS.begin(), CLIENTS.end(), [&src](const auto &client)
-                           { return client.endpoint == src; });
-
-    if (it == CLIENTS.end())
+    if (net->clients().size() < 1)
     {
-        if (packet_type != PACKET_TYPE::CONNECT)
-            return;
-        CLIENTS.push_back(ntw::ClientInformation(src,
-            (CLIENTS.size() > 4) ? ntw::ClientInformation::Type::VIEWER : ntw::ClientInformation::Type::PLAYER,
-            CLIENTS.size()
-        ));
-
-        std::cout << "New client, new size: " << CLIENTS.size() << std::endl;
-
-        std::cout << "Client connected: " << src << std::endl;
-        it = CLIENTS.end() - 1;
+        std::cout << "Not enough players to start the game" << std::endl;
+        return;
     }
 
-    if (_packet_handlers.contains(packet_type))
-        _packet_handlers.at(packet_type)(*it, packet);
-} */
+    std::cout << "Starting the game..." << std::endl;
+    game::RestrictedGame::instance().scenes().load("game");
 
-/* void WaitingRoom::_broadcast(const ntw::UDPPacket& packet)
-{
-    for (auto &[endpoint, type, name, id] : CLIENTS)
-    {
-        _manager.send(endpoint, packet);
-    }
-} */
+    ntw::UDPPacket packet;
+    packet << PACKET_TYPE::START;
 
-void WaitingRoom::_onConnect(const ntw::ClientInformation& src, ntw::UDPPacket& packet)
-{
-    std::string name;
-    packet >> name;
-    std::cout << "Client connected: " << name << std::endl;
-
-    /* ntw::UDPPacket response;
-    response << PACKET_TYPE::CONNECT;
-    response << src.id;
-
-    _manager.send(src.endpoint, response); */
-
-    auto entity = _registry.create();
-    Text clientText {
-        .message = "Client " + std::to_string(src.id),
-        .font = "./assets/arial.ttf",
-        .fontSize = 20,
-        .color = Color( 255, 255, 255 )
-    };
-    _registry.addComponent<Text>(entity, clientText);
-    //_registry.addComponent<Position>(entity, {50.0f, 50.0f + 30.0f * CLIENTS.size()}); //TODO: update this
-}
-
-void WaitingRoom::_onDisconnect(const ntw::ClientInformation& src, ntw::UDPPacket& packet) {
-    std::cout << "Client disconnected: " << src.endpoint << std::endl;
-    // std::erase_if(CLIENTS, [&src](const auto& client) { //TODO: update this
-    //     return client.endpoint == src.endpoint;
-    // });
-
-    // send informations about players connected
-}
-
-void WaitingRoom::_onMessage(const ntw::ClientInformation& source, ntw::UDPPacket& packet)
-{
-    std::string message;
-    packet >> message;
-    std::cout << "Message from " << source.endpoint << ": " << message << std::endl;
-}
-
-void WaitingRoom::_onExit(const std::vector<std::string> &args)
-{
-    std::cout << "Exiting..." << std::endl;
-    _manager.stop();
-
-    //this->_broadcast(ntw::UDPPacket{} << PACKET_TYPE::DISCONNECT);
-}
-
-void WaitingRoom::_onStart(const std::vector<std::string> &args)
-{
-    std::cout << "Starting game..." << std::endl;
-
-    // if (CLIENTS.empty()) // TODO: update this
-    // {
-    //     std::cout << "Not enough players to start the game." << std::endl;
-    //     return;
-    // }
-
-    //this->_broadcast(ntw::UDPPacket{} << PACKET_TYPE::START);
-    _manager.load("Level1");
+    net->sendPacket(packet);
 }

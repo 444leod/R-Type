@@ -15,13 +15,14 @@
 #include "BaseComponents.hpp"
 #include "BaseSystems/Render/DrawTextsSystem.hpp"
 
-#include "Systems/DrawMenuButtonsSystem.hpp"
 #include "PacketTypes.hpp"
 
 #include <chrono>
 #include <functional>
 #include <memory>
 #include "BaseSystems/Update/CollisionSystem.hpp"
+
+#include <engine/RestrictedGame.hpp>
 
 class WaitingRoom final : public AScene {
 public:
@@ -43,35 +44,17 @@ public:
     void onExit(const AScene& nextScene) override;
 
 private:
-
-    void _onConnect(const ntw::ClientInformation& src, ntw::UDPPacket& packet);
-    void _onDisconnect(const ntw::ClientInformation& src, ntw::UDPPacket& packet);
-    void _onMessage(const ntw::ClientInformation& src, ntw::UDPPacket& packet);
-
-    void _onExit(const std::vector<std::string>& args);
-    void _onStart(const std::vector<std::string>& args);
-
-    //void _broadcast(const UDPPacket& packet);
-
+    void _startGame(const std::vector<std::string>& args);
 
 public:
 private:
     ecs::Registry _registry;
-    ecs::EventDispatcher _eventDispatcher;
-
-    /* std::map<PACKET_TYPE, std::function<void(const ClientInformation& client, ntw::UDPPacket& packet)>> _packet_handlers = {
-        {PACKET_TYPE::CONNECT,      [this](const ClientInformation& src, ntw::UDPPacket& packet)   { this->_onConnect(src, packet); }},
-        {PACKET_TYPE::DISCONNECT,   [this](const ClientInformation& src, ntw::UDPPacket& packet)   { this->_onDisconnect(src, packet); }},
-        {PACKET_TYPE::MESSAGE,      [this](const ClientInformation& src, ntw::UDPPacket& packet)   { this->_onMessage(src, packet); }}
-    }; */
 
     std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
-        {"exit",    [this](const std::vector<std::string>& args) { this->_onExit(args); }},
-        {"start",   [this](const std::vector<std::string>& args) { this->_onStart(args); }},
+        {"exit",    [this](const std::vector<std::string>& args) { game::RestrictedGame::instance().stop(); }},
+        {"start",   [this](const std::vector<std::string>& args) { this->_startGame(args); }},
         {"",        [this](const std::vector<std::string>& args) { }}
     };
-
-    // PlayerMovement _playerMovement{_registry};
 };
 
 

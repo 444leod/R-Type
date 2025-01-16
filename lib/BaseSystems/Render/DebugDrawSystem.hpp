@@ -26,11 +26,11 @@ public:
 
         view.each([&] (const Entity& entity, const Debug&, const Hitbox& hitbox, const Transform& transform) {
             if (std::holds_alternative<shape::Rectangle>(hitbox.shape)) {
-                const auto&[width, height, fillColor, outlineColor, outlineThickness, rotation] = std::get<shape::Rectangle>(hitbox.shape);
+                const auto&[width, height, fillColor, outlineColor, outlineThickness] = std::get<shape::Rectangle>(hitbox.shape);
                 sf::RectangleShape shape(sf::Vector2f(width, height));
                 shape.setPosition(transform.x + width / 2, transform.y + height / 2);
-                shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b));
-                shape.setOutlineColor(sf::Color(outlineColor.r, outlineColor.g, outlineColor.b));
+                shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b, fillColor.a));
+                shape.setOutlineColor(sf::Color(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a));
                 shape.setOutlineThickness(outlineThickness);
                 shape.setRotation(transform.rotation);
                 shape.setOrigin(width / 2, height / 2);
@@ -39,10 +39,10 @@ public:
                 const auto&[radius, fillColor, outlineColor, outlineThickness] = std::get<shape::Circle>(hitbox.shape);
                 sf::CircleShape shape(radius);
                 shape.setPosition(transform.x, transform.y);
-                shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b));
-                shape.setOutlineColor(sf::Color(outlineColor.r, outlineColor.g, outlineColor.b));
+                shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b, fillColor.a));
+                shape.setOutlineColor(sf::Color(outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a));
                 shape.setOutlineThickness(outlineThickness);
-                shape.setOrigin(radius / 2, radius / 2);
+                shape.setOrigin(radius, radius);
                 window.draw(shape);
             }
         });

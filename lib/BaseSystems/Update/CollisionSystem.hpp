@@ -122,12 +122,14 @@ private:
     static bool checkCircleRectangleCollision(const shape::Circle& circle, const Transform& circleTransform, const shape::Rectangle& rect, const Transform& rectTransform)
     {
         const float angle = rectTransform.rotation * (M_PI / 180.0f);
-
         const float cosAngle = std::cos(angle);
         const float sinAngle = std::sin(angle);
 
-        const float localCircleX = circleTransform.x - rectTransform.x;
-        const float localCircleY = circleTransform.y - rectTransform.y;
+        const float rectCenterX = rectTransform.x + rect.width / 2;
+        const float rectCenterY = rectTransform.y + rect.height / 2;
+
+        const float localCircleX = circleTransform.x - rectCenterX;
+        const float localCircleY = circleTransform.y - rectCenterY;
 
         const float rotatedCircleX = localCircleX * cosAngle + localCircleY * sinAngle;
         const float rotatedCircleY = -localCircleX * sinAngle + localCircleY * cosAngle;

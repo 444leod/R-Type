@@ -5,41 +5,72 @@
 ** MonsterKilledSystem
 */
 
-#ifndef MONSTERKILLEDSYSTEM_HPP_
-#define MONSTERKILLEDSYSTEM_HPP_
+#ifndef MONSTER_KILLED_SYSTEM_HPP_
+#define MONSTER_KILLED_SYSTEM_HPP_
 
 
 #include "BaseSystems/Abstracts/ASystem.hpp"
 #include "BaseComponents.hpp"
-#include "../Components.hpp"
-#include "Config.hpp"
-
-#include "../Events/PacketInformation.hpp"
-#include <SFML/Graphics.hpp>
 
 class MonsterKilledSystem final : public ASystem
 {
 public:
     explicit MonsterKilledSystem(ecs::Registry &registry) : ASystem(registry, "MonsterKilledSystem") {}
 
-    void execute(const PacketInformation &event, const sf::Texture &explosionTex) const {
-        uint32_t monster_id;
-        uint32_t projectile_id;
-        event.packet >> monster_id >> projectile_id;
+    void execute(const std::uint32_t& monsterId, const std::uint32_t& projectileId)
+    {
+        std::optional<std::tuple<Entity, Enemy, Transform>> monster = std::nullopt;
 
-        _registry.view<Enemy, Sprite, Transform>().each([&](const Entity& enemy, const Enemy&e_enemy, const Sprite&, const Transform& transform)  {
-            _registry.view<Projectile, Transform>().each([&](const Entity& projectile, const Projectile&p_projectile, const Transform& projectile_transform) {
-                if (e_enemy.id != monster_id || p_projectile.id != projectile_id)
-                    return;
-                const auto explosion = _registry.create();
-                _registry.addComponent(explosion, explosionSprite);
-                _registry.addComponent(explosion, Transform{.x = transform.x, .y = transform.y, .z = 1, .rotation = 0});
-                _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .speed = 100, .frameCount = 6, .loop = false});
-                _registry.remove(enemy);
-                _registry.remove(projectile);
-            });
-        });
+        for (auto &[entity, enemy, transform] : _registry.view<Enemy, Transform>().each())
+        {
+            if (enemy.id != monsterId)
+                continue;
+
+            monster = std::make_tuple(entity, enemy, transform);
+            break;
+        }
+
+        if (!monster.has_value())
+            return;
+
+        std::optional<std::tuple<Entity, Projectile, Transform>> projectile = std::nullopt;
+
+        for (auto &[entity, proj, transform] : _registry.view<Projectile, Transform>().each())
+        {
+            if (proj.id != projectileId)
+                continue;
+
+            projectile = std::make_tuple(entity, proj, transform);
+            break;
+        }
+
+        if (!projectile.has_value())
+            return;
+
+        const auto [monsterEntity, monsterEnemy, monsterTransform] = *monster;
+        const auto [projectileEntity, projectileProjectile, projectileTransform] = *projectile;
+        _registry.remove(monsterEntity);
+        _registry.remove(projectileEntity);
+
+        const auto explosion = _registry.create();
+
+        // auto explosionSprite = sf::Sprite(explosionTex);
+        // explosionSprite.setOrigin(16, 16);
+        // explosionSprite.setScale(SCALE, SCALE);
+        // explosionSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+        // explosionSprite.setPosition(monsterTransform->x, monsterTransform->y);
+        // _registry.addComponent(explosion, explosionSprite);
+
+        _registry.addComponent(explosion, Transform{.x = monsterTransform.x, .y = monsterTransform.y, .z = 1, .rotation = 0});
+        _registry.addComponent(explosion, Animation {
+                .frameSize = {32, 32},
+                .frameDuration = 0.1,
+                .frameCount = 6,
+                .loop = false,
+                .onEnd = [&](const Entity& entity){ _registry.remove(entity); }
+            }
+        );
     }
 };
 
-#endif /* !MONSTERKILLEDSYSTEM_HPP_ */
+#endif /* !MONSTER_KILLED_SYSTEM_HPP_ */

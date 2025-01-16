@@ -86,19 +86,35 @@ namespace ecs {
          */
         void clear()
         {
-            for (const auto &sparse : _sparse_sets | std::views::values)
+            for (auto const &[id, sparse] : _sparse_sets)
                 sparse->clear();
             _entities.clear();
+        }
+
+        /**
+         * @brief Clears all the components of a given type
+         *
+         * @tparam Component The type of component to clear
+         * @tparam  OtherComponents Additional types of components to clear
+         */
+        template <typename Component, typename... OtherComponents>
+        void clear()
+        {
+            for (const auto types = { Family<Component>::id(), Family<OtherComponents>::id()... }; auto id : types)
+            {
+                if (_sparse_sets.contains(id))
+                    _sparse_sets.at(id)->clear();
+            }
         }
 
         /**
          * @brief Attaches a Component to an Entity
          * @tparam T The type of component to attach. Can be deduced by the parameter
          * @param entity The Entity to attach to
-         * @param component The Component informations to attach
+         * @param component The Component information to attach
          */
         template <typename T>
-        void addComponent(Entity entity, const T &component)
+        T& addComponent(Entity entity, const T &component)
         {
             const auto id = Family<T>::id();
             SparseSet<T> *set = nullptr;
@@ -111,6 +127,7 @@ namespace ecs {
             else
                 set = dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id));
             set->set(entity, component);
+            return set->at(entity);
         }
 
         /**
@@ -140,6 +157,81 @@ namespace ecs {
                 std::cout << id << std::endl;
                 set->display();
             }
+        }
+
+        /**
+         * @brief Checks if an Entity has a component
+         *
+         * @tparam Component The type of component to check
+         * @tparam OtherComponents Additional types of components to check
+         *
+         * @param entity The Entity to check
+         *
+         * @return True if the Entity has the component, false otherwise
+         */
+        template <typename Component, typename... OtherComponents>
+        bool has_all_of(const Entity& entity)
+        {
+
+            for (const auto types = { Family<Component>::id(), Family<OtherComponents>::id()... };auto id : types)
+            {
+                if (!_sparse_sets.contains(id))
+                    return false;
+                if (!_sparse_sets.at(id)->contains(entity))
+                    return false;
+            }
+            return true;
+        }
+
+        /**
+         * @brief Checks if an Entity has any of the components
+         *
+         * @tparam Component The type of component to check
+         * @tparam OtherComponents Additional types of components to check
+         *
+         * @param entity The Entity to check
+         *
+         * @return True if the Entity has any of the components, false otherwise
+         */
+        template <typename Component, typename... OtherComponents>
+        bool has_any_of(const Entity& entity)
+        {
+
+            for (const auto types = { Family<Component>::id(), Family<OtherComponents>::id()... };auto id : types)
+            {
+                if (_sparse_sets.contains(id) && _sparse_sets.at(id)->contains(entity))
+                    return true;
+            }
+            return false;
+        }
+
+        /**
+         * @brief Gets a component from an Entity
+         *
+         * @tparam T The type of component to get
+         *
+         * @param entity The Entity to get the component from
+         *
+         * @return The component
+         */
+        template <typename T>
+        T& get(const Entity entity)
+        {
+            const auto id = Family<T>::id();
+
+            if (!this->_sparse_sets.contains(id))
+            {
+                throw std::out_of_range("No such component in the registry:" + Family<T>::name());
+            }
+
+            const auto set = dynamic_cast<SparseSet<T> *>(this->_sparse_sets.at(id));
+
+            if (!set->contains(entity))
+            {
+                throw std::out_of_range(entity + " does not have the component " + Family<T>::name());
+            }
+
+            return set->at(entity);
         }
 
     private:

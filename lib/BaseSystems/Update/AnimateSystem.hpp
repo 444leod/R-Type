@@ -26,18 +26,24 @@ public:
                 if (animation.loop) {
                     animation.currentFrame = 0;
                 } else {
-                    if (animation.velocity.x != 0 || animation.velocity.y != 0)
-                        _registry.addComponent(entity, animation.velocity);
-                    else
-                        _registry.remove(entity);
+                    const std::function<void(Entity entity)> func = animation.onEnd;
+                    // try {
+                    //     _registry.get<Animation>(entity);
+                    // }
+                    // catch (std::out_of_range&) {
+                    //     return;
+                    // }
                     _registry.removeComponent<Animation>(entity);
+                    func(entity);
+                    return;
                 }
             }
-            if (animation.clock.getElapsedTime().asMilliseconds() >= animation.speed) {
-                sprite.textureRect = sf::IntRect(sf::IntRect(animation.currentFrame * animation.frameSize.first, 0, animation.frameSize.first, animation.frameSize.second));
+            if (animation.elapsedTime >= animation.frameDuration) {
+                sprite.textureRect = sf::IntRect(animation.currentFrame * animation.frameSize.first, sprite.textureRect.value().top, animation.frameSize.first, animation.frameSize.second);
                 animation.currentFrame++;
-                animation.clock.restart();
+                animation.elapsedTime = 0;
             }
+            animation.elapsedTime += deltaTime;
         });
     }
 };

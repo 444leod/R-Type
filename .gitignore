@@ -60,6 +60,8 @@ cmake-build-release
 r-type_client
 r-type_server
 rtype_venv
+cmake-build-debug
+cmake-build-release
 
 # Docusaurus specific
 node_modules/**

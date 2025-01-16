@@ -20,7 +20,6 @@
 
 namespace game
 {
-
     template <typename T>
     concept GameModule = std::is_base_of_v<AGameModule, T>;
 
@@ -65,32 +64,33 @@ namespace game
         void run(const std::string& scene) {
             this->_running = true;
             this->_sceneManager.load(scene);
+            this->_sceneManager.update();
             auto before = std::chrono::high_resolution_clock::now();
             double deltaTime = .0;
 
-            for (const auto module: this->_modules)
-                module->start();
+            for (const auto& module: this->_modules)
+                module->start(this->_sceneManager.current());
 
             while (_running)
             {
                 if (this->_sceneManager.update())
-                    for (const auto module: this->_modules)
+                    for (const auto& module: this->_modules)
                         module->refresh(this->_sceneManager.current());
-                for (const auto module: this->_modules)
+                for (const auto& module: this->_modules)
                     module->update();
                 this->_sceneManager.current().update(deltaTime);
                 this->_registry.flush();
 
                 // Compute deltaTime
                 auto now = std::chrono::high_resolution_clock::now();
-                before = now;
                 deltaTime = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(now - before).count() / 1000.0;
                 if (deltaTime < this->_targetDeltaTime)
                     std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(this->_targetDeltaTime - deltaTime)));
+                before = now;
             }
 
             this->_sceneManager.stop();
-            for (const auto module: this->_modules)
+            for (const auto& module: this->_modules)
               module->stop();
         }
 

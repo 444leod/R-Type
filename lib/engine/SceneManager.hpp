@@ -121,6 +121,8 @@ public:
 
     /**
      * @brief Updates the state of the current scene.
+     *
+     * @return true if the scene was updated, false otherwise.
      */
     bool update()
     {

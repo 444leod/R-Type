@@ -11,7 +11,7 @@ class AScene;
 
 class ASceneModule {
 public:
-    ASceneModule(AScene& scene): _scene(scene) {}
+    explicit ASceneModule(AScene& scene): _scene(scene) {}
     virtual ~ASceneModule() = default;
 
 protected:
