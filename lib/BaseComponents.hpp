@@ -13,7 +13,6 @@
 #include <string>
 #include <utility>
 #include <filesystem>
-#include <bits/fs_ops.h>
 #include <variant>
 #include <SFML/Graphics.hpp>
 
