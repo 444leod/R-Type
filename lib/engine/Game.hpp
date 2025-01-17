@@ -68,8 +68,10 @@ namespace game
             auto before = std::chrono::high_resolution_clock::now();
             double deltaTime = .0;
 
-            for (const auto& module: this->_modules)
+            for (const auto& module: this->_modules) {
                 module->start(this->_sceneManager.current());
+                module->refresh(this->_sceneManager.current());
+            }
 
             while (_running)
             {

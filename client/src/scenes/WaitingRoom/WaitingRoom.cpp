@@ -12,7 +12,9 @@
 #include "Components.hpp"
 
 #include "NetworkModules/ANetworkSceneModule.hpp"
-#include "engine/modules/ASceneEventsModule.hpp"
+#include "engine/modules/ASceneRenderingModule.hpp"
+
+#include "systems/ExampleSystem.hpp"
 
 void WaitingRoom::initialize()
 {
@@ -54,20 +56,21 @@ void WaitingRoom::update(const double& deltaTime)
 void WaitingRoom::onEnter() {
     _registry.clear();
 
-    auto events = this->getModule<ASceneEventsModule>();
-    if (events != nullptr) {
-        events->addHandler(
-            [&] (sf::Event& e) {
+    auto rendering = this->getModule<ASceneRenderingModule>();
+    if (rendering != nullptr) {
+        rendering->systems().push_back(std::make_unique<ExampleRenderingSystem>(this->_registry));
+        rendering->addHandler(
+            [] (sf::Event& e) {
                 return e.type == sf::Event::KeyPressed
                     && e.key.code <= sf::Keyboard::Z
                     && e.key.code >= sf::Keyboard::A;
             },
-            [&] (sf::Event& e) {
+            [] (sf::Event& e) {
                 std::cout << "Pressed key: " << (char)(e.key.code + 'A') << std::endl;
             }
         );
     } else
-        std::cout << "No module for type ASceneEventsModule" << std::endl;
+        std::cout << "No module for type ASceneRenderingModule" << std::endl;
 
     const auto enttext = _registry.create();
     _registry.addComponent(enttext, Text {

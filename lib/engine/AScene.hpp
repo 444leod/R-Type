@@ -56,9 +56,7 @@ public:
         for (auto module: this->_modules) {
             auto cast = std::dynamic_pointer_cast<T>(module);
             if (cast != nullptr)
-            {
                 return cast;
-            }
         }
         return nullptr;
     }

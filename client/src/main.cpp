@@ -26,11 +26,11 @@ int main() {
     const auto networkGameModule = game.addModule<NetworkGameModule>();
 
     const auto main = game.registerScene<WaitingRoom>("main");
-    main->addModule<ASceneEventsModule>();
+    main->addModule<ASceneRenderingModule>();
     {
         const auto net = main->addModule<ANetworkSceneModule>(*networkGameModule);
         main->addModule<waiting_room::PacketHandlerSceneModule>(game.registry(), game.scenes(), net);
-        main->addModule<ASceneEventsModule>();
+        main->addModule<ASceneRenderingModule>();
     }
 
 
@@ -38,7 +38,7 @@ int main() {
     {
         const auto net = level1->addModule<ANetworkSceneModule>(*networkGameModule);
         level1->addModule<level1::PacketHandlerSceneModule>(game.registry(), game.scenes(), net);
-        level1->addModule<ASceneEventsModule>();
+        level1->addModule<ASceneRenderingModule>();
     }
 
     game.run();
