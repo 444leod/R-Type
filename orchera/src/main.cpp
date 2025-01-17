@@ -17,13 +17,13 @@ int main() {
 
     const auto homeScreen = game.registerScene<HomeScreen>("home screen");
     {
-        homeScreen->addModule<ASceneEventsModule>();
+        homeScreen->addModule<ASceneRenderingModule>();
     }
 
 
     const auto gameScene = game.registerScene<Game>("game");
     {
-        gameScene->addModule<ASceneEventsModule>();
+        gameScene->addModule<ASceneRenderingModule>();
     }
 
     game.run();

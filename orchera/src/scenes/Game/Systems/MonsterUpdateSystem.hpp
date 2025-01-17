@@ -59,6 +59,7 @@ public:
     void execute(const double& deltaTime) override
     {
         spawnMonster(deltaTime);
+        updateVelocity();
     }
 
 private:
@@ -93,7 +94,7 @@ private:
         });
         // _registry.addComponent(entity, Debug{});
         _registry.addComponent(entity, Health{
-            .health = 1,
+            .health = 100,
             .maxHealth = 100
         });
 
@@ -106,6 +107,20 @@ private:
             _registry.addComponent(entity, goblinAnimation);
         }
 
+    }
+
+    void updateVelocity()
+    {
+        //give a random velocity sometimes to the monster
+        _registry.view<Monster, Transform>().each([&](const Entity& entity, const Monster& monster, Transform &transform) {
+            if (std::rand() % 100 == 0)
+            {
+                _registry.addComponent(entity, Velocity{
+                    .x = static_cast<float>(std::rand() % 100 - 50),
+                    .y = static_cast<float>(std::rand() % 100 - 50)
+                });
+            }
+        });
     }
 };
 

@@ -12,7 +12,7 @@
 
 #include "Components.hpp"
 
-#include "engine/modules/ASceneEventsModule.hpp"
+#include "engine/modules/ASceneRenderingModule.hpp"
 
 #include <engine/RestrictedGame.hpp>
 
@@ -83,6 +83,7 @@ void HomeScreen::onEnter()
 
 void HomeScreen::onEnter(const AScene& lastScene)
 {
+    _registry.clear();
 }
 
 void HomeScreen::onExit()

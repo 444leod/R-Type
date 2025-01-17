@@ -26,6 +26,7 @@
 #include "Systems/MonsterUpdateSystem.hpp"
 #include "Systems/BorderCollisionSystem.hpp"
 #include "Systems/DamageProtectionSystem.hpp"
+#include "Systems/DeathUpdateSystem.hpp"
 
 #include <set>
 
@@ -41,6 +42,7 @@ public:
         this->_updateSystems.push_back(std::make_unique<MonsterUpdateSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<BorderCollisionSystem>(_registry));
         this->_updateSystems.push_back(std::make_unique<DamageProtectionSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<DeathUpdateSystem>(_registry));
     }
 
     void initialize() override;
@@ -60,11 +62,8 @@ private:
 
 public:
 private:
-    bool canShoot = true;
     std::set<sf::Keyboard::Key> _pressedKeys;
     Entity player;
-    const float delayBetweenSpawns = 0.25f;
-    double timeSinceLastSpawn = 0.f;
 
 };
 

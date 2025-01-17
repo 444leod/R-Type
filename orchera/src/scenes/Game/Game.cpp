@@ -14,6 +14,7 @@
 
 //#include "Systems/PlayerShotSystem.hpp"
 #include "Systems/PlayerUpdateSystem.hpp"
+#include "Systems/HealthRenderingSystem.hpp"
 
 #include "../../Components/Weapon.hpp"
 #include "../../Components/DamageProtection.hpp"
@@ -21,7 +22,7 @@
 #include "../../Components/Player.hpp"
 
 #include <engine/RestrictedGame.hpp>
-#include <engine/modules/ASceneEventsModule.hpp>
+#include <engine/modules/ASceneRenderingModule.hpp>
 #include <set>
 
 void Game::initialize()
@@ -82,8 +83,7 @@ void Game::onEnter(const AScene& lastScene)
         .onCollision = [this] (const Entity entity) {
             if (_registry.has_any_of<Monster>(entity) && !_registry.has_any_of<DamageProtection>(entity))
             {
-                std::cout << "Player hit by monster" << std::endl;
-                _registry.get<Health>(entity).health -= 10;
+                _registry.get<Health>(player).health -= 10;
                 _registry.addComponent(entity, DamageProtection{.duration = 0.3f});
             }
         }
@@ -115,8 +115,8 @@ void Game::onEnter(const AScene& lastScene)
     _registry.addComponent(map, Sprite("assets/orchera/map.png", {1.4375, 1.4375}));
     _registry.addComponent(map, Transform{.x = 0, .y = 0, .z = -1});
 
-    const auto events = this->getModule<ASceneEventsModule>();
-    if (!events)
+    const auto sceneRenderingModule = this->getModule<ASceneRenderingModule>();
+    if (!sceneRenderingModule)
     {
         game::RestrictedGame::instance().stop();
         std::cerr << "No events module found, exiting..." << std::endl;
@@ -124,7 +124,9 @@ void Game::onEnter(const AScene& lastScene)
 
 //    _playerShotSystem = std::make_unique<PlayerShotSystem>(_registry);
 
-    events->addHandler(
+    sceneRenderingModule->systems().push_back(std::make_unique<HealthRenderingSystem>(_registry));
+
+    sceneRenderingModule->addHandler(
         [](const sf::Event& event)
         {
             return event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased;
@@ -160,6 +162,7 @@ void Game::onEnter(const AScene& lastScene)
             x *= speed / norm;
             y *= speed / norm;
             _registry.removeComponent<Animation>(player);
+            _registry.get<Sprite>(player).textureRect = {0, 0, 192, 192};
         }
     );
 }

@@ -26,25 +26,6 @@ const Sprite arrowSprite(
     sf::IntRect{0, 0, 64, 64}
 );
 
-const Sprite explosionSprite{
-    .texture = "assets/orchera/explosion.png",
-    .scale = {0.8, 0.8},
-    .origin = {128 / 2, 128 / 2},
-    .textureRect = sf::IntRect{0, 0, 128, 128}
-};
-
-const Animation explosionAnimation{
-    .elapsedTime = 0,
-    .frameSize = {128, 128},
-    .frameDuration = 0.1f,
-    .frameCount = 12,
-    .loop = false,
-    .currentFrame = 0,
-    .onEnd = [](Entity entity) {
-        // to modify.
-    }
-};
-
 class AttackSystem final : public AUpdateSystem
 {
 public:
@@ -131,21 +112,6 @@ private:
                         auto& proj = _registry.get<Projectile>(arrow);
                         auto& health = _registry.get<Health>(entity);
                         health.health -= proj.damage;
-                        if (health.health <= 0) {
-                            // _registry.removeComponent<Hitbox>(entity);
-                            _registry.get<Hitbox>(entity).shape = shape::Circle{.radius = 0};
-                            _registry.removeComponent<Monster>(entity);
-                            _registry.removeComponent<Health>(entity);
-                            _registry.removeComponent<Sprite>(entity);
-                            _registry.removeComponent<Debug>(entity);
-                            _registry.addComponent<Sprite>(entity, explosionSprite);
-
-                            auto& anim = _registry.addComponent(entity, explosionAnimation);
-                            anim.onEnd = [this, entity] (Entity) {
-                                _registry.remove(entity);
-                            };
-                        }
-
                         if (proj.pierce > 0)
                             proj.pierce--;
                         else
