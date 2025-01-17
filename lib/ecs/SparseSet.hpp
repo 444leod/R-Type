@@ -27,6 +27,7 @@ namespace ecs {
         [[nodiscard]] virtual const std::vector<Entity>& entities() const noexcept = 0;
         [[nodiscard]] virtual std::size_t size() const noexcept = 0;
         [[nodiscard]] virtual std::size_t capacity() const noexcept = 0;
+        [[nodiscard]] virtual std::string type() const noexcept = 0;
         virtual void display() const = 0;
         friend std::ostream& operator<<(std::ostream& os, const ISparseSet& sparse) { return os; }
     };
@@ -130,6 +131,8 @@ namespace ecs {
          * @return std::size_t
          */
         [[nodiscard]] std::size_t capacity() const noexcept override { return this->_sparse.capacity(); }
+
+        [[nodiscard]] virtual std::string type() const noexcept override { return Family<T>::name(); }
 
         void display() const override
         {

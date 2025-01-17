@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <exception>
+#include <ranges>
 
 #include "AGameModule.hpp"
 
@@ -32,7 +33,7 @@ namespace engine
     public:
         virtual void start(AScene& scene)
         {
-            this->_window.create(sf::VideoMode(400, 200), "R-Type Profiling");
+            this->_window.create(sf::VideoMode(500, 300), "R-Type Profiling");
             if (!this->_window.isOpen())
                 throw std::runtime_error("Failed to open window for Profiler.");
             this->_window.setFramerateLimit(15);
@@ -60,7 +61,7 @@ namespace engine
                 return;
             this->_ticks = 0;
 
-            static const auto clear = sf::Color(200, 200, 200);
+            static const auto clear = sf::Color(255, 255, 255);
             this->_window.clear(clear);
             this->_events();
 
@@ -69,6 +70,7 @@ namespace engine
             this->_updates();
             this->_scene();
             this->_entities();
+            this->_components();
             //
 
             this->_window.display();
@@ -86,7 +88,7 @@ namespace engine
         void _drawKeyValue(const std::string& key, const std::string& value, float x, float y) {
             static sf::Text t_key;
             static sf::Text t_value;
-            static const sf::Color c_key(55, 55, 55);
+            static const sf::Color c_key(110, 110, 110);
             static const sf::Color c_value(0, 0, 0);
 
             t_key.setString(key + ": ");
@@ -124,31 +126,34 @@ namespace engine
 
         // Updates
         void _updates() {
-            double fastestUpdate = 0.f;
-            double slowestUpdate = 0.f;
+            double fastest = 0.f;
+            double slowest = 0.f;
             double avg = 0.f;
+            double tps = 0.f;
             for (auto time: this->_tickUpdates) {
-                if (time < fastestUpdate || fastestUpdate <= 0.f)
-                    fastestUpdate = time;
-                if (time > slowestUpdate)
-                    slowestUpdate = time;
+                if (time < fastest || fastest <= 0.f)
+                    fastest = time;
+                if (time > slowest)
+                    slowest = time;
                 avg += time;
             }
-            avg /= (double)this->_tickUpdates.size();
+            if (this->_tickUpdates.size() != 0)
+                avg /= (double)this->_tickUpdates.size();
+            if (avg != 0.f)
+                tps = 1000.f / avg;
             this->_tickUpdates.clear();
-            this->_drawKeyValue("Updates",
-                std::string("~") + P_STR((int)avg) + "ms, -" + P_STR((int)fastestUpdate) + "ms, +" + P_STR((int)slowestUpdate) + "ms",
-                0, 20);
+            std::stringstream ss;
+            ss << "~" << avg << "ms, -" << fastest << "ms, +" << slowest << "ms (" << tps << "TPS)";
+            this->_drawKeyValue("Updates", ss.str(), 0, 20);
         }
 
         // Entities
         void _entities() {
             const auto& reg = _game.registry();
             const auto& ents = _game.registry().entities();
-            this->_drawKeyValue("Entities",
-                P_STR(ents.size()) + "/" + P_STR(ents.capacity()) +
-                " (+" + P_STR(reg.instances()) + " -" + P_STR(reg.deletions()) + ")",
-                0, 40);
+            std::stringstream ss;
+            ss << ents.size() << "/" << ents.capacity() << " (+" << reg.instances() << " -" << reg.deletions() << ")";
+            this->_drawKeyValue("Entities", ss.str(), 0, 40);
         }
 
         // Scene
@@ -156,6 +161,31 @@ namespace engine
             const auto& scene = _game.scenes().current();
             scene.name();
             this->_drawKeyValue("Scene", scene.name(), -5, 0);
+        }
+
+        // Components
+        void _components() {
+            const auto& sets = this->_game.registry().sparseSets();
+            this->_drawKeyValue("Kinds", P_STR(sets.size()),
+            -5, 60);
+
+            uint32_t size = 0;
+            uint32_t capacity = 0;
+            std::vector<std::pair<std::string, uint32_t>> frequencies = {};
+            for (const auto [key, set]: sets) {
+                size += set->size();
+                frequencies.push_back({set->type(), set->size()});
+                capacity += set->capacity();
+            }
+            this->_drawKeyValue("Components Total", P_STR(size) + "/" + P_STR(capacity), 0, 60);
+
+            std::sort(frequencies.begin(), frequencies.end(), [](const auto& a, const auto& b){ return a.second < b.second; });
+            std::stringstream ss;
+            for (uint8_t i = 0; i < frequencies.size() && i < 3; i++) {
+                if (i > 0) ss << ", ";
+                ss << frequencies.at(i).first << " (" << frequencies.at(i).second << ")";
+            }
+            this->_drawKeyValue("Most Used Comp.s", ss.str(), 0, 80);
         }
 
     private:

@@ -236,6 +236,7 @@ namespace ecs {
             return set->at(entity);
         }
 
+        const std::map<std::size_t, ISparseSet *>& sparseSets() const noexcept { return this->_sparse_sets; }
         const std::vector<Entity>& entities() const noexcept { return this->_entities; }
         uint32_t instances() const noexcept { return this->_instances; }
         uint32_t deletions() const noexcept { return this->_deletions; }
