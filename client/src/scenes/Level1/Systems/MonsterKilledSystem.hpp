@@ -8,18 +8,24 @@
 #ifndef MONSTER_KILLED_SYSTEM_HPP_
 #define MONSTER_KILLED_SYSTEM_HPP_
 
+#include <ECS/Entity.hpp>
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
+#include "PremadeSystems/Abstracts/ASystem.hpp"
+
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Projectile.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+
+#include "SharedComponents/Enemy.hpp"
 
 class MonsterKilledSystem final : public ASystem
 {
 public:
-    explicit MonsterKilledSystem(ecs::Registry &registry) : ASystem(registry, "MonsterKilledSystem") {}
+    explicit MonsterKilledSystem() : ASystem("MonsterKilledSystem") {}
 
-    void execute(const std::uint32_t& monsterId, const std::uint32_t& projectileId)
+    void execute(const std::uint32_t& monsterId, const std::uint32_t& projectileId) const
     {
-        std::optional<std::tuple<Entity, Enemy, Transform>> monster = std::nullopt;
+        std::optional<std::tuple<ecs::Entity, Enemy, Transform>> monster = std::nullopt;
 
         for (auto &[entity, enemy, transform] : _registry.view<Enemy, Transform>().each())
         {
@@ -33,7 +39,7 @@ public:
         if (!monster.has_value())
             return;
 
-        std::optional<std::tuple<Entity, Projectile, Transform>> projectile = std::nullopt;
+        std::optional<std::tuple<ecs::Entity, Projectile, Transform>> projectile = std::nullopt;
 
         for (auto &[entity, proj, transform] : _registry.view<Projectile, Transform>().each())
         {
@@ -67,7 +73,7 @@ public:
                 .frameDuration = 0.1,
                 .frameCount = 6,
                 .loop = false,
-                .onEnd = [&](const Entity& entity){ _registry.remove(entity); }
+                .onEnd = [&](const ecs::Entity& entity){ _registry.remove(entity); }
             }
         );
     }

@@ -7,20 +7,24 @@
 
 #include "PacketHandlerSceneModule.hpp"
 
-#include "Components.hpp"
-
 #include "../Systems/ShipMovementSystem.hpp"
 #include "../Systems/NewProjectileSystem.hpp"
 #include "../Systems/NewShipSystem.hpp"
 #include "../Systems/NewMonsterSystem.hpp"
 #include "../Systems/MonsterKilledSystem.hpp"
 
+#include "PremadeComponents/Tags/Self.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+
+#include "SharedComponents/Client.hpp"
+
 namespace level1
 {
 
-void handleShipMovement(ecs::Registry& registry, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+void handleShipMovement(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
-    static ShipMovementSystem shipMovementSystem(registry);
+    static ShipMovementSystem shipMovementSystem{};
 
     std::uint32_t id;
     Velocity velocity{};
@@ -30,9 +34,9 @@ void handleShipMovement(ecs::Registry& registry, RestrictedSceneManager&, const 
     shipMovementSystem.execute(id, velocity, position);
 }
 
-void handleNewProjectile(ecs::Registry& registry, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+void handleNewProjectile(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
-    static NewProjectileSystem newProjectileSystem(registry);
+    static NewProjectileSystem newProjectileSystem{};
 
     std::uint32_t shipId;
     std::uint32_t projectileId;
@@ -43,9 +47,9 @@ void handleNewProjectile(ecs::Registry& registry, RestrictedSceneManager&, const
     newProjectileSystem.execute(shipId, projectileId, transform, velocity);
 }
 
-void handleCurrentPlayerShip(ecs::Registry& registry, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+void handleCurrentPlayerShip(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
-    static NewShipSystem newShipSystem(registry);
+    static NewShipSystem newShipSystem{};
 
     std::uint32_t id;
     Transform transform{};
@@ -56,21 +60,21 @@ void handleCurrentPlayerShip(ecs::Registry& registry, RestrictedSceneManager&, c
     registry.addComponent(spaceship, Self{});
 }
 
-void handleNewShip(ecs::Registry& registry, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+void handleNewShip(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
-    static NewShipSystem newShipSystem(registry);
+    static NewShipSystem newShipSystem{};
 
     std::uint32_t id;
     Transform transform{};
     Velocity velocity{};
     packet >> id >> transform >> velocity;
 
-    newShipSystem.execute(id, transform, velocity);
+    (void)newShipSystem.execute(id, transform, velocity);
 }
 
-void handleNewMonster(ecs::Registry& registry, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+void handleNewMonster(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
-    static NewMonsterSystem newMonsterSystem(registry);
+    static NewMonsterSystem newMonsterSystem{};
 
     std::uint32_t id;
     std::uint8_t type;
@@ -81,9 +85,9 @@ void handleNewMonster(ecs::Registry& registry, RestrictedSceneManager&, const st
     newMonsterSystem.execute(id, type, transform, velocity);
 }
 
-void handleMonsterKilled(ecs::Registry& registry, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+void handleMonsterKilled(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
-    static MonsterKilledSystem monsterKilledSystem(registry);
+    static MonsterKilledSystem monsterKilledSystem{};
 
     std::uint32_t monsterId;
     std::uint32_t projectileId;
@@ -92,12 +96,12 @@ void handleMonsterKilled(ecs::Registry& registry, RestrictedSceneManager&, const
     monsterKilledSystem.execute(monsterId, projectileId);
 }
 
-void handleDisconnect(ecs::Registry&, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
-    game::RestrictedGame::instance().stop();
+    engine::RestrictedGame::instance().stop();
 }
 
-void handleMessage(ecs::Registry&, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+void handleMessage(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
     std::uint32_t id;
     std::string message;
@@ -105,7 +109,7 @@ void handleMessage(ecs::Registry&, RestrictedSceneManager&, const std::shared_pt
     std::cout << "Message from " << id << ": " << message << std::endl;
 }
 
-void handleClientDisconnected(ecs::Registry& registry, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+void handleClientDisconnected(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
     std::uint32_t id;
     packet >> id;
@@ -120,7 +124,7 @@ void handleClientDisconnected(ecs::Registry& registry, RestrictedSceneManager&, 
     }
 }
 
-PacketHandlerSceneModule::PacketHandlerSceneModule(AScene& scene, ecs::Registry& registry, RestrictedSceneManager& sceneManager, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, registry, sceneManager, net) {
+PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net) {
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::CLIENT_DISCONNECTED, handleClientDisconnected);
 

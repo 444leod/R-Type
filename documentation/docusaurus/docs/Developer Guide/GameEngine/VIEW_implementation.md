@@ -87,8 +87,8 @@ public:
          *
          * @return A tuple containing the entity and its components.
          */
-        std::tuple<const Entity&, Component&, Others&...> operator*() {
-            const Entity& entity = *_entityIdsIterator;
+        std::tuple<const ecs::Entity&, Component&, Others&...> operator*() {
+            const ecs::Entity& entity = *_entityIdsIterator;
             return std::tie(
                 entity,
                 this->get<Component>(entity),
@@ -149,7 +149,7 @@ public:
          * @return Reference to the component.
          */
         template <typename T>
-        [[nodiscard]] T& get(const Entity& entity) {
+        [[nodiscard]] T& get(const ecs::Entity& entity) {
             return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).at(entity);
         }
 
@@ -187,8 +187,8 @@ public:
      *
      * @param entity The entity that was erased.
      */
-    void onEntityErased(const Entity& entity) override {
-        std::erase_if(_entities, [entity](const Entity& e) { return e == entity; });
+    void onEntityErased(const ecs::Entity& entity) override {
+        std::erase_if(_entities, [entity](const ecs::Entity& e) { return e == entity; });
     }
 
     /**
@@ -196,7 +196,7 @@ public:
      *
      * @param entity The entity that was set.
      */
-    void onEntitySet(const Entity& entity) override {
+    void onEntitySet(const ecs::Entity& entity) override {
         for (auto [_, set] : this->_sparse_sets)
             if (!set->contains(entity))
                 return;
@@ -265,7 +265,7 @@ public:
      */
     template <typename T>
     requires part_of<T, Component, Others...>
-    [[nodiscard]] T& get(const Entity& entity) {
+    [[nodiscard]] T& get(const ecs::Entity& entity) {
         return dynamic_cast<SparseSet<T>&>(*_sparse_sets.at(type<T>::id())).at(entity);
     }
 
