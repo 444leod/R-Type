@@ -9,6 +9,7 @@
 #define A_SYSTEM_HPP
 
 #include <Engine/RestrictedGame.hpp>
+#include <ECS/Registry.hpp>
 
 #include <string>
 #include <utility>
