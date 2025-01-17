@@ -28,7 +28,7 @@ namespace
 
 #include "../AScene.hpp"
 #include "AGameModule.hpp"
-#include "ASceneEventsModule.hpp"
+#include "ASceneRenderingModule.hpp"
 #include "engine/Game.hpp"
 
 namespace ecs {
@@ -60,22 +60,9 @@ namespace engine
 
         void refresh(AScene& scene) override
         {
-            // Dumbly deactivate / reactivate modules to avoid redering dumb stuff when uneeded
-            this->_spritesSystem.disable();
-            this->_textsSystem.disable();
-            this->_debugDrawSystem.disable();
-            this->_buttonSystem.disable();
-            this->_buttonClickedSystem.disable();
-            this->_shapeSystem.disable();
-            this->_target = scene.getModule<ASceneEventsModule>();
+            this->_target = scene.getModule<ASceneRenderingModule>();
             if (this->_target == nullptr)
                 return;
-            this->_spritesSystem.enable();
-            this->_textsSystem.enable();
-            this->_debugDrawSystem.enable();
-            this->_buttonSystem.enable();
-            this->_buttonClickedSystem.enable();
-            this->_shapeSystem.enable();
         }
 
         void stop() override
@@ -99,11 +86,15 @@ namespace engine
             }
 
             this->_window.clear();
+            // TODO: Should find a cool way of letting the user decide on the ordering of those.
             this->_spritesSystem.execute(this->_window);
             this->_textsSystem.execute(this->_window);
             this->_buttonSystem.execute(this->_window);
             this->_debugDrawSystem.execute(this->_window);
             this->_shapeSystem.execute(this->_window);
+            // Execute additional scene systems
+            if (this->_target != nullptr)
+                this->_target->executeSystems(this->_window);
             this->_window.display();
         }
 
@@ -111,7 +102,7 @@ namespace engine
     private:
         ResourcesManager _resourcesManager;
 
-        std::shared_ptr<ASceneEventsModule> _target;
+        std::shared_ptr<ASceneRenderingModule> _target;
 
         std::string _title;
         sf::VideoMode _mode;

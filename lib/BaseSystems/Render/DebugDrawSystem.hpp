@@ -10,7 +10,6 @@
 
 #include "BaseSystems/Abstracts/ARenderSystem.hpp"
 #include "BaseComponents.hpp"
-#include "../../../orchera/src/Components/Border.hpp"
 
 #include <algorithm>
 #include <SFML/Graphics.hpp>
