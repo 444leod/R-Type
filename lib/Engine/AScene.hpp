@@ -13,9 +13,7 @@ class SceneManager;
 #include <ECS/Registry.hpp>
 
 #include <Engine/Modules/ASceneModule.hpp>
-
-#include "PremadeSystems/Abstracts/ARenderSystem.hpp"
-#include "PremadeSystems/Abstracts/AUpdateSystem.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
 
 #include <memory>
 #include <utility>
@@ -104,14 +102,6 @@ class AScene
                 return true;
             }
         }
-        for (const auto& system : this->_renderSystems)
-        {
-            if (system->name() == systemName)
-            {
-                system->enable();
-                return true;
-            }
-        }
         return false;
     }
 
@@ -123,14 +113,6 @@ class AScene
     bool disableSystem(const std::string& systemName)
     {
         for (const auto& system : this->_updateSystems)
-        {
-            if (system->name() == systemName)
-            {
-                system->disable();
-                return true;
-            }
-        }
-        for (const auto& system : this->_renderSystems)
         {
             if (system->name() == systemName)
             {
@@ -156,7 +138,6 @@ class AScene
     RestrictedSceneManager& _manager;
 
     std::vector<std::unique_ptr<AUpdateSystem>> _updateSystems;
-    std::vector<std::unique_ptr<ARenderSystem>> _renderSystems;
 
     /**
      * @brief Executes all the update systems in the scene
@@ -169,21 +150,6 @@ class AScene
             if (system->isEnabled())
             {
                 system->execute(deltaTime);
-            }
-        }
-    }
-
-    /**
-     * @brief Executes all the render systems in the scene
-     * @param window The window to render to
-     */
-    void _executeRenderSystems(sf::RenderWindow& window)
-    {
-        for (const auto& system : this->_renderSystems)
-        {
-            if (system->isEnabled())
-            {
-                system->execute(window);
             }
         }
     }

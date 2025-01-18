@@ -8,6 +8,8 @@
 #ifndef NEW_PROJECTILE_SYSTEM_HPP_
 #define NEW_PROJECTILE_SYSTEM_HPP_
 
+#include "SharedComponents/Ship.hpp"
+
 #include <Engine/Systems/ASystem.hpp>
 
 #include "PremadeComponents/Displayable/Animation.hpp"
