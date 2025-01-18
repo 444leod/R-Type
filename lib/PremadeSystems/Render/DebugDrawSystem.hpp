@@ -21,7 +21,7 @@ class DebugDrawSystem final : public ARenderSystem
   public:
     DebugDrawSystem() : ARenderSystem("DebugDrawSystem") {}
 
-    void execute(sf::RenderWindow& window) override
+    void _execution(sf::RenderWindow& window) override
     {
 
         auto view = _registry.view<Debug, Hitbox, Transform>();

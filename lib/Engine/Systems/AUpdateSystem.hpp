@@ -28,10 +28,8 @@ public:
         const auto start = std::chrono::_V2::system_clock::now();
         this->_execution(deltaTime);
         const auto end = std::chrono::_V2::system_clock::now();
-        this->_executionTime = std::chrono::duration_cast<std::chrono::duration<float, std::micro>>(end - start).count();
+        _setExecutionTime(_name, std::chrono::duration_cast<std::chrono::duration<float, std::micro>>(end - start).count());
     }
-
-    double lastExecutionTime() const noexcept { return this->_executionTime; }
 
 protected:
     /**
@@ -40,8 +38,6 @@ protected:
      */
     virtual void _execution(double deltaTime) = 0;
 
-private:
-    double _executionTime = 0;
 };
 
 } // namespace engine

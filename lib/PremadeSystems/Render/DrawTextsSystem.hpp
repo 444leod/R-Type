@@ -23,7 +23,7 @@ class DrawTextsSystem final : public ARenderSystem
   public:
     explicit DrawTextsSystem(ResourcesManager& resourceManager) : ARenderSystem("DrawTextsSystem"), _fonts(resourceManager.fonts()) {}
 
-    void execute(sf::RenderWindow& window) override
+    void _execution(sf::RenderWindow& window) override
     {
         this->_registry.view<Transform, Text>().each(
             [&](const auto&, auto& transform, auto& text)

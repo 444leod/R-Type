@@ -190,6 +190,11 @@ private:
         this->_drawKeyValue("Most Used Comp.s", ss.str(), 0, 80);
     }
 
+    // Update Systems
+    void _systems() {
+        const auto& times = engine::ASystem::executionTimes();
+    }
+
 private:
     sf::Font _font;
     sf::RenderWindow _window;

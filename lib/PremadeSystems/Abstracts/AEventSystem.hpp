@@ -18,10 +18,22 @@ class AEventSystem : public engine::ASystem
 
     /**
      * @brief Execute a 'event' system's logic
-     *
      * @param event The event to handle
      */
-    virtual void execute(sf::Event& event) = 0;
+    void execute(sf::Event& event)
+    {
+        const auto start = std::chrono::_V2::system_clock::now();
+        this->_execution(event);
+        const auto end = std::chrono::_V2::system_clock::now();
+        _setExecutionTime(_name, std::chrono::duration_cast<std::chrono::duration<float, std::micro>>(end - start).count());
+    }
+
+protected:
+    /**
+     * @brief Execute a 'event' system's logic
+     * @param event The event to handle
+     */
+    virtual void _execution(sf::Event& event) = 0;
 };
 
 #endif // A_EVENT_SYSTEM_HPP

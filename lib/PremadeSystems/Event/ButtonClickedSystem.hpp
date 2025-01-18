@@ -18,7 +18,7 @@ class ButtonClickedSystem final : public AEventSystem
   public:
     explicit ButtonClickedSystem() : AEventSystem("ButtonClickedSystem") {}
 
-    void execute(sf::Event& event) override
+    void _execution(sf::Event& event) override
     {
         if (event.type != sf::Event::MouseButtonPressed)
             return;
