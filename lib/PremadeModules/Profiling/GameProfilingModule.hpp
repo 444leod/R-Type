@@ -193,7 +193,7 @@ private:
         }
         this->_drawKeyValue("Components Total", P_STR(size) + "/" + P_STR(capacity), 0, 60);
 
-        std::sort(frequencies.begin(), frequencies.end(), [](const auto& a, const auto& b){ return a.second < b.second; });
+        std::sort(frequencies.begin(), frequencies.end(), [](const auto& a, const auto& b){ return a.second > b.second; });
         std::stringstream ss;
         for (uint8_t i = 0; i < frequencies.size() && i < 3; i++) {
             if (i > 0) ss << ", ";
