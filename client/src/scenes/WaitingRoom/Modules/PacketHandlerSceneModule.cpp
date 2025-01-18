@@ -20,7 +20,10 @@ void handleGameStart(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&
     engine::RestrictedGame::instance().scenes().load("game");
 }
 
-void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket&) { engine::RestrictedGame::instance().stop(); }
+void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket&)
+{
+    engine::RestrictedGame::instance().stop();
+}
 
 void handleAuthenticated(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
 {
@@ -69,8 +72,7 @@ void handleClientDisconnected(ecs::Registry& registry, const std::shared_ptr<ANe
     }
 }
 
-PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
-{
+PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net) {
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::AUTHENTICATED, handleAuthenticated);
     this->setHandler(PACKET_TYPE::NEW_CLIENT, handlerNewClient);

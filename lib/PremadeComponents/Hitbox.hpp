@@ -9,8 +9,8 @@
 #define HITBOX_HPP
 
 #include "ECS/Entity.hpp"
-#include "Shapes/Circle.hpp"
 #include "Shapes/Rectangle.hpp"
+#include "Shapes/Circle.hpp"
 
 #include <functional>
 #include <variant>
@@ -21,4 +21,4 @@ struct Hitbox
     std::function<void(const ecs::Entity& other)> onCollision;
 };
 
-#endif // HITBOX_HPP
+#endif //HITBOX_HPP

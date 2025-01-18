@@ -10,22 +10,19 @@
 
 #include <Engine/Systems/AUpdateSystem.hpp>
 
-#include "PremadeComponents/Transform.hpp"
 #include "SharedComponents/Parallax.hpp"
+#include "PremadeComponents/Transform.hpp"
 
 class ParallaxSystem final : public engine::AUpdateSystem
 {
-  public:
+public:
     ParallaxSystem() : AUpdateSystem("ParallaxSystem") {}
 
-    void execute(const double& deltaTime) override
-    {
-        _registry.view<Parallax, Transform>().each(
-            [deltaTime](Parallax& parallax, Transform& transform)
-            {
-                parallax.offset += static_cast<float>(deltaTime * parallax.offsetMultiplier);
-                transform.x = -parallax.offset;
-            });
+    void execute(const double& deltaTime) override {
+        _registry.view<Parallax, Transform>().each([deltaTime](Parallax& parallax, Transform& transform) {
+            parallax.offset += static_cast<float>(deltaTime * parallax.offsetMultiplier);
+            transform.x = -parallax.offset;
+        });
     }
 };
 

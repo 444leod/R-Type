@@ -10,8 +10,8 @@
 
 #include "Utils/IntRect.hpp"
 
-#include <optional>
 #include <string>
+#include <optional>
 
 struct Sprite
 {
@@ -21,4 +21,4 @@ struct Sprite
     std::optional<IntRect> textureRect = std::nullopt;
 };
 
-#endif // SPRITE_HPP
+#endif //SPRITE_HPP

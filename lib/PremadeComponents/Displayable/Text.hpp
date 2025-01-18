@@ -12,13 +12,12 @@
 
 #include <string>
 
-struct Text
-{
-  public:
+struct Text {
+public:
     std::string font;
     std::string message;
     std::uint32_t fontSize;
     Color color;
 };
 
-#endif // TEXT_HPP
+#endif //TEXT_HPP

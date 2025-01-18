@@ -10,9 +10,8 @@
 
 #include <SFML/System/Clock.hpp>
 
-struct Bug
-{
+struct Bug {
     sf::Clock clock = sf::Clock();
 };
 
-#endif // BUG_HPP
+#endif //BUG_HPP

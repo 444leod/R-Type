@@ -18,7 +18,7 @@
 
 class RemoveClientSystem final : public engine::ASystem
 {
-  public:
+public:
     explicit RemoveClientSystem() : ASystem("RemoveClientSystem") {}
 
     void execute(const asio::ip::udp::endpoint& src, const std::shared_ptr<ANetworkSceneModule>& net) const

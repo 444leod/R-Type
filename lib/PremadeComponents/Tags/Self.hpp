@@ -8,8 +8,6 @@
 #ifndef SELF_HPP
 #define SELF_HPP
 
-struct Self
-{
-};
+struct Self {};
 
-#endif // SELF_HPP
+#endif //SELF_HPP

@@ -7,21 +7,20 @@
 
 #include <Engine/Game.hpp>
 
-#include "PremadeModules/Network/ANetworkSceneModule.hpp"
 #include "PremadeModules/Rendering/GameRenderingModule.hpp"
+#include "PremadeModules/Network/ANetworkSceneModule.hpp"
 
 #include "GameModules/NetworkGameModule.hpp"
 
 #include "scenes/Level1/Level1.hpp"
 #include "scenes/Level1/Modules/PacketHandlerSceneModule.hpp"
 
-#include "scenes/WaitingRoom/Modules/PacketHandlerSceneModule.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
+#include "scenes/WaitingRoom/Modules/PacketHandlerSceneModule.hpp"
 
 #include "Config.hpp"
 
-int main()
-{
+int main() {
     auto game = engine::Game();
 
     game.addModule<GameRenderingModule>(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "R-Type - Client");

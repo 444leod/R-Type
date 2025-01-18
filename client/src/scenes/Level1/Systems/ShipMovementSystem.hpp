@@ -17,12 +17,11 @@
 
 class ShipMovementSystem final : public engine::ASystem
 {
-  public:
+public:
     explicit ShipMovementSystem() : ASystem("ShipMovementSystem") {}
 
-    void execute(const ecs::Entity& entity_id, const Velocity& velocity, const Transform& position) const
-    {
-        for (auto& [entity, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>().each())
+    void execute(const ecs::Entity& entity_id, const Velocity& velocity, const Transform& position) const {
+        for (auto &[entity, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>().each())
         {
             if (ship.id != entity_id)
                 continue;

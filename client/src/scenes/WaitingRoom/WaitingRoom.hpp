@@ -11,16 +11,18 @@
 #include <chrono>
 #include <optional>
 
-#include <ECS/EventDispatcher.hpp>
 #include <ECS/Registry.hpp>
+#include <ECS/EventDispatcher.hpp>
 #include <Engine/AScene.hpp>
 
 #include "PremadeSystems/Update/CollisionSystem.hpp"
 
-class WaitingRoom final : public engine::AScene
-{
-  public:
-    explicit WaitingRoom(const std::string& name) : AScene(name) { _updateSystems.push_back(std::make_unique<CollisionSystem>()); }
+class WaitingRoom final : public engine::AScene {
+public:
+    explicit WaitingRoom(const std::string& name) : AScene(name)
+    {
+        _updateSystems.push_back(std::make_unique<CollisionSystem>());
+    }
 
     void initialize() override;
 

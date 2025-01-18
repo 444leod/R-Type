@@ -7,11 +7,16 @@
 
 #include "PacketHandlerSceneModule.hpp"
 
-#include "../Systems/MonsterKilledSystem.hpp"
-#include "../Systems/NewMonsterSystem.hpp"
+#include "../Systems/ShipMovementSystem.hpp"
 #include "../Systems/NewProjectileSystem.hpp"
 #include "../Systems/NewShipSystem.hpp"
 #include "../Systems/ShipMovementSystem.hpp"
+
+#include "PremadeComponents/Tags/Self.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+
+#include "SharedComponents/Client.hpp"
 
 #include "PremadeComponents/Tags/Self.hpp"
 #include "PremadeComponents/Transform.hpp"
@@ -96,7 +101,10 @@ void handleMonsterKilled(ecs::Registry&, const std::shared_ptr<ANetworkSceneModu
     monsterKilledSystem.execute(monsterId, projectileId);
 }
 
-void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) { engine::RestrictedGame::instance().stop(); }
+void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
+    engine::RestrictedGame::instance().stop();
+}
 
 void handleMessage(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
@@ -122,8 +130,7 @@ void handleClientDisconnected(ecs::Registry& registry, const std::shared_ptr<ANe
     }
 }
 
-PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
-{
+PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net) {
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::CLIENT_DISCONNECTED, handleClientDisconnected);
 

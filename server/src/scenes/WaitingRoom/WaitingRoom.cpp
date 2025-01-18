@@ -15,8 +15,8 @@
 
 #include "PacketTypes.hpp"
 
-#include <cmath>
 #include <iostream>
+#include <cmath>
 
 inline bool isInputAvailable()
 {
@@ -95,7 +95,10 @@ void WaitingRoom::onEnter()
     }
 }
 
-void WaitingRoom::onEnter(const AScene& lastScene) { this->onEnter(); }
+void WaitingRoom::onEnter(const AScene& lastScene)
+{
+    this->onEnter();
+}
 
 void WaitingRoom::onExit()
 {
@@ -109,7 +112,10 @@ void WaitingRoom::onExit()
     net->sendPacket(packet);
 }
 
-void WaitingRoom::onExit(const AScene& nextScene) { std::cout << "Exiting to " << nextScene.name() << std::endl; }
+void WaitingRoom::onExit(const AScene& nextScene)
+{
+    std::cout << "Exiting to " << nextScene.name() << std::endl;
+}
 
 void WaitingRoom::_startGame(const std::vector<std::string>&)
 {

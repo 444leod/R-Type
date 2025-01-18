@@ -15,19 +15,17 @@
 
 #include "Config.hpp"
 
+
 class MovementSystem final : public engine::AUpdateSystem
 {
-  public:
+public:
     explicit MovementSystem() : AUpdateSystem("MovementSystem") {}
 
-    void execute(const double& deltaTime) override
-    {
-        _registry.view<Transform, Velocity>().each(
-            [deltaTime](Transform& transform, const Velocity& velocity)
-            {
-                transform.x += static_cast<float>((velocity.x * SCALE) * deltaTime);
-                transform.y += static_cast<float>((velocity.y * SCALE) * deltaTime);
-            });
+    void execute(const double& deltaTime) override {
+        _registry.view<Transform, Velocity>().each([deltaTime](Transform& transform, const Velocity& velocity) {
+            transform.x += static_cast<float>((velocity.x * SCALE) * deltaTime);
+            transform.y += static_cast<float>((velocity.y * SCALE) * deltaTime);
+        });
     }
 };
 

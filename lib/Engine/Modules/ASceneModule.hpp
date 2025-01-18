@@ -9,15 +9,14 @@
 
 namespace engine
 {
-class AScene;
+    class AScene;
 
-class ASceneModule
-{
-  public:
-    explicit ASceneModule(AScene& scene) : _scene(scene) {}
-    virtual ~ASceneModule() = default;
+    class ASceneModule {
+    public:
+        explicit ASceneModule(AScene& scene): _scene(scene) {}
+        virtual ~ASceneModule() = default;
 
-  protected:
-    AScene& _scene;
-};
-} // namespace engine
+    protected:
+        AScene& _scene;
+    };
+}

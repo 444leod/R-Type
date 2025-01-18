@@ -18,7 +18,7 @@
 
 class DrawShapeSystem final : public ARenderSystem
 {
-  public:
+public:
     DrawShapeSystem() : ARenderSystem("DrawShapeSystem") {}
 
     void execute(sf::RenderWindow& window) override
@@ -27,7 +27,7 @@ class DrawShapeSystem final : public ARenderSystem
         auto view = _registry.view<shape::Circle, Transform>();
 
         _registry.view<shape::Rectangle, Transform>().each(
-            [&](const ecs::Entity& entity, const shape::Rectangle& rect, const Transform& transform)
+            [&] (const ecs::Entity& entity, const shape::Rectangle& rect, const Transform& transform)
             {
                 const auto& [width, height, fillColor, outlineColor, outlineThickness] = rect;
                 sf::RectangleShape shape(sf::Vector2f(width, height));
@@ -41,7 +41,7 @@ class DrawShapeSystem final : public ARenderSystem
             });
 
         _registry.view<shape::Circle, Transform>().each(
-            [&](const ecs::Entity& entity, const shape::Circle& circle, const Transform& transform)
+            [&] (const ecs::Entity& entity, const shape::Circle& circle, const Transform& transform)
             {
                 const auto& [radius, fillColor, outlineColor, outlineThickness] = circle;
                 sf::CircleShape shape(radius);

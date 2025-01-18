@@ -10,8 +10,8 @@
 
 #include "ECS/Entity.hpp"
 
-#include <cstdint>
 #include <functional>
+#include <cstdint>
 
 /**
  * @struct Animation
@@ -20,8 +20,7 @@
  * This struct holds the properties and behaviors of an animation, including
  * frame size, duration, and looping behavior.
  */
-struct Animation
-{
+struct Animation {
     /**
      * @brief The time elapsed since the last frame.
      */
@@ -62,4 +61,4 @@ struct Animation
     std::function<void(const ecs::Entity& entity)> onEnd = [](const ecs::Entity&) {};
 };
 
-#endif // ANIMATION_HPP
+#endif //ANIMATION_HPP

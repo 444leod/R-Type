@@ -24,4 +24,4 @@ struct Rectangle
 
 } // namespace shape
 
-#endif // RECTANGLE_HPP
+#endif //RECTANGLE_HPP

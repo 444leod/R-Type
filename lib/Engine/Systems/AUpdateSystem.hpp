@@ -15,7 +15,7 @@ namespace engine
 
 class AUpdateSystem : public engine::ASystem
 {
-  public:
+public:
     explicit AUpdateSystem(const std::string& name) : ASystem(name) {}
 
     /**

@@ -8,12 +8,11 @@
 #ifndef INTRECT_HPP
 #define INTRECT_HPP
 
-struct IntRect
-{
+struct IntRect {
     int left;
     int top;
     unsigned int width;
     unsigned int height;
 };
 
-#endif // INTRECT_HPP
+#endif //INTRECT_HPP

@@ -10,10 +10,10 @@
 
 #include <Engine/AScene.hpp>
 
+#include "PremadeSystems/Update/ParalaxSystem.hpp"
+#include "PremadeSystems/Update/MovementSystem.hpp"
 #include "PremadeSystems/Update/AnimateSystem.hpp"
 #include "PremadeSystems/Update/CollisionSystem.hpp"
-#include "PremadeSystems/Update/MovementSystem.hpp"
-#include "PremadeSystems/Update/ParalaxSystem.hpp"
 
 #include "SharedSystems/BugsMovementSystem.hpp"
 #include "SharedSystems/RemoveOutOfBoundProjectilesSystem.hpp"
@@ -22,11 +22,9 @@
 
 #include <chrono>
 
-class Level1 final : public engine::AScene
-{
-  public:
-    explicit Level1(const std::string& name) : AScene(name)
-    {
+class Level1 final : public engine::AScene {
+public:
+    explicit Level1(const std::string& name) : AScene(name) {
         this->_updateSystems.push_back(std::make_unique<ParallaxSystem>());
         this->_updateSystems.push_back(std::make_unique<MovementSystem>());
         this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>());
@@ -50,8 +48,8 @@ class Level1 final : public engine::AScene
   private:
     void addBug(const Transform& transform);
 
-  public:
-  private:
+public:
+private:
     std::uint32_t _enemyId = 0;
 };
 
