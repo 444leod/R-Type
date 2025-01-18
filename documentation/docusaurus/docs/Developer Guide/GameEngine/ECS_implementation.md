@@ -19,7 +19,7 @@ Those are the main components of our ECS implementation:
     
 ```cpp
 #include "Foo.hpp"
-#include "ecs/Registry.hpp"
+#include "ECS/Registry.hpp"
 #include <SFML/Graphics.hpp>
 
 // Components

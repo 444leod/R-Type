@@ -23,16 +23,16 @@ class ISparseSetObserver {
 public:
     virtual ~ISparseSetObserver() = default;
 
-    virtual void onEntitySet(const Entity& entity) = 0;
-    virtual void onEntityErased(const Entity& entity) = 0;
+    virtual void onEntitySet(const ecs::Entity& entity) = 0;
+    virtual void onEntityErased(const ecs::Entity& entity) = 0;
 };
 
 class ISparseSet {
 public:
     virtual ~ISparseSet() = default;
 
-    [[nodiscard]] virtual bool contains(const Entity& entity) const noexcept = 0;
-    virtual void remove(const Entity& entity) = 0;
+    [[nodiscard]] virtual bool contains(const ecs::Entity& entity) const noexcept = 0;
+    virtual void remove(const ecs::Entity& entity) = 0;
     virtual void clear() = 0;
     [[nodiscard]] virtual const std::vector<Entity>& entities() const noexcept = 0;
     [[nodiscard]] virtual std::size_t size() const noexcept = 0;
@@ -59,7 +59,7 @@ public:
      * @param entity The entity to check for
      * @return `true` if the entity is in the set. `false` otherwise
      */
-    [[nodiscard]] bool contains(const Entity& entity) const noexcept override
+    [[nodiscard]] bool contains(const ecs::Entity& entity) const noexcept override
     {
         return entity < this->_sparse.size()
             && this->_sparse[entity] < this->_dense.size()
@@ -71,7 +71,7 @@ public:
      * @param entity The entity to get the component of
      * @return A reference to an entiy
      */
-    [[nodiscard]] T& at(const Entity& entity)
+    [[nodiscard]] T& at(const ecs::Entity& entity)
     {
         if (!this->contains(entity))
             throw std::out_of_range("Entity not present in the set.");
@@ -83,7 +83,7 @@ public:
      * @param entity The entity to set the component to
      * @param component The component
      */
-    void set(const Entity& entity, T component)
+    void set(const ecs::Entity& entity, T component)
     {
         if (this->contains(entity)) {
             this->_components[this->_sparse[entity]] = component;
@@ -102,7 +102,7 @@ public:
      * @brief Remove an entity from a set
      * @param entity The entity to remove from the set
      */
-    void remove(const Entity& entity) override
+    void remove(const ecs::Entity& entity) override
     {
         if (!this->contains(entity))
             return;
@@ -165,7 +165,7 @@ private:
      * @param entity The entity to add to
      * @param value The value to set to the entity id
      */
-    void _add_in_sparse(const Entity& entity, std::size_t value)
+    void _add_in_sparse(const ecs::Entity& entity, std::size_t value)
     {
         if (this->_sparse.capacity() <= entity) {
             this->_sparse.resize(this->_compute_resize(entity));
