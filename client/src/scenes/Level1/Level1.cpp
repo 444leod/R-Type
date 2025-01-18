@@ -10,16 +10,16 @@
 #include "PremadeModules/Network/ANetworkGameModule.hpp"
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
 
+#include "PremadeComponents/Displayable/Animation.hpp"
 #include "PremadeComponents/Hitbox.hpp"
 #include "PremadeComponents/Projectile.hpp"
 #include "PremadeComponents/Velocity.hpp"
-#include "PremadeComponents/Displayable/Animation.hpp"
 
 #include "SharedComponents/Enemy.hpp"
 
-#include "Sprites/Level1.hpp"
 #include "Config.hpp"
 #include "PacketTypes.hpp"
+#include "Sprites/Level1.hpp"
 
 void Level1::update(const double& deltaTime) { _executeUpdateSystems(deltaTime); }
 
@@ -66,12 +66,10 @@ void Level1::addProjectile(const Transform& transform)
     // _registry.addComponent(projectile, Hitbox{});
     _registry.addComponent(projectile, transform);
     _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = .020, .frameCount = 3, .loop = false, .onEnd = [&](const ecs::Entity& entity){
-        _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
-    }});
-    #if DEBUG
-        _registry.addComponent(projectile, Debug{});
-    #endif
+    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = .020, .frameCount = 3, .loop = false, .onEnd = [&](const ecs::Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }});
+#if DEBUG
+    _registry.addComponent(projectile, Debug{});
+#endif
 }
 
 void Level1::addBug(const Transform& transform)

@@ -8,15 +8,16 @@
 #ifndef A_NETWORK_GAME_MODULE_HPP
 #define A_NETWORK_GAME_MODULE_HPP
 
-#include <Engine/Modules/AGameModule.hpp>
 #include <Engine/AScene.hpp>
+#include <Engine/Modules/AGameModule.hpp>
 
 #include <Network/NetworkAgent.hpp>
 
 #include "APacketHandlerSceneModule.hpp"
 
-class ANetworkGameModule : public engine::AGameModule, public ntw::NetworkAgent {
-public:
+class ANetworkGameModule : public engine::AGameModule, public ntw::NetworkAgent
+{
+  public:
     explicit ANetworkGameModule(const std::uint32_t& port = 0) : AGameModule(), NetworkAgent(port) {}
     ~ANetworkGameModule() override = default;
 

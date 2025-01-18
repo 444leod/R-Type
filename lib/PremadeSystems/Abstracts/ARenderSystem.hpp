@@ -13,7 +13,7 @@
 
 class ARenderSystem : public engine::ASystem
 {
-public:
+  public:
     explicit ARenderSystem(const std::string& name) : ASystem(name) {}
 
     /**

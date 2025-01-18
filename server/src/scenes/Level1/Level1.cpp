@@ -9,26 +9,25 @@
 
 #include "Config.hpp"
 
-#include "PremadeComponents/Transform.hpp"
-#include "PremadeComponents/Velocity.hpp"
 #include "PremadeComponents/Hitbox.hpp"
 #include "PremadeComponents/Tags/Self.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
 
-#include "SharedComponents/Enemy.hpp"
 #include "SharedComponents/Bug.hpp"
+#include "SharedComponents/Enemy.hpp"
 #include "SharedComponents/Parallax.hpp"
 
-#include <iostream>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <iostream>
 
 void Level1::initialize() {}
 
-void Level1::update(const double& deltaTime) {
-    _executeUpdateSystems(deltaTime);
-}
+void Level1::update(const double& deltaTime) { _executeUpdateSystems(deltaTime); }
 
-void Level1::onEnter() {
+void Level1::onEnter()
+{
     _registry.clear();
     const auto spaceship = _registry.create();
 

@@ -15,10 +15,11 @@
 #include <functional>
 #include <variant>
 
-struct Button {
+struct Button
+{
     std::variant<Sprite, shape::Rectangle> shape;
     std::function<void()> onClick;
     std::optional<Text> label = std::nullopt;
 };
 
-#endif //BUTTON_HPP
+#endif // BUTTON_HPP

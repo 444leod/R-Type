@@ -10,15 +10,15 @@
 
 #include <Engine/Systems/ASystem.hpp>
 
-#include "PremadeComponents/Transform.hpp"
-#include "PremadeComponents/Velocity.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
 #include "PremadeComponents/Hitbox.hpp"
 #include "PremadeComponents/Projectile.hpp"
-#include "PremadeComponents/Displayable/Animation.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
 
 class NewProjectileSystem final : public engine::ASystem
 {
-public:
+  public:
     explicit NewProjectileSystem() : ASystem("NewProjectileSystem") {}
 
     void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity) const
@@ -40,15 +40,8 @@ public:
 
             _registry.addComponent(projectile, Hitbox{});
             _registry.addComponent(projectile, transform);
-            _registry.addComponent(projectile, Projectile{ .id = projectileId });
-            _registry.addComponent(projectile, Animation{
-                    .frameSize = {16, 16},
-                    .frameDuration = 0.02,
-                    .frameCount = 3,
-                    .loop = false,
-                    .onEnd = [&](const ecs::Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }
-                }
-            );
+            _registry.addComponent(projectile, Projectile{.id = projectileId});
+            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = 0.02, .frameCount = 3, .loop = false, .onEnd = [&](const ecs::Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }});
             return;
         }
     }

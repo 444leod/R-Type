@@ -16,7 +16,7 @@
 
 class ShipMovementSystem final : public engine::ASystem
 {
-public:
+  public:
     explicit ShipMovementSystem(const std::shared_ptr<ANetworkSceneModule>& net) : ASystem("ShipMovementSystem"), _net(net) {}
 
     void execute(const asio::ip::udp::endpoint& source, const UserInput& input) const;

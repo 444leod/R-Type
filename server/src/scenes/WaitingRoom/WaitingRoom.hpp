@@ -18,12 +18,10 @@
 #include <functional>
 #include <memory>
 
-class WaitingRoom final : public engine::AScene {
-public:
-    explicit WaitingRoom(const std::string& name) : AScene(name)
-    {
-        this->_updateSystems.push_back(std::make_unique<CollisionSystem>());
-    }
+class WaitingRoom final : public engine::AScene
+{
+  public:
+    explicit WaitingRoom(const std::string& name) : AScene(name) { this->_updateSystems.push_back(std::make_unique<CollisionSystem>()); }
 
     void initialize() override;
 
@@ -45,10 +43,7 @@ public:
     ecs::Registry _registry;
 
     std::map<std::string, std::function<void(const std::vector<std::string>&)>> _command_handlers = {
-        {"exit",    [this](const std::vector<std::string>& args) { engine::RestrictedGame::instance().stop(); }},
-        {"start",   [this](const std::vector<std::string>& args) { this->_startGame(args); }},
-        {"",        [this](const std::vector<std::string>& args) { }}
-    };
+        {"exit", [this](const std::vector<std::string>& args) { engine::RestrictedGame::instance().stop(); }}, {"start", [this](const std::vector<std::string>& args) { this->_startGame(args); }}, {"", [this](const std::vector<std::string>& args) {}}};
 };
 
 #endif // GAME_HPP

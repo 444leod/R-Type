@@ -10,15 +10,15 @@
 
 #include <Engine/Systems/ASystem.hpp>
 
+#include "PremadeComponents/Hitbox.hpp"
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
-#include "PremadeComponents/Hitbox.hpp"
 
 #include "SharedComponents/Enemy.hpp"
 
 class NewMonsterSystem final : public engine::ASystem
 {
-public:
+  public:
     explicit NewMonsterSystem() : ASystem("NewMonsterSystem") {}
 
     void execute(const std::uint32_t& id, const std::uint8_t& type, const Transform& transform, const Velocity& velocity) const

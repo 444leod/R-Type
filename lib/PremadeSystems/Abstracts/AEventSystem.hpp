@@ -13,7 +13,7 @@
 
 class AEventSystem : public engine::ASystem
 {
-public:
+  public:
     explicit AEventSystem(const std::string& name) : ASystem(name) {}
 
     /**
@@ -24,4 +24,4 @@ public:
     virtual void execute(sf::Event& event) = 0;
 };
 
-#endif //A_EVENT_SYSTEM_HPP
+#endif // A_EVENT_SYSTEM_HPP

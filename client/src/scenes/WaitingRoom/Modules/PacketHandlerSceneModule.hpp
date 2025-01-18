@@ -15,14 +15,11 @@ namespace waiting_room
 
 class PacketHandlerSceneModule final : public APacketHandlerSceneModule
 {
-public:
+  public:
     explicit PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net);
     ~PacketHandlerSceneModule() override = default;
 
-private:
-
-
-
+  private:
 };
 
 } // namespace waiting_room
