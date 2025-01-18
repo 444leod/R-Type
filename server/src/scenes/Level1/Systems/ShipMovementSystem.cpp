@@ -6,13 +6,18 @@
 */
 
 #include "ShipMovementSystem.hpp"
-#include "BaseComponents.hpp"
-#include "../Components.hpp"
+
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+#include "PremadeComponents/Hitbox.hpp"
+
+#include "SharedComponents/Client.hpp"
+#include "SharedComponents/Ship.hpp"
 
 #include "PacketTypes.hpp"
-#include "Components.hpp"
 
-static std::optional<Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
+
+static std::optional<ecs::Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
 {
     for (auto [entity, info] : registry.view<Client>())
     {

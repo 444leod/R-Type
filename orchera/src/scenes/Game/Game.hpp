@@ -11,38 +11,40 @@
 #include <chrono>
 #include <memory>
 
-#include "engine/AScene.hpp"
-#include "ecs/Registry.hpp"
+#include <Engine/AScene.hpp>
+#include <ECS/Registry.hpp>
 
 // From Game Engine
-#include "BaseSystems/Update/MovementSystem.hpp"
-#include "BaseSystems/Update/AnimateSystem.hpp"
+#include "PremadeSystems/Update/MovementSystem.hpp"
+#include "PremadeSystems/Update/AnimateSystem.hpp"
 
-#include "BaseSystems/Update/CollisionSystem.hpp"
+#include "PremadeSystems/Update/CollisionSystem.hpp"
+
+#include "SharedSystems/RemoveOutOfBoundProjectilesSystem.hpp"
 
 // Game specific
-#include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
 #include "Systems/AttackSystem.hpp"
 #include "Systems/MonsterUpdateSystem.hpp"
 #include "Systems/BorderCollisionSystem.hpp"
 #include "Systems/DamageProtectionSystem.hpp"
 #include "Systems/DeathUpdateSystem.hpp"
 
+#include <SFML/Window/Keyboard.hpp>
 #include <set>
 
-class Game final : public AScene {
+class Game final : public engine::AScene {
 public:
-    Game(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
+    Game(const std::string& name) : AScene(name)
     {
-        this->_updateSystems.push_back(std::make_unique<MovementSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<AnimateSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<AttackSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<MonsterUpdateSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<BorderCollisionSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<DamageProtectionSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<DeathUpdateSystem>(_registry));
+        this->_updateSystems.push_back(std::make_unique<MovementSystem>());
+        this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>());
+        this->_updateSystems.push_back(std::make_unique<AnimateSystem>());
+        this->_updateSystems.push_back(std::make_unique<CollisionSystem>());
+        this->_updateSystems.push_back(std::make_unique<AttackSystem>());
+        this->_updateSystems.push_back(std::make_unique<MonsterUpdateSystem>());
+        this->_updateSystems.push_back(std::make_unique<BorderCollisionSystem>());
+        this->_updateSystems.push_back(std::make_unique<DamageProtectionSystem>());
+        this->_updateSystems.push_back(std::make_unique<DeathUpdateSystem>());
     }
 
     void initialize() override;
@@ -63,7 +65,7 @@ private:
 public:
 private:
     std::set<sf::Keyboard::Key> _pressedKeys;
-    Entity player;
+    ecs::Entity player;
 
 };
 

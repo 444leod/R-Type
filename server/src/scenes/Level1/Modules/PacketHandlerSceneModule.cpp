@@ -7,7 +7,8 @@
 
 #include "PacketHandlerSceneModule.hpp"
 
-#include "../../../Systems/RemoveClientSystem.hpp"
+#include "SharedSystems/RemoveClientSystem.hpp"
+
 #include "../Systems/ShipMovementSystem.hpp"
 #include "../Systems/ShipShotSystem.hpp"
 
@@ -16,31 +17,31 @@
 namespace level1
 {
 
-void handleDisconnect(ecs::Registry& registry, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& src, ntw::UDPPacket&)
+void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& src, ntw::UDPPacket&)
 {
-    static RemoveClientSystem removeClientSystem(registry);
+    static RemoveClientSystem removeClientSystem{};
 
     removeClientSystem.execute(src, net);
 }
 
-void handleUserInput(ecs::Registry& registry, RestrictedSceneManager&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& source, ntw::UDPPacket& packet)
+void handleUserInput(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& source, ntw::UDPPacket& packet)
 {
     UserInput input{};
     packet >> input;
 
     if (input.key >= sf::Keyboard::Left && input.key <= sf::Keyboard::Down)
     {
-        static ShipMovementSystem shipMovementSystem(registry, net);
+        static ShipMovementSystem shipMovementSystem(net);
         shipMovementSystem.execute(source, input);
     }
     else if (input.key == sf::Keyboard::Space)
     {
-        static ShipShotSystem shipShotSystem(registry, net);
+        static ShipShotSystem shipShotSystem(net);
         shipShotSystem.execute(source);
     }
 }
 
-PacketHandlerSceneModule::PacketHandlerSceneModule(AScene& scene, ecs::Registry& registry, RestrictedSceneManager& sceneManager, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, registry, sceneManager, net)
+PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
 {
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::USER_INPUT, handleUserInput);

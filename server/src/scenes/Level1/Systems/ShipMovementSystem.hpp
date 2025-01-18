@@ -8,15 +8,16 @@
 #ifndef SHIP_MOVEMENT_SYSTEM_HPP_
 #define SHIP_MOVEMENT_SYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "NetworkModules/ANetworkSceneModule.hpp"
+#include <Engine/Systems/ASystem.hpp>
+
+#include "PremadeModules/Network/ANetworkSceneModule.hpp"
 
 #include "Structures/UserInput.hpp"
 
-class ShipMovementSystem final : public ASystem
+class ShipMovementSystem final : public engine::ASystem
 {
 public:
-    ShipMovementSystem(ecs::Registry &registry, const std::shared_ptr<ANetworkSceneModule>& net) : ASystem(registry, "ShipMovementSystem"), _net(net) {}
+    explicit ShipMovementSystem(const std::shared_ptr<ANetworkSceneModule>& net) : ASystem("ShipMovementSystem"), _net(net) {}
 
     void execute(const asio::ip::udp::endpoint &source, const UserInput& input) const;
 

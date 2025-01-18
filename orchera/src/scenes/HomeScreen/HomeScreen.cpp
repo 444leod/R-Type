@@ -8,13 +8,20 @@
 #include <iostream>
 
 #include "HomeScreen.hpp"
-#include "ecs/Registry.hpp"
 
-#include "Components.hpp"
+#include <Engine/RestrictedGame.hpp>
+#include <Engine/SceneManager.hpp>
 
-#include "engine/modules/ASceneRenderingModule.hpp"
+#include "PremadeComponents/Displayable/Sprite.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+#include "PremadeComponents/Displayable/Button.hpp"
+#include "PremadeComponents/Displayable/Text.hpp"
+#include "PremadeComponents/Transform.hpp"
 
-#include <engine/RestrictedGame.hpp>
+#include "PremadeModules/Rendering/ASceneRenderingModule.hpp"
+
+#include "Config.hpp"
+#include <set>
 
 void HomeScreen::initialize()
 {
@@ -39,7 +46,7 @@ void HomeScreen::onEnter()
         .shape = Sprite{"assets/orchera/UI/Buttons/Button_Blue_3Slides.png", {2.85, 2}},
         .onClick = [&]()
         {
-            game::RestrictedGame::instance().scenes().load("game");
+            engine::RestrictedGame::instance().scenes().load("game");
         },
         .label = Text{
             .font = "assets/arial.ttf",
@@ -71,7 +78,7 @@ void HomeScreen::onEnter()
         .shape = Sprite{"assets/orchera/UI/Buttons/Button_Blue_3Slides.png", {2.85, 2}},
         .onClick = [&]()
         {
-            game::RestrictedGame::instance().stop();
+            engine::RestrictedGame::instance().stop();
         },
         .label = Text{
             .font = "assets/arial.ttf",

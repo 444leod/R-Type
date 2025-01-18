@@ -8,19 +8,25 @@
 #ifndef DEATH_UPDATE_SYSTEM_HPP
 #define DEATH_UPDATE_SYSTEM_HPP
 
-#include "engine/RestrictedGame.hpp"
 
-#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
-#include "BaseComponents.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
 
-#include "../../../Components/Health.hpp"
+#include "PremadeComponents/Tags/Debug.hpp"
+#include "PremadeComponents/Displayable/Sprite.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+#include "PremadeComponents/Hitbox.hpp"
+
 #include "../../../Components/Monster.hpp"
+#include "../../../Components/Player.hpp"
+#include "../../../Components/Health.hpp"
+
+#include "Config.hpp"
 
 const Sprite explosionSprite{
     .texture = "assets/orchera/explosion.png",
     .scale = {0.8, 0.8},
     .origin = {128 / 2, 128 / 2},
-    .textureRect = sf::IntRect{0, 0, 128, 128}
+    .textureRect = IntRect{0, 0, 128, 128}
 };
 
 const Animation explosionAnimation{
@@ -30,21 +36,21 @@ const Animation explosionAnimation{
     .frameCount = 12,
     .loop = false,
     .currentFrame = 0,
-    .onEnd = [](Entity entity) {
+    .onEnd = [](ecs::Entity entity) {
         // to modify.
     }
 };
 
-class DeathUpdateSystem final : public AUpdateSystem
+class DeathUpdateSystem final : public engine::AUpdateSystem
 {
 public:
-    explicit DeathUpdateSystem(ecs::Registry &registry) : AUpdateSystem(registry, "DeathUpdateSystem")
+    DeathUpdateSystem() : AUpdateSystem("DeathUpdateSystem")
     {
     }
 
     void execute(const double& deltaTme) override
     {
-        _registry.view<Health>().each([&](const Entity& entity, Health& health) {
+        _registry.view<Health>().each([&](const ecs::Entity& entity, Health& health) {
             if (health.health <= 0)
             {
                 if (_registry.has_any_of<Monster>(entity))
@@ -58,11 +64,11 @@ public:
                     _registry.addComponent<Sprite>(entity, explosionSprite);
 
                     auto& anim = _registry.addComponent(entity, explosionAnimation);
-                    anim.onEnd = [this, entity] (Entity) {
+                    anim.onEnd = [this, entity] (ecs::Entity) {
                         _registry.remove(entity);
                     };
                 } else if (_registry.has_any_of<Player>(entity)) {
-                    game::RestrictedGame::instance().stop();
+                    engine::RestrictedGame::instance().stop();
                 }
             }
         });

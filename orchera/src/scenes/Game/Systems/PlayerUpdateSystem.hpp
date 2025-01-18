@@ -8,20 +8,26 @@
 #ifndef PLAYER_UPDATE_SYSTEM_HPP
 #define PLAYER_UPDATE_SYSTEM_HPP
 
-#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 
-#include "BaseComponents.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
+
+#include "PremadeComponents/Displayable/Sprite.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
 
 #include "../../../Components/Monster.hpp"
 #include "../../../Components/Target.hpp"
 
+#include "Config.hpp"
+
 #include <cmath>
 
-class PlayerUpdateSystem final : public AUpdateSystem
+class PlayerUpdateSystem final : public engine::AUpdateSystem
 {
 public:
-    explicit PlayerUpdateSystem(ecs::Registry &registry, const Entity& player)
-        : AUpdateSystem(registry, "PlayerUpdateSystem"), player(player)
+    explicit PlayerUpdateSystem(const ecs::Entity& player)
+        : AUpdateSystem("PlayerUpdateSystem"), player(player)
     {
     }
 
@@ -32,7 +38,7 @@ public:
     }
 
 private:
-    Entity player;
+    ecs::Entity player;
 
     void attack()
     {
@@ -44,7 +50,7 @@ private:
         }
 
         const auto [x, y, z, rotation] = _registry.get<Transform>(player);
-        std::optional<std::pair<Entity, double>> target = std::nullopt;
+        std::optional<std::pair<ecs::Entity, double>> target = std::nullopt;
         for (const auto& [monster, _, monsterPos] : _registry.view<Monster, Transform>().each())
         {
             if (!target.has_value())
@@ -66,7 +72,7 @@ private:
     {
         if (!_registry.has_any_of<Animation>(player)) {
             auto& sp = _registry.get<Sprite>(player);
-            sp.textureRect = sf::IntRect{0, 0, 192, 192};
+            sp.textureRect = IntRect{0, 0, 192, 192};
             sp.texture = "assets/orchera/Factions/Knights/Troops/Archer/Red/Archer_Red.png";
             _registry.addComponent(player, Animation{
                .elapsedTime = 0,
@@ -75,7 +81,7 @@ private:
                .frameCount = 6,
                .loop = true,
                .currentFrame = 0,
-               .onEnd = [](Entity) {}
+               .onEnd = [](ecs::Entity) {}
             });
         }
     }

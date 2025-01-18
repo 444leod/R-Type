@@ -9,16 +9,18 @@
 #define HOME_SCREEN_HPP
 
 #include <chrono>
-#include <optional>
+#include <memory>
 
-#include "ecs/Registry.hpp"
-#include "ecs/EventDispatcher.hpp"
-#include "engine/AScene.hpp"
-#include "BaseComponents.hpp"
+#include <Engine/AScene.hpp>
+#include <ECS/Registry.hpp>
 
-class HomeScreen final : public AScene {
+// Game specific
+#include <SFML/Window/Keyboard.hpp>
+#include <set>
+
+class HomeScreen final : public engine::AScene {
 public:
-    HomeScreen(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
+    HomeScreen(const std::string& name) : AScene(name)
     {
     }
 

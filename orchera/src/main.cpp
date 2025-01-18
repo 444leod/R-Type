@@ -5,15 +5,18 @@
 ** main
 */
 
-#include "engine/Game.hpp"
 #include "scenes/Game/Game.hpp"
+#include <Engine/Game.hpp>
+
+#include "PremadeModules/Rendering/GameRenderingModule.hpp"
+#include "PremadeModules/Rendering/ASceneRenderingModule.hpp"
+
 #include "scenes/HomeScreen/HomeScreen.hpp"
-#include "engine/modules/GameRenderingModule.hpp"
 
 int main() {
-    auto game = game::Game();
+    auto game = engine::Game();
 
-    game.addModule<engine::GameRenderingModule>(598, 1012, "Orchera");
+    game.addModule<GameRenderingModule>(598, 1012, "Orchera");
 
     const auto homeScreen = game.registerScene<HomeScreen>("home screen");
     {

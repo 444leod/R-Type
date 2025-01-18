@@ -8,18 +8,25 @@
 #ifndef MONSTER_UPDATE_SYSTEM_HPP
 #define MONSTER_UPDATE_SYSTEM_HPP
 
-#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
 
-#include "BaseComponents.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
+
+#include "PremadeComponents/Displayable/Sprite.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+#include "PremadeComponents/Hitbox.hpp"
 
 #include "../../../Components/Monster.hpp"
 #include "../../../Components/Health.hpp"
+
+#include "Config.hpp"
 
 const auto goblinSprite = Sprite(
     "assets/orchera/Factions/Goblins/Troops/TNT/Red/TNT_Red.png",
     {1, 1},
     {192 / 2, 192 / 2},
-    sf::IntRect{0, 0, 192, 192}
+    IntRect{0, 0, 192, 192}
 );
 
 const auto goblinAnimation = Animation{
@@ -29,14 +36,14 @@ const auto goblinAnimation = Animation{
     .frameCount = 6,
     .loop = true,
     .currentFrame = 0,
-    .onEnd = [](Entity) {}
+    .onEnd = [](ecs::Entity) {}
 };
 
 const auto torchSprite = Sprite(
     "assets/orchera/Factions/Goblins/Troops/Torch/Red/Torch_Red.png",
     {1, 1},
     {192 / 2, 192 / 2},
-    sf::IntRect{0, 0, 192, 192}
+    IntRect{0, 0, 192, 192}
 );
 
 const auto torchAnimation = Animation{
@@ -46,13 +53,13 @@ const auto torchAnimation = Animation{
     .frameCount = 7,
     .loop = true,
     .currentFrame = 0,
-    .onEnd = [](Entity) {}
+    .onEnd = [](ecs::Entity) {}
 };
 
-class MonsterUpdateSystem final : public AUpdateSystem
+class MonsterUpdateSystem final : public engine::AUpdateSystem
 {
 public:
-    explicit MonsterUpdateSystem(ecs::Registry &registry) : AUpdateSystem(registry, "MonsterUpdateSystem")
+    explicit MonsterUpdateSystem() : AUpdateSystem("MonsterUpdateSystem")
     {
     }
 
@@ -90,7 +97,7 @@ private:
                 .radius = 30,
                 .fillColor = {0, 255, 255, 80}
             },
-            .onCollision = [](const Entity&) {}
+            .onCollision = [](const ecs::Entity&) {}
         });
         // _registry.addComponent(entity, Debug{});
         _registry.addComponent(entity, Health{
@@ -112,7 +119,7 @@ private:
     void updateVelocity()
     {
         //give a random velocity sometimes to the monster
-        _registry.view<Monster, Transform>().each([&](const Entity& entity, const Monster& monster, Transform &transform) {
+        _registry.view<Monster, Transform>().each([&](const ecs::Entity& entity, const Monster& monster, Transform &transform) {
             if (std::rand() % 100 == 0)
             {
                 _registry.addComponent(entity, Velocity{

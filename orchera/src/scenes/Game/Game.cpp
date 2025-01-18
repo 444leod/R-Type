@@ -7,12 +7,8 @@
 
 #include "Game.hpp"
 
-#include "Components.hpp"
-#include "BaseComponents.hpp"
-#include "ecs/Registry.hpp"
-#include "Config.hpp"
+#include <Engine/RestrictedGame.hpp>
 
-//#include "Systems/PlayerShotSystem.hpp"
 #include "Systems/PlayerUpdateSystem.hpp"
 #include "Systems/HealthRenderingSystem.hpp"
 
@@ -21,13 +17,18 @@
 #include "../../Components/Border.hpp"
 #include "../../Components/Player.hpp"
 
-#include <engine/RestrictedGame.hpp>
-#include <engine/modules/ASceneRenderingModule.hpp>
+#include "PremadeComponents/Displayable/Sprite.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+#include "PremadeComponents/Displayable/Button.hpp"
+
+#include "PremadeModules/Rendering/ASceneRenderingModule.hpp"
+
+#include "Config.hpp"
 #include <set>
 
 void Game::initialize()
 {
-    this->_updateSystems.push_back(std::make_unique<AnimateSystem>(_registry));
+    this->_updateSystems.push_back(std::make_unique<AnimateSystem>());
 }
 
 void Game::update(const double& deltaTime)
@@ -63,7 +64,7 @@ void Game::onEnter(const AScene& lastScene)
     _registry.addComponent(rightBorder, Border{.width = 50 + 30, .height = 1012});
 
     player = _registry.create();
-    _registry.addComponent(player, Sprite("assets/orchera/Factions/Knights/Troops/Archer/Red/Archer_Red.png", {1, 1}, {192 / 2, 192 / 2}, sf::IntRect{0, 0, 192, 192}));
+    _registry.addComponent(player, Sprite("assets/orchera/Factions/Knights/Troops/Archer/Red/Archer_Red.png", {1, 1}, {192 / 2, 192 / 2}, IntRect{0, 0, 192, 192}));
     _registry.addComponent(player, Transform{.x = 322, .y = 736, .z = 0});
     _registry.addComponent(player, Animation{
         .elapsedTime = 0,
@@ -72,7 +73,7 @@ void Game::onEnter(const AScene& lastScene)
         .frameCount = 6,
         .loop = true,
         .currentFrame = 0,
-        .onEnd = [](Entity) {}
+        .onEnd = [](ecs::Entity) {}
     });
     _registry.addComponent<Velocity>(player, Velocity{.x = 0, .y = 0});
     _registry.addComponent<Hitbox>(player, Hitbox{
@@ -80,7 +81,7 @@ void Game::onEnter(const AScene& lastScene)
             .radius = 30,
             .fillColor = {100, 100, 100, 80}
         },
-        .onCollision = [this] (const Entity entity) {
+        .onCollision = [this] (const ecs::Entity entity) {
             if (_registry.has_any_of<Monster>(entity) && !_registry.has_any_of<DamageProtection>(entity))
             {
                 _registry.get<Health>(player).health -= 10;
@@ -107,7 +108,7 @@ void Game::onEnter(const AScene& lastScene)
     _registry.addComponent(player, Health{.health = 100, .maxHealth = 100});
     _registry.addComponent(player, Player{});
 
-    this->_updateSystems.push_back(std::make_unique<PlayerUpdateSystem>(_registry, player));
+    this->_updateSystems.push_back(std::make_unique<PlayerUpdateSystem>(player));
 
     // _registry.addComponent(player, Debug{});
 
@@ -118,13 +119,13 @@ void Game::onEnter(const AScene& lastScene)
     const auto sceneRenderingModule = this->getModule<ASceneRenderingModule>();
     if (!sceneRenderingModule)
     {
-        game::RestrictedGame::instance().stop();
+        engine::RestrictedGame::instance().stop();
         std::cerr << "No events module found, exiting..." << std::endl;
     }
 
 //    _playerShotSystem = std::make_unique<PlayerShotSystem>(_registry);
 
-    sceneRenderingModule->systems().push_back(std::make_unique<HealthRenderingSystem>(_registry));
+    sceneRenderingModule->systems().push_back(std::make_unique<HealthRenderingSystem>());
 
     sceneRenderingModule->addHandler(
         [](const sf::Event& event)

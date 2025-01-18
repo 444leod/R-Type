@@ -8,14 +8,21 @@
 #ifndef ATTACK_SYSTEM_HPP
 #define ATTACK_SYSTEM_HPP
 
-#include "BaseSystems/Abstracts/AUpdateSystem.hpp"
-#include "BaseComponents.hpp"
-#include "Config.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
+
+#include "PremadeComponents/Displayable/Sprite.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Projectile.hpp"
 
 #include "../../../Components/Weapon.hpp"
 #include "../../../Components/Target.hpp"
 #include "../../../Components/Monster.hpp"
 #include "../../../Components/Health.hpp"
+
+#include "Config.hpp"
 
 #include <cmath>
 
@@ -23,19 +30,19 @@ const Sprite arrowSprite(
     "assets/orchera/Factions/Knights/Troops/Archer/Arrow/Arrow.png",
     {1, 1},
     {64 / 2, 64 / 2},
-    sf::IntRect{0, 0, 64, 64}
+    IntRect{0, 0, 64, 64}
 );
 
-class AttackSystem final : public AUpdateSystem
+class AttackSystem final : public engine::AUpdateSystem
 {
 public:
-    explicit AttackSystem(ecs::Registry &registry) : AUpdateSystem(registry, "AttackSystem")
+    AttackSystem() : AUpdateSystem("AttackSystem")
     {
     }
 
     void execute(const double& deltaTime)
     {
-        _registry.view<Transform, Weapon, Target>().each([&](const Entity& entity, const Transform& transform, Weapon& weapon, const Target& target) {
+        _registry.view<Transform, Weapon, Target>().each([&](const ecs::Entity& entity, const Transform& transform, Weapon& weapon, const Target& target) {
             std::visit([&](auto& weaponType) {
 
                 weaponType.shootCooldown -= deltaTime;
@@ -69,11 +76,11 @@ public:
     }
 
 private:
-    void attack(Bow& bow, const Entity& player, const Transform& source, const std::pair<float, float>& target, const int directionX, const std::pair<int, int>& frame, const double angle)
+    void attack(Bow& bow, const ecs::Entity& player, const Transform& source, const std::pair<float, float>& target, const int directionX, const std::pair<int, int>& frame, const double angle)
     {
         auto& sprite = _registry.get<Sprite>(player);
 
-        sprite.textureRect = sf::IntRect(frame.first, 192 * 2 + frame.second, 192, 192);
+        sprite.textureRect = IntRect(frame.first, 192 * 2 + frame.second, 192, 192);
         sprite.scale = {directionX, 1};
 
         if (!_registry.has_any_of<Animation>(player))
@@ -85,7 +92,7 @@ private:
         loop = false;
         currentFrame = 0;
         elapsedTime = 0;
-        onEnd = [&, angle, source] (Entity) {
+        onEnd = [&, angle, source] (ecs::Entity) {
             const auto arrow = _registry.create();
 
             _registry.addComponent(arrow, Transform{
@@ -106,7 +113,7 @@ private:
                     .radius = 10,
                     .fillColor = {255, 100, 100, 255}
                 },
-                .onCollision = [this, &bow, arrow] (const Entity& entity) {
+                .onCollision = [this, &bow, arrow] (const ecs::Entity& entity) {
                     if (_registry.has_any_of<Monster>(entity))
                     {
                         auto& proj = _registry.get<Projectile>(arrow);

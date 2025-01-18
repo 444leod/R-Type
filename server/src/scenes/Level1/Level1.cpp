@@ -5,36 +5,27 @@
 ** Game.cpp
 */
 
-#include <algorithm>
-#include <cmath>
-#include "Config.hpp"
-#include <iostream>
-#include <SFML/Graphics.hpp>
 #include "Level1.hpp"
-#include "network/NetworkAgent.hpp"
-#include "ecs/Registry.hpp"
-#include "Structures/UserInput.hpp"
-#include "PacketTypes.hpp"
+
+#include "Config.hpp"
+
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Tags/Self.hpp"
+
+#include "SharedComponents/Enemy.hpp"
+#include "SharedComponents/Bug.hpp"
+#include "SharedComponents/Parallax.hpp"
+
+#include <iostream>
+#include <cmath>
+#include <algorithm>
 
 void Level1::initialize() {}
 
 void Level1::update(const double& deltaTime) {
     _executeUpdateSystems(deltaTime);
-
-    // TODO: update this
-    // HandleEnemyProjectileCollisionSystem
-    // RTYPE SPECIFIC
-    //! USES _manager but manager should not be passed to systems
-
-    this->_bugTimer -= deltaTime;
-    // if (this->_bugTimer < 0)
-    // {
-    //     this->_bugTimer = 5.f;
-    //     this->addBug(Transform{.x = 2000, .y = 250, .z = 1, .rotation = 90});
-    // }
-
-    // auto explosions = _registry.view<Animation, sf::Sprite, Transform>();
-    // explosions.displaySets();
 }
 
 void Level1::onEnter() {
@@ -66,7 +57,6 @@ void Level1::onEnter(const AScene& lastScene)
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
-    std::cout << "Game onEnter" << std::endl;
 }
 
 void Level1::onExit()

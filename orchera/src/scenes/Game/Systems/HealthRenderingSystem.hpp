@@ -8,21 +8,25 @@
 #ifndef HEALTH_RENDERING_SYSTEM_HPP
 #define HEALTH_RENDERING_SYSTEM_HPP
 
-#include "BaseSystems/Abstracts/ARenderSystem.hpp"
-#include "BaseComponents.hpp"
+
+#include "PremadeSystems/Abstracts/ARenderSystem.hpp"
+
+#include "PremadeComponents/Transform.hpp"
 
 #include "../../../Components/Health.hpp"
+
+#include "Config.hpp"
 
 class HealthRenderingSystem final : public ARenderSystem
 {
 public:
-    explicit HealthRenderingSystem(ecs::Registry &registry) : ARenderSystem(registry, "HealthRenderingSystem")
+    HealthRenderingSystem() : ARenderSystem("HealthRenderingSystem")
     {
     }
 
     void execute(sf::RenderWindow &window) override
     {
-        _registry.view<Transform, Health>().each([&](const Entity& entity, const Transform& transform, const Health& health) {
+        _registry.view<Transform, Health>().each([&](const ecs::Entity& entity, const Transform& transform, const Health& health) {
             if (health.health <= 0)
                 return;
             constexpr float barWidth = 40.0f;

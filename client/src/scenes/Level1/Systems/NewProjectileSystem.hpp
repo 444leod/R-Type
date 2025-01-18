@@ -8,19 +8,21 @@
 #ifndef NEW_PROJECTILE_SYSTEM_HPP_
 #define NEW_PROJECTILE_SYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
-#include "../Components.hpp"
-#include "Config.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
-#include "Sprites/Level1.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Projectile.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
 
-class NewProjectileSystem final : public ASystem
+class NewProjectileSystem final : public engine::ASystem
 {
 public:
-    explicit NewProjectileSystem(ecs::Registry &registry) : ASystem(registry, "NewProjectileSystem") {}
+    explicit NewProjectileSystem() : ASystem("NewProjectileSystem") {}
 
-    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity) {
+    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity) const
+    {
         for (auto [_, ship, transform] : _registry.view<Ship, Transform>().each())
         {
             if (ship.id != shipId)
@@ -44,7 +46,7 @@ public:
                     .frameDuration = 0.02,
                     .frameCount = 3,
                     .loop = false,
-                    .onEnd = [&](const Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }
+                    .onEnd = [&](const ecs::Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }
                 }
             );
             return;

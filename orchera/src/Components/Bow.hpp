@@ -8,9 +8,7 @@
 #ifndef BOW_HPP
 #define BOW_HPP
 
-#include "ecs/Registry.hpp"
-
-#include <functional>
+#include <cstdint>
 
 struct Bow
 {
