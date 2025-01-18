@@ -21,6 +21,8 @@
 #include "PacketTypes.hpp"
 #include "Sprites/Level1.hpp"
 
+void Level1::initialize() {}
+
 void Level1::update(const double& deltaTime) { _executeUpdateSystems(deltaTime); }
 
 void Level1::onEnter()
