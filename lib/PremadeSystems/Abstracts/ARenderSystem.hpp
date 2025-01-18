@@ -8,6 +8,7 @@
 #ifndef A_RENDER_SYSTEM_HPP_
 #define A_RENDER_SYSTEM_HPP_
 
+#include <chrono>
 #include <Engine/Systems/ASystem.hpp>
 #include <SFML/Graphics.hpp>
 

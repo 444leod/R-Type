@@ -8,6 +8,7 @@
 #ifndef A_EVENT_SYSTEM_HPP
 #define A_EVENT_SYSTEM_HPP
 
+#include <chrono>
 #include <Engine/Systems/ASystem.hpp>
 #include <SFML/Graphics.hpp>
 
