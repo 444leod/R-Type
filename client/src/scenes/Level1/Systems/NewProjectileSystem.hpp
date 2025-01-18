@@ -10,11 +10,11 @@
 
 #include <Engine/Systems/ASystem.hpp>
 
-#include "PremadeComponents/Displayable/Animation.hpp"
-#include "PremadeComponents/Hitbox.hpp"
-#include "PremadeComponents/Projectile.hpp"
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Projectile.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
 
 class NewProjectileSystem final : public engine::ASystem
 {

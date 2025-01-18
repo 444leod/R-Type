@@ -7,15 +7,11 @@
 
 #include "PacketHandlerSceneModule.hpp"
 
+#include "../Systems/ShipMovementSystem.hpp"
 #include "../Systems/NewProjectileSystem.hpp"
 #include "../Systems/NewShipSystem.hpp"
-#include "../Systems/ShipMovementSystem.hpp"
-
-#include "PremadeComponents/Tags/Self.hpp"
-#include "PremadeComponents/Transform.hpp"
-#include "PremadeComponents/Velocity.hpp"
-
-#include "SharedComponents/Client.hpp"
+#include "../Systems/NewMonsterSystem.hpp"
+#include "../Systems/MonsterKilledSystem.hpp"
 
 #include "PremadeComponents/Tags/Self.hpp"
 #include "PremadeComponents/Transform.hpp"
