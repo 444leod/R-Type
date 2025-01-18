@@ -5,20 +5,24 @@
 ** ShipMovementSystem
 */
 
-#ifndef SHIPMOVEMENTSYSTEM_HPP_
-#define SHIPMOVEMENTSYSTEM_HPP_
+#ifndef SHIP_MOVEMENT_SYSTEM_HPP_
+#define SHIP_MOVEMENT_SYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
-#include "../Components.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
-class ShipMovementSystem final : public ASystem
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+
+#include "SharedComponents/Ship.hpp"
+
+class ShipMovementSystem final : public engine::ASystem
 {
-public:
-    explicit ShipMovementSystem(ecs::Registry &registry) : ASystem(registry, "ShipMovementSystem") {}
+  public:
+    explicit ShipMovementSystem() : ASystem("ShipMovementSystem") {}
 
-    void execute(const Entity& entity_id, const Velocity& velocity, const Transform& position) const {
-        for (auto &[entity, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>().each())
+    void execute(const ecs::Entity& entity_id, const Velocity& velocity, const Transform& position) const
+    {
+        for (auto& [entity, ship, vel, pos] : _registry.view<Ship, Velocity, Transform>().each())
         {
             if (ship.id != entity_id)
                 continue;
@@ -29,4 +33,4 @@ public:
     }
 };
 
-#endif /* !SHIPMOVEMENTSYSTEM_HPP_ */
+#endif /* !SHIP_MOVEMENT_SYSTEM_HPP_ */

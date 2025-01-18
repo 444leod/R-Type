@@ -8,40 +8,16 @@
 #ifndef LEVEL1_SPRITES_HPP
 #define LEVEL1_SPRITES_HPP
 
-#include "BaseComponents.hpp"
+#include "PremadeComponents/Displayable/Sprite.hpp"
 
-inline const auto spaceshipSprite = Sprite {
-    "assets/r-typesheet42.gif",
-    { SCALE, SCALE },
-    { 0, 0 },
-    sf::IntRect(0, 0, 34, 18)
-};
+inline const auto spaceshipSprite = Sprite{"assets/r-typesheet42.gif", {SCALE, SCALE}, {0, 0}, IntRect(0, 0, 34, 18)};
 
-inline const auto projectileSprite = Sprite {
-    "assets/r-typesheet1.gif",
-    { SCALE, SCALE },
-    { 0, 0 },
-    sf::IntRect(0, 91, 48, 16)
-};
+inline const auto projectileSprite = Sprite{"assets/r-typesheet1.gif", {SCALE, SCALE}, {0, 0}, IntRect(0, 91, 48, 16)};
 
-inline const auto backgroundSprite = Sprite {
-    "assets/rtype-background.png",
-    { SCALE, SCALE },
-    { 0, 0 },
-    sf::IntRect(0, 243, 3072, 205)
-};
+inline const auto backgroundSprite = Sprite{"assets/rtype-background.png", {SCALE, SCALE}, {0, 0}, IntRect(0, 243, 3072, 205)};
 
-inline const auto bugSprite = Sprite {
-    "assets/r-typesheet8.gif",
-    { SCALE, SCALE },
-    { 16, 13 }
-};
+inline const auto bugSprite = Sprite{"assets/r-typesheet8.gif", {SCALE, SCALE}, {16, 13}};
 
-inline const auto explosionSprite = Sprite {
-    "assets/r-typesheet44.gif",
-    { SCALE, SCALE },
-    { 16, 16 },
-    sf::IntRect(131, 0, 192, 32)
-};
+inline const auto explosionSprite = Sprite{"assets/r-typesheet44.gif", {SCALE, SCALE}, {16, 16}, IntRect(131, 0, 192, 32)};
 
-#endif //LEVEL1_SPRITES_HPP
+#endif // LEVEL1_SPRITES_HPP

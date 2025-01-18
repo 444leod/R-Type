@@ -13,4 +13,4 @@
 #define SCREEN_HEIGHT 256
 #define DEBUG false
 
-#endif //CONFIG_H
+#endif // CONFIG_H

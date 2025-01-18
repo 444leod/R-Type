@@ -6,13 +6,17 @@
 */
 
 #include "ShipMovementSystem.hpp"
-#include "BaseComponents.hpp"
-#include "../Components.hpp"
+
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+
+#include "SharedComponents/Client.hpp"
+#include "SharedComponents/Ship.hpp"
 
 #include "PacketTypes.hpp"
-#include "Components.hpp"
 
-static std::optional<Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
+static std::optional<ecs::Entity> getEntityBySource(ecs::Registry& registry, const asio::ip::udp::endpoint& source)
 {
     for (auto [entity, info] : registry.view<Client>())
     {
@@ -22,7 +26,7 @@ static std::optional<Entity> getEntityBySource(ecs::Registry &registry, const as
     return std::nullopt;
 }
 
-void ShipMovementSystem::execute(const asio::ip::udp::endpoint &source, const UserInput& input) const
+void ShipMovementSystem::execute(const asio::ip::udp::endpoint& source, const UserInput& input) const
 {
     const auto entityId = getEntityBySource(_registry, source);
     if (!entityId.has_value())
@@ -34,20 +38,20 @@ void ShipMovementSystem::execute(const asio::ip::udp::endpoint &source, const Us
 
     switch (input.key)
     {
-        case sf::Keyboard::Key::Up:
-            velocity.y += input.pressed ? -75 : 75;
+    case sf::Keyboard::Key::Up:
+        velocity.y += input.pressed ? -75 : 75;
         break;
-        case sf::Keyboard::Key::Down:
-            velocity.y += input.pressed ? 75 : -75;
+    case sf::Keyboard::Key::Down:
+        velocity.y += input.pressed ? 75 : -75;
         break;
-        case sf::Keyboard::Key::Left:
-            velocity.x += input.pressed ? -75 : 75;
+    case sf::Keyboard::Key::Left:
+        velocity.x += input.pressed ? -75 : 75;
         break;
-        case sf::Keyboard::Key::Right:
-            velocity.x += input.pressed ? 75 : -75;
+    case sf::Keyboard::Key::Right:
+        velocity.x += input.pressed ? 75 : -75;
         break;
-        default:
-            break;
+    default:
+        break;
     }
 
     ntw::UDPPacket packet;

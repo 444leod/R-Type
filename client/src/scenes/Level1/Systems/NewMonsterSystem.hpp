@@ -8,30 +8,32 @@
 #ifndef NEW_MONSTER_SYSTEM_HPP_
 #define NEW_MONSTER_SYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
-#include "../Components.hpp"
-#include "Config.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
-class NewMonsterSystem final : public ASystem
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+
+#include "SharedComponents/Enemy.hpp"
+
+class NewMonsterSystem final : public engine::ASystem
 {
-public:
-    explicit NewMonsterSystem(ecs::Registry &registry) : ASystem(registry, "NewMonsterSystem") {}
+  public:
+    explicit NewMonsterSystem() : ASystem("NewMonsterSystem") {}
 
-    void execute(const std::uint32_t& id, const std::uint8_t& type, const Transform& transform, const Velocity& velocity) const {
+    void execute(const std::uint32_t& id, const std::uint8_t& type, const Transform& transform, const Velocity& velocity) const
+    {
         const auto monster = _registry.create();
-//        auto monsterSprite = sf::Sprite(_bugTex);
-//        monsterSprite.setOrigin(16, 13);
-//        monsterSprite.setScale(SCALE, SCALE);
-//        monsterSprite.setPosition(transform.x, transform.y);
+        //        auto monsterSprite = sf::Sprite(_bugTex);
+        //        monsterSprite.setOrigin(16, 13);
+        //        monsterSprite.setScale(SCALE, SCALE);
+        //        monsterSprite.setPosition(transform.x, transform.y);
         _registry.addComponent(monster, Enemy{.id = id});
-//        _registry.addComponent(monster, Monster{.type = type});
+        //        _registry.addComponent(monster, Monster{.type = type});
         _registry.addComponent(monster, transform);
         _registry.addComponent(monster, velocity);
         _registry.addComponent(monster, Hitbox{});
-
     }
 };
-
 
 #endif /* !NEW_MONSTER_SYSTEM_HPP_ */

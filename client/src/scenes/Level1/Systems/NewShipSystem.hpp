@@ -8,34 +8,35 @@
 #ifndef NEW_SHIP_SYSTEM_HPP_
 #define NEW_SHIP_SYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
-#include "../Components.hpp"
-#include "Config.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
-//#include <SFML/Graphics.hpp>
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
 
-class NewShipSystem final : public ASystem
+#include "SharedComponents/Ship.hpp"
+
+class NewShipSystem final : public engine::ASystem
 {
-public:
-    explicit NewShipSystem(ecs::Registry &registry) : ASystem(registry, "NewShipSystem") {}
+  public:
+    explicit NewShipSystem() : ASystem("NewShipSystem") {}
 
-    Entity execute(const std::uint32_t& id, const Transform& transform, const Velocity& velocity) {
+    ecs::Entity execute(const std::uint32_t& id, const Transform& transform, const Velocity& velocity) const
+    {
         const auto spaceship = _registry.create();
         _registry.addComponent(spaceship, Ship{.id = id});
         _registry.addComponent(spaceship, transform);
         _registry.addComponent(spaceship, velocity);
         _registry.addComponent(spaceship, Hitbox{});
 
-        //TODO: update
-//        auto spaceshipSprite = sf::Sprite(_spaceshipTex);
-//        spaceshipSprite.setOrigin(0, 0);
-//        spaceshipSprite.setScale(SCALE, SCALE);
-//        spaceshipSprite.setPosition(transform.x, transform.y);
+        //        TODO: update
+        //        auto spaceshipSprite = sf::Sprite(_spaceshipTex);
+        //        spaceshipSprite.setOrigin(0, 0);
+        //        spaceshipSprite.setScale(SCALE, SCALE);
+        //        spaceshipSprite.setPosition(transform.x, transform.y);
 
         return spaceship;
     }
 };
-
 
 #endif /* !NEW_SHIP_SYSTEM_HPP_ */

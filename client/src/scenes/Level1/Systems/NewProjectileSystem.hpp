@@ -8,26 +8,29 @@
 #ifndef NEW_PROJECTILE_SYSTEM_HPP_
 #define NEW_PROJECTILE_SYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
-#include "../Components.hpp"
-#include "Config.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
-#include "Sprites/Level1.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Projectile.hpp"
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+#include "SharedComponents/Ship.hpp"
 
-class NewProjectileSystem final : public ASystem
+class NewProjectileSystem final : public engine::ASystem
 {
-public:
-    explicit NewProjectileSystem(ecs::Registry &registry) : ASystem(registry, "NewProjectileSystem") {}
+  public:
+    explicit NewProjectileSystem() : ASystem("NewProjectileSystem") {}
 
-    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity) {
+    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity) const
+    {
         for (auto [_, ship, transform] : _registry.view<Ship, Transform>().each())
         {
             if (ship.id != shipId)
                 continue;
             const auto projectile = _registry.create();
 
-            //TODO: update
+            // TODO: update
 
             // auto projectileSprite = sf::Sprite(projectileTex);
             // projectileSprite.setOrigin(0, 0);
@@ -38,19 +41,11 @@ public:
 
             _registry.addComponent(projectile, Hitbox{});
             _registry.addComponent(projectile, transform);
-            _registry.addComponent(projectile, Projectile{ .id = projectileId });
-            _registry.addComponent(projectile, Animation{
-                    .frameSize = {16, 16},
-                    .frameDuration = 0.02,
-                    .frameCount = 3,
-                    .loop = false,
-                    .onEnd = [&](const Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }
-                }
-            );
+            _registry.addComponent(projectile, Projectile{.id = projectileId});
+            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = 0.02, .frameCount = 3, .loop = false, .onEnd = [&](const ecs::Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }});
             return;
         }
     }
 };
-
 
 #endif /* !NEW_PROJECTILE_SYSTEM_HPP_ */

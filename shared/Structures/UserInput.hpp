@@ -16,4 +16,4 @@ struct UserInput
     bool pressed;
 };
 
-#endif //USERINPUT_HPP
+#endif // USERINPUT_HPP

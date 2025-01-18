@@ -8,18 +8,20 @@
 #ifndef WAITING_ROOM_PACKET_HANDLER_SCENE_MODULE_HPP
 #define WAITING_ROOM_PACKET_HANDLER_SCENE_MODULE_HPP
 
-#include "NetworkModules/ANetworkGameModule.hpp"
+#include "PremadeModules/Network/ANetworkGameModule.hpp"
 
 namespace waiting_room
 {
 
 class PacketHandlerSceneModule final : public APacketHandlerSceneModule
 {
-public:
-    explicit PacketHandlerSceneModule(AScene& scene, ecs::Registry& registry, RestrictedSceneManager& sceneManager, const std::shared_ptr<ANetworkSceneModule>& net);
+  public:
+    explicit PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net);
     ~PacketHandlerSceneModule() override = default;
+
+  private:
 };
 
-}
+} // namespace waiting_room
 
-#endif //WAITING_ROOM_PACKET_HANDLER_SCENE_MODULE_HPP
+#endif // WAITING_ROOM_PACKET_HANDLER_SCENE_MODULE_HPP

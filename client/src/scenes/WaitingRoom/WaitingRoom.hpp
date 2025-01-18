@@ -11,19 +11,16 @@
 #include <chrono>
 #include <optional>
 
-#include "ecs/Registry.hpp"
-#include "ecs/EventDispatcher.hpp"
-#include "engine/AScene.hpp"
-#include "BaseComponents.hpp"
+#include <ECS/EventDispatcher.hpp>
+#include <ECS/Registry.hpp>
+#include <Engine/AScene.hpp>
 
-#include <BaseSystems/Update/CollisionSystem.hpp>
+#include "PremadeSystems/Update/CollisionSystem.hpp"
 
-class WaitingRoom final : public AScene {
-public:
-    WaitingRoom(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n)
-    {
-        _updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
-    }
+class WaitingRoom final : public engine::AScene
+{
+  public:
+    explicit WaitingRoom(const std::string& name) : AScene(name) { _updateSystems.push_back(std::make_unique<CollisionSystem>()); }
 
     void initialize() override;
 
@@ -31,13 +28,13 @@ public:
 
     void onEnter() override;
 
-    void onEnter(const AScene& lastScene) override;
+    void onEnter(const engine::AScene& lastScene) override;
 
     void onExit() override;
 
-    void onExit(const AScene& nextScene) override;
+    void onExit(const engine::AScene& nextScene) override;
 
-private:
+  private:
     std::optional<std::uint32_t> _id = std::nullopt;
 
     ecs::EventDispatcher _eventDispatcher;
@@ -48,6 +45,4 @@ private:
     std::uint8_t _pointNumber = 0;
 };
 
-
-
-#endif //WAITING_ROOM_HPP
+#endif // WAITING_ROOM_HPP

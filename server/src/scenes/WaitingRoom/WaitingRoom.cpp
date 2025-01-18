@@ -6,16 +6,17 @@
 */
 
 #include "WaitingRoom.hpp"
-#include "ecs/Registry.hpp"
-#include <algorithm>
-#include <cmath>
 
-#include <iostream>
-#include <SFML/Graphics.hpp>
+#include <ECS/Registry.hpp>
+
+#include "PremadeModules/Network/ANetworkSceneModule.hpp"
+
+#include "PremadeComponents/Transform.hpp"
+
 #include "PacketTypes.hpp"
-#include "NetworkModules/ANetworkSceneModule.hpp"
-#include "Components.hpp"
-#include "../../Systems/RemoveClientSystem.hpp"
+
+#include <cmath>
+#include <iostream>
 
 inline bool isInputAvailable()
 {
@@ -36,8 +37,9 @@ void WaitingRoom::initialize()
 
 void WaitingRoom::update(const double& deltaTime)
 {
-    if (isInputAvailable()) {
-        if (std::string input;!std::getline(std::cin, input))
+    if (isInputAvailable())
+    {
+        if (std::string input; !std::getline(std::cin, input))
         {
             if (std::cin.eof())
             {
@@ -72,42 +74,28 @@ void WaitingRoom::onEnter()
 {
     _registry.clear();
 
-    float y = 50.0f;
-    // for (const auto& client : CLIENTS) { //todo: update this
-    //     auto entity = _registry.create();
-    //     _registry.addComponent<Position>(entity, {50.0f, y});
-    //     sf::Text clientText("Client " + std::to_string(client.id), _font, 20);
-    //     clientText.setFillColor(sf::Color::White);
-    //     _registry.addComponent<Text>(entity, {clientText});
-    //     y += 30.0f;
-    // }
-
     auto exitButtonEntity = _registry.create();
-    _registry.addComponent<Position>(exitButtonEntity, {20.0f, 20.0f});
-    sf::RectangleShape exitButtonShape({100.0f, 40.0f});
-    exitButtonShape.setFillColor(sf::Color::Red);
+    // _registry.addComponent<Transform>(exitButtonEntity, Transform { .x = 20.0f, .y = 20.0f});
+    // sf::RectangleShape exitButtonShape({100.0f, 40.0f});
+    // exitButtonShape.setFillColor(sf::Color::Red);
     // _registry.addComponent<Button>(exitButtonEntity, {.shape exitButtonShape, "Exit", [this](){ game::RestrictedGame::instance().stop(); }});
 
     auto startButtonEntity = _registry.create();
-    _registry.addComponent<Position>(startButtonEntity, {140.0f, 20.0f});
-    sf::RectangleShape startButtonShape({100.0f, 40.0f});
-    startButtonShape.setFillColor(sf::Color::Green);
+    // _registry.addComponent<Transform>(startButtonEntity, Transform { .x = 140.0f, .y = 20.0f});
+    // sf::RectangleShape startButtonShape({100.0f, 40.0f});
+    // startButtonShape.setFillColor(sf::Color::Green);
     // _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){
     //    //TODO: start the game
     // }});
 
-    const auto net = this->getModule<ANetworkSceneModule>();
-    if (net == nullptr)
+    if (this->getModule<ANetworkSceneModule>() == nullptr)
     {
-        std::cout << "No network module found, exiting..." << std::endl;
-        game::RestrictedGame::instance().stop();
-        return;
+        std::cout << "No Network module found, exiting..." << std::endl;
+        throw std::runtime_error("No Network module found");
     }
 }
 
-void WaitingRoom::onEnter(const AScene& lastScene)
-{
-}
+void WaitingRoom::onEnter(const AScene& lastScene) { this->onEnter(); }
 
 void WaitingRoom::onExit()
 {
@@ -121,15 +109,11 @@ void WaitingRoom::onExit()
     net->sendPacket(packet);
 }
 
-void WaitingRoom::onExit(const AScene& nextScene)
-{
-    std::cout << "Exiting to " << nextScene.name() << std::endl;
-    // std::cout << "zeajkh" << std::endl;
-}
+void WaitingRoom::onExit(const AScene& nextScene) { std::cout << "Exiting to " << nextScene.name() << std::endl; }
 
-void WaitingRoom::_startGame(const std::vector<std::string> &)
+void WaitingRoom::_startGame(const std::vector<std::string>&)
 {
-    auto net = this->getModule<ANetworkSceneModule>();
+    const auto net = this->getModule<ANetworkSceneModule>();
 
     if (net->clients().size() < 1)
     {
@@ -138,7 +122,7 @@ void WaitingRoom::_startGame(const std::vector<std::string> &)
     }
 
     std::cout << "Starting the game..." << std::endl;
-    game::RestrictedGame::instance().scenes().load("game");
+    engine::RestrictedGame::instance().scenes().load("game");
 
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::START;

@@ -8,20 +8,26 @@
 #ifndef MONSTER_KILLED_SYSTEM_HPP_
 #define MONSTER_KILLED_SYSTEM_HPP_
 
+#include <ECS/Entity.hpp>
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "BaseComponents.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
-class MonsterKilledSystem final : public ASystem
+#include "PremadeComponents/Displayable/Animation.hpp"
+#include "PremadeComponents/Projectile.hpp"
+#include "PremadeComponents/Transform.hpp"
+
+#include "SharedComponents/Enemy.hpp"
+
+class MonsterKilledSystem final : public engine::ASystem
 {
-public:
-    explicit MonsterKilledSystem(ecs::Registry &registry) : ASystem(registry, "MonsterKilledSystem") {}
+  public:
+    explicit MonsterKilledSystem() : ASystem("MonsterKilledSystem") {}
 
-    void execute(const std::uint32_t& monsterId, const std::uint32_t& projectileId)
+    void execute(const std::uint32_t& monsterId, const std::uint32_t& projectileId) const
     {
-        std::optional<std::tuple<Entity, Enemy, Transform>> monster = std::nullopt;
+        std::optional<std::tuple<ecs::Entity, Enemy, Transform>> monster = std::nullopt;
 
-        for (auto &[entity, enemy, transform] : _registry.view<Enemy, Transform>().each())
+        for (auto& [entity, enemy, transform] : _registry.view<Enemy, Transform>().each())
         {
             if (enemy.id != monsterId)
                 continue;
@@ -33,9 +39,9 @@ public:
         if (!monster.has_value())
             return;
 
-        std::optional<std::tuple<Entity, Projectile, Transform>> projectile = std::nullopt;
+        std::optional<std::tuple<ecs::Entity, Projectile, Transform>> projectile = std::nullopt;
 
-        for (auto &[entity, proj, transform] : _registry.view<Projectile, Transform>().each())
+        for (auto& [entity, proj, transform] : _registry.view<Projectile, Transform>().each())
         {
             if (proj.id != projectileId)
                 continue;
@@ -62,14 +68,7 @@ public:
         // _registry.addComponent(explosion, explosionSprite);
 
         _registry.addComponent(explosion, Transform{.x = monsterTransform.x, .y = monsterTransform.y, .z = 1, .rotation = 0});
-        _registry.addComponent(explosion, Animation {
-                .frameSize = {32, 32},
-                .frameDuration = 0.1,
-                .frameCount = 6,
-                .loop = false,
-                .onEnd = [&](const Entity& entity){ _registry.remove(entity); }
-            }
-        );
+        _registry.addComponent(explosion, Animation{.frameSize = {32, 32}, .frameDuration = 0.1, .frameCount = 6, .loop = false, .onEnd = [&](const ecs::Entity& entity) { _registry.remove(entity); }});
     }
 };
 

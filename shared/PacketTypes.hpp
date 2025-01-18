@@ -9,14 +9,14 @@
 #define PACKET_TYPES_HPP
 
 /**
-  * @brief This enum will describe what the packet is for.
-  *
-  *  - NONE: No packet type
-  *  - CONNECT: Connection packet
-  *  - DISCONNECT: Disconnection packet
-  *  - MESSAGE: Message packet (temporary
-  *  - POSITION: Position packet (temporary)
-  */
+ * @brief This enum will describe what the packet is for.
+ *
+ *  - NONE: No packet type
+ *  - CONNECT: Connection packet
+ *  - DISCONNECT: Disconnection packet
+ *  - MESSAGE: Message packet (temporary
+ *  - POSITION: Position packet (temporary)
+ */
 enum class PACKET_TYPE
 {
     NONE = 0,
@@ -43,4 +43,4 @@ enum class PACKET_TYPE
     MONSTER_KILLED
 };
 
-#endif //PACKET_TYPES_HPP
+#endif // PACKET_TYPES_HPP

@@ -8,36 +8,31 @@
 #ifndef LEVEL_1_HPP
 #define LEVEL_1_HPP
 
-#include "engine/AScene.hpp"
-#include "ecs/Registry.hpp"
-#include "ecs/EventDispatcher.hpp"
-// From Game Engine
-#include "BaseComponents.hpp"
-#include "BaseSystems/Update/ParalaxSystem.hpp"
-#include "BaseSystems/Update/MovementSystem.hpp"
-#include "BaseSystems/Update/AnimateSystem.hpp"
-#include "BaseSystems/Update/CollisionSystem.hpp"
+#include <Engine/AScene.hpp>
 
-// Game specific
-#include "Components.hpp"
-#include "Events/InputHandler.hpp"
-#include "Systems/RemoveOutOfBoundProjectilesSystem.hpp"
-#include "Systems/BugsMovementSystem.hpp"
+#include "PremadeSystems/Update/AnimateSystem.hpp"
+#include "PremadeSystems/Update/CollisionSystem.hpp"
+#include "PremadeSystems/Update/MovementSystem.hpp"
+#include "PremadeSystems/Update/ParalaxSystem.hpp"
+
+#include "SharedSystems/BugsMovementSystem.hpp"
+#include "SharedSystems/RemoveOutOfBoundProjectilesSystem.hpp"
 
 #include "Sprites/Level1.hpp"
 
 #include <chrono>
 
-class Level1 final : public AScene {
-public:
-    Level1(RestrictedSceneManager& m, ecs::Registry& r, const std::string& n) : AScene(m, r, n) {
-        // update systems
-        this->_updateSystems.push_back(std::make_unique<ParallaxSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<MovementSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<AnimateSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<BugsMovementSystem>(_registry));
-        this->_updateSystems.push_back(std::make_unique<CollisionSystem>(_registry));
+class Level1 final : public engine::AScene
+{
+  public:
+    explicit Level1(const std::string& name) : AScene(name)
+    {
+        this->_updateSystems.push_back(std::make_unique<ParallaxSystem>());
+        this->_updateSystems.push_back(std::make_unique<MovementSystem>());
+        this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>());
+        this->_updateSystems.push_back(std::make_unique<AnimateSystem>());
+        this->_updateSystems.push_back(std::make_unique<BugsMovementSystem>());
+        this->_updateSystems.push_back(std::make_unique<CollisionSystem>());
     }
 
     void initialize() override;
@@ -52,20 +47,12 @@ public:
 
     void onExit(const AScene& nextScene) override;
 
-private:
+  private:
     void addBug(const Transform& transform);
 
-public:
-private:
-    float _bugTimer = 0.f;
+  public:
+  private:
     std::uint32_t _enemyId = 0;
-    ecs::EventDispatcher _eventDispatcher;
-
-    InputHandler _inputHandler{_registry};
-
-    //this is temporary, if this texture get deleted, then the sprite will not be able to render
 };
 
-
-
-#endif //GAME_HPP
+#endif // GAME_HPP
