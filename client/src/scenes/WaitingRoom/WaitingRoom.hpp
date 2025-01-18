@@ -11,18 +11,16 @@
 #include <chrono>
 #include <optional>
 
-#include <ECS/Registry.hpp>
 #include <ECS/EventDispatcher.hpp>
+#include <ECS/Registry.hpp>
 #include <Engine/AScene.hpp>
 
 #include "PremadeSystems/Update/CollisionSystem.hpp"
 
-class WaitingRoom final : public engine::AScene {
-public:
-    explicit WaitingRoom(const std::string& name) : AScene(name)
-    {
-        _updateSystems.push_back(std::make_unique<CollisionSystem>());
-    }
+class WaitingRoom final : public engine::AScene
+{
+  public:
+    explicit WaitingRoom(const std::string& name) : AScene(name) { _updateSystems.push_back(std::make_unique<CollisionSystem>()); }
 
     void initialize() override;
 
@@ -36,7 +34,7 @@ public:
 
     void onExit(const engine::AScene& nextScene) override;
 
-private:
+  private:
     std::optional<std::uint32_t> _id = std::nullopt;
 
     ecs::EventDispatcher _eventDispatcher;
@@ -47,6 +45,4 @@ private:
     std::uint8_t _pointNumber = 0;
 };
 
-
-
-#endif //WAITING_ROOM_HPP
+#endif // WAITING_ROOM_HPP

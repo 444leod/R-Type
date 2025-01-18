@@ -45,7 +45,6 @@ PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const 
 {
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::USER_INPUT, handleUserInput);
-
 }
 
-}
+} // namespace level1

@@ -18,4 +18,4 @@ struct Client
     Client(const Client& other) = default;
 };
 
-#endif //CLIENT_HPP
+#endif // CLIENT_HPP

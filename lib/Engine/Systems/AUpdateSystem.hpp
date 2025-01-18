@@ -15,7 +15,7 @@ namespace engine
 
 class AUpdateSystem : public engine::ASystem
 {
-public:
+  public:
     explicit AUpdateSystem(const std::string& name) : ASystem(name) {}
 
     /**
@@ -25,6 +25,6 @@ public:
     virtual void execute(const double& deltaTime) = 0;
 };
 
-}
+} // namespace engine
 
 #endif /* !A_UPDATE_SYSTEM_HPP_ */

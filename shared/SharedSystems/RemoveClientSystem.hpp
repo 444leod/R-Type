@@ -18,14 +18,15 @@
 
 class RemoveClientSystem final : public engine::ASystem
 {
-public:
+  public:
     explicit RemoveClientSystem() : ASystem("RemoveClientSystem") {}
 
     void execute(const asio::ip::udp::endpoint& src, const std::shared_ptr<ANetworkSceneModule>& net) const
     {
-        for (auto& [entity, client] : _registry.view<Client>().each() )
+        for (auto& [entity, client] : _registry.view<Client>().each())
         {
-            if (client.info.endpoint == src) {
+            if (client.info.endpoint == src)
+            {
                 _registry.remove(entity);
                 break;
             }
@@ -33,9 +34,7 @@ public:
 
         auto clients = net->clients();
 
-        const auto client = std::ranges::find_if(clients, [&src](const auto& actualClient) {
-            return actualClient.endpoint == src;
-        });
+        const auto client = std::ranges::find_if(clients, [&src](const auto& actualClient) { return actualClient.endpoint == src; });
 
         if (client == clients.end())
             return;
@@ -49,8 +48,7 @@ public:
         net->removeClient(client->id);
 
         net->sendPacket(disconnectPacket);
-
     }
 };
 
-#endif //REMOVE_CLIENT_SYSTEM_HPP
+#endif // REMOVE_CLIENT_SYSTEM_HPP

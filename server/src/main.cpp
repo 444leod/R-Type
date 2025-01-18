@@ -5,20 +5,19 @@
 ** main
 */
 
-#include <thread>
 #include <Engine/Game.hpp>
+#include <thread>
 
 // #include "PremadeModules/Rendering/GameRenderingModule.hpp"
 #include "GameModules/NetworkGameModule.hpp"
 
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
 
-#include "scenes/WaitingRoom/WaitingRoom.hpp"
 #include "scenes/WaitingRoom/Modules/PacketHandlerSceneModule.hpp"
+#include "scenes/WaitingRoom/WaitingRoom.hpp"
 
 #include "scenes/Level1/Level1.hpp"
 #include "scenes/Level1/Modules/PacketHandlerSceneModule.hpp"
-
 
 int main()
 {

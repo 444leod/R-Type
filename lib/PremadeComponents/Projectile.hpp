@@ -10,9 +10,10 @@
 
 #include <cstdint>
 
-struct Projectile {
+struct Projectile
+{
     double range;
     std::uint32_t id;
 };
 
-#endif //PROJECTILE_HPP
+#endif // PROJECTILE_HPP

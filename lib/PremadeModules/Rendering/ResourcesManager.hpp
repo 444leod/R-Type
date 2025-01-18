@@ -8,12 +8,12 @@
 #ifndef RESOURCES_MANAGER_HPP
 #define RESOURCES_MANAGER_HPP
 
+#include <SFML/Graphics.hpp>
 #include <map>
 #include <string>
-#include <SFML/Graphics.hpp>
 
-  class ResourcesManager
-  {
+class ResourcesManager
+{
   public:
     ResourcesManager() = default;
     ~ResourcesManager() = default;
@@ -24,6 +24,6 @@
   private:
     std::map<std::string, sf::Texture> _textures;
     std::map<std::string, sf::Font> _fonts;
-  };
+};
 
-#endif //RESOURCES_MANAGER_HPP
+#endif // RESOURCES_MANAGER_HPP

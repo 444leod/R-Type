@@ -18,17 +18,18 @@
 
 class DrawShapeSystem final : public ARenderSystem
 {
-public:
+  public:
     DrawShapeSystem() : ARenderSystem("DrawShapeSystem") {}
 
-    void execute(sf::RenderWindow &window) override {
+    void execute(sf::RenderWindow& window) override
+    {
 
         auto view = _registry.view<shape::Circle, Transform>();
 
         _registry.view<shape::Rectangle, Transform>().each(
-            [&] (const ecs::Entity& entity, const shape::Rectangle& rect, const Transform& transform)
+            [&](const ecs::Entity& entity, const shape::Rectangle& rect, const Transform& transform)
             {
-                const auto&[width, height, fillColor, outlineColor, outlineThickness] = rect;
+                const auto& [width, height, fillColor, outlineColor, outlineThickness] = rect;
                 sf::RectangleShape shape(sf::Vector2f(width, height));
                 shape.setPosition(transform.x + width / 2, transform.y + height / 2);
                 shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b, fillColor.a));
@@ -37,13 +38,12 @@ public:
                 shape.setRotation(transform.rotation);
                 shape.setOrigin(width / 2, height / 2);
                 window.draw(shape);
-            }
-        );
+            });
 
         _registry.view<shape::Circle, Transform>().each(
-            [&] (const ecs::Entity& entity, const shape::Circle& circle, const Transform& transform)
+            [&](const ecs::Entity& entity, const shape::Circle& circle, const Transform& transform)
             {
-                const auto&[radius, fillColor, outlineColor, outlineThickness] = circle;
+                const auto& [radius, fillColor, outlineColor, outlineThickness] = circle;
                 sf::CircleShape shape(radius);
                 shape.setPosition(transform.x, transform.y);
                 shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b, fillColor.a));
@@ -51,12 +51,10 @@ public:
                 shape.setOutlineThickness(outlineThickness);
                 shape.setOrigin(radius / 2, radius / 2);
                 window.draw(shape);
-            }
-        );
-
+            });
     }
 
-private:
+  private:
     ecs::SparseSet<sf::Texture> _textures;
 };
 

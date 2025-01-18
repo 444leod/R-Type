@@ -14,12 +14,12 @@
 
 class ShipShotSystem final : public engine::ASystem
 {
-public:
+  public:
     explicit ShipShotSystem(const std::shared_ptr<ANetworkSceneModule>& net) : ASystem("ShipShotSystem"), _net(net) {}
 
-    void execute(const asio::ip::udp::endpoint &source) const;
-    
-private:
+    void execute(const asio::ip::udp::endpoint& source) const;
+
+  private:
     const std::shared_ptr<ANetworkSceneModule>& _net;
 };
 

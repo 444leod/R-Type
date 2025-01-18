@@ -14,21 +14,22 @@
 #include <Engine/AScene.hpp>
 
 // From Game Engine
-#include "PremadeSystems/Update/ParalaxSystem.hpp"
-#include "PremadeSystems/Update/MovementSystem.hpp"
 #include "PremadeSystems/Update/AnimateSystem.hpp"
+#include "PremadeSystems/Update/MovementSystem.hpp"
+#include "PremadeSystems/Update/ParalaxSystem.hpp"
 
 // Game specific
-#include "SharedSystems/RemoveOutOfBoundProjectilesSystem.hpp"
 #include "SharedSystems/BugsMovementSystem.hpp"
+#include "SharedSystems/RemoveOutOfBoundProjectilesSystem.hpp"
 
 #include <chrono>
 #include <memory>
 
 class Level1 final : public engine::AScene
 {
-public:
-    explicit Level1(const std::string& n) : AScene(n) {
+  public:
+    explicit Level1(const std::string& n) : AScene(n)
+    {
         this->_updateSystems.push_back(std::make_unique<ParallaxSystem>());
         this->_updateSystems.push_back(std::make_unique<MovementSystem>());
         this->_updateSystems.push_back(std::make_unique<AnimateSystem>());
@@ -48,12 +49,12 @@ public:
 
     void onExit(const AScene& nextScene) override;
 
-private:
+  private:
     void addProjectile(const Transform& transform);
     void addBug(const Transform& transform);
 
-public:
-private:
+  public:
+  private:
 };
 
-#endif //GAME_HPP
+#endif // GAME_HPP
