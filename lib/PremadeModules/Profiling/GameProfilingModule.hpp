@@ -70,8 +70,6 @@ public:
         this->_window.clear(clear);
         this->_events();
 
-        std::cout << "Scroll: " << this->_scroll << std::endl;
-
         // Draw Content
         this->_runtime();
         this->_updates();
