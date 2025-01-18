@@ -20,7 +20,8 @@ class AnimateSystem final : public engine::AUpdateSystem
   public:
     explicit AnimateSystem() : AUpdateSystem("AnimateSystem") {}
 
-    void execute(const double& deltaTime) override
+private:
+    void _execution(double deltaTime) override
     {
         _registry.view<Animation, Sprite>().each(
             [&](const ecs::Entity& entity, Animation& animation, Sprite& sprite)

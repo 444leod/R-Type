@@ -19,7 +19,8 @@ class BugsMovementSystem final : public engine::AUpdateSystem
   public:
     explicit BugsMovementSystem() : AUpdateSystem("BugsMovementSystem") {}
 
-    void execute(const double& deltaTime) override
+private:
+    void _execution(double deltaTime) override
     {
         _registry.view<Bug, Transform>().each(
             [&](const Bug& bug, Transform& transform)

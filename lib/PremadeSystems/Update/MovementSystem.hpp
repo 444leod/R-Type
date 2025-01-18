@@ -20,7 +20,8 @@ class MovementSystem final : public engine::AUpdateSystem
   public:
     explicit MovementSystem() : AUpdateSystem("MovementSystem") {}
 
-    void execute(const double& deltaTime) override
+private:
+    void _execution(double deltaTime) override
     {
         _registry.view<Transform, Velocity>().each(
             [deltaTime](Transform& transform, const Velocity& velocity)

@@ -18,7 +18,6 @@
 #include "scenes/WaitingRoom/Modules/PacketHandlerSceneModule.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
 
-
 #include "Config.hpp"
 
 int main()

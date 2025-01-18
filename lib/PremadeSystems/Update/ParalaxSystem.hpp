@@ -18,7 +18,8 @@ class ParallaxSystem final : public engine::AUpdateSystem
   public:
     ParallaxSystem() : AUpdateSystem("ParallaxSystem") {}
 
-    void execute(const double& deltaTime) override
+private:
+    void _execution(double deltaTime) override
     {
         _registry.view<Parallax, Transform>().each(
             [deltaTime](Parallax& parallax, Transform& transform)

@@ -18,10 +18,11 @@
 
 class RemoveOutOfBoundProjectilesSystem final : public engine::AUpdateSystem
 {
-  public:
+public:
     explicit RemoveOutOfBoundProjectilesSystem() : AUpdateSystem("RemoveOutOfBoundProjectilesSystem") {}
 
-    void execute(const double& deltaTime) override
+private:
+    void _execution(double deltaTime) override
     {
         _registry.view<Projectile, Velocity, Transform>().each(
             [&](const ecs::Entity& entity, Projectile& projectile, const Velocity& velocity, const Transform& transform)

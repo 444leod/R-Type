@@ -31,7 +31,7 @@ class CollisionSystem final : public engine::AUpdateSystem
   public:
     explicit CollisionSystem() : AUpdateSystem("CollisionSystem") {}
 
-    void execute(const double&) override
+    void _execution(double) override
     {
         auto view = _registry.view<Hitbox, Transform>();
 
