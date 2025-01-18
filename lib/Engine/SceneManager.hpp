@@ -8,8 +8,8 @@
 #ifndef SCENE_MANAGER_HPP
 #define SCENE_MANAGER_HPP
 
-#include "RestrictedSceneManager.hpp"
-#include "AScene.hpp"
+#include <Engine/RestrictedSceneManager.hpp>
+#include <Engine/AScene.hpp>
 
 #include <memory>
 #include <map>

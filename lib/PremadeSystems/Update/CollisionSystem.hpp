@@ -8,14 +8,11 @@
 #ifndef COLLISION_SYSTEM_HPP
 #define COLLISION_SYSTEM_HPP
 
-#include "PremadeSystems/Abstracts/AUpdateSystem.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
 
 #include "PremadeComponents/Hitbox.hpp"
 #include "PremadeComponents/Transform.hpp"
 
-#include "Config.hpp"
-
-#include <algorithm>
 #include <cmath>
 
 inline bool pointInRectangle(const float& px, const float& py, const float& rx, const float& ry, const float& rw, const float& rh, const float& cosAngle, const float& sinAngle)
@@ -29,7 +26,7 @@ inline bool pointInRectangle(const float& px, const float& py, const float& rx, 
     return std::abs(rotatedX) <= rw / 2 && std::abs(rotatedY) <= rh / 2;
 }
 
-class CollisionSystem final : public AUpdateSystem
+class CollisionSystem final : public engine::AUpdateSystem
 {
 public:
     explicit CollisionSystem() : AUpdateSystem("CollisionSystem") {}

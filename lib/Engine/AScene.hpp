@@ -14,8 +14,7 @@ class SceneManager;
 
 #include <Engine/Modules/ASceneModule.hpp>
 
-#include "PremadeSystems/Abstracts/AUpdateSystem.hpp"
-#include "PremadeSystems/Abstracts/ARenderSystem.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
 
 #include <utility>
 #include <vector>
@@ -107,12 +106,6 @@ namespace engine
                     return true;
                 }
             }
-            for (const auto& system : this->_renderSystems) {
-                if (system->name() == systemName) {
-                    system->enable();
-                    return true;
-                }
-            }
             return false;
         }
 
@@ -124,12 +117,6 @@ namespace engine
         bool disableSystem(const std::string& systemName)
         {
             for (const auto& system : this->_updateSystems) {
-                if (system->name() == systemName) {
-                    system->disable();
-                    return true;
-                }
-            }
-            for (const auto& system : this->_renderSystems) {
                 if (system->name() == systemName) {
                     system->disable();
                     return true;
@@ -155,7 +142,6 @@ namespace engine
         RestrictedSceneManager& _manager;
 
         std::vector<std::unique_ptr<AUpdateSystem>> _updateSystems;
-        std::vector<std::unique_ptr<ARenderSystem>> _renderSystems;
 
         /**
          * @brief Executes all the update systems in the scene
@@ -169,20 +155,6 @@ namespace engine
                 }
             }
         }
-
-        /**
-         * @brief Executes all the render systems in the scene
-         * @param window The window to render to
-         */
-        void _executeRenderSystems(sf::RenderWindow& window)
-        {
-            for (const auto& system : this->_renderSystems) {
-                if (system->isEnabled()) {
-                    system->execute(window);
-                }
-            }
-        }
-
 
     private:
         std::vector<std::shared_ptr<ASceneModule>> _modules;

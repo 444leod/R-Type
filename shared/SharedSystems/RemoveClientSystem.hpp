@@ -8,7 +8,7 @@
 #ifndef REMOVE_CLIENT_SYSTEM_HPP
 #define REMOVE_CLIENT_SYSTEM_HPP
 
-#include "PremadeSystems/Abstracts/ASystem.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
 
@@ -16,7 +16,7 @@
 
 #include <asio.hpp>
 
-class RemoveClientSystem final : public ASystem
+class RemoveClientSystem final : public engine::ASystem
 {
 public:
     explicit RemoveClientSystem() : ASystem("RemoveClientSystem") {}

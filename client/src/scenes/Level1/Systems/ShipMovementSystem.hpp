@@ -8,14 +8,14 @@
 #ifndef SHIP_MOVEMENT_SYSTEM_HPP_
 #define SHIP_MOVEMENT_SYSTEM_HPP_
 
-#include "PremadeSystems/Abstracts/ASystem.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
 
 #include "SharedComponents/Ship.hpp"
 
-class ShipMovementSystem final : public ASystem
+class ShipMovementSystem final : public engine::ASystem
 {
 public:
     explicit ShipMovementSystem() : ASystem("ShipMovementSystem") {}

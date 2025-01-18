@@ -8,7 +8,7 @@
 #ifndef MOVEMENT_SYSTEM_HPP_
 #define MOVEMENT_SYSTEM_HPP_
 
-#include "PremadeSystems/Abstracts/AUpdateSystem.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
 
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
@@ -16,7 +16,7 @@
 #include "Config.hpp"
 
 
-class MovementSystem final : public AUpdateSystem
+class MovementSystem final : public engine::AUpdateSystem
 {
 public:
     explicit MovementSystem() : AUpdateSystem("MovementSystem") {}

@@ -10,9 +10,9 @@
 
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
 
-#include "PremadeSystems/Abstracts/ASystem.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
-class ShipShotSystem final : public ASystem
+class ShipShotSystem final : public engine::ASystem
 {
 public:
     explicit ShipShotSystem(const std::shared_ptr<ANetworkSceneModule>& net) : ASystem("ShipShotSystem"), _net(net) {}

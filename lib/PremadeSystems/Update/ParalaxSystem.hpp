@@ -8,12 +8,12 @@
 #ifndef PARALLAX_SYSTEM_HPP_
 #define PARALLAX_SYSTEM_HPP_
 
-#include "PremadeSystems/Abstracts/AUpdateSystem.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
 
 #include "SharedComponents/Parallax.hpp"
 #include "PremadeComponents/Transform.hpp"
 
-class ParallaxSystem final : public AUpdateSystem
+class ParallaxSystem final : public engine::AUpdateSystem
 {
 public:
     ParallaxSystem() : AUpdateSystem("ParallaxSystem") {}

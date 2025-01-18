@@ -8,7 +8,7 @@
 #ifndef NEW_SHIP_SYSTEM_HPP_
 #define NEW_SHIP_SYSTEM_HPP_
 
-#include "PremadeSystems/Abstracts/ASystem.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
@@ -16,7 +16,7 @@
 
 #include "SharedComponents/Ship.hpp"
 
-class NewShipSystem final : public ASystem
+class NewShipSystem final : public engine::ASystem
 {
 public:
     explicit NewShipSystem() : ASystem("NewShipSystem") {}
