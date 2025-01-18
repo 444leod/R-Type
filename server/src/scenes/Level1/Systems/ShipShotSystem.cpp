@@ -6,16 +6,22 @@
 */
 
 #include "ShipShotSystem.hpp"
-#include "BaseComponents.hpp"
-#include "../Components.hpp"
 
-#include "network/UDPPacket.hpp"
+#include "Network/UDPPacket.hpp"
+
+#include "PremadeComponents/Transform.hpp"
+#include "PremadeComponents/Velocity.hpp"
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Projectile.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+
+#include "SharedComponents/Client.hpp"
+#include "SharedComponents/Ship.hpp"
+
 #include "Config.hpp"
-#include <SFML/Graphics.hpp>
 #include "PacketTypes.hpp"
-#include "Components.hpp"
 
-static std::optional<Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
+static std::optional<ecs::Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
 {
     for (auto [entity, info] : registry.view<Client>())
     {
@@ -55,7 +61,7 @@ void ShipShotSystem::execute(const asio::ip::udp::endpoint &source) const
             .frameDuration = 0.02,
             .frameCount = 3,
             .loop = false,
-            .onEnd = [&](const Entity& entity){ _registry.addComponent(entity, Velocity{.x = 200, .y = 0} ); }
+            .onEnd = [&](const ecs::Entity& entity){ _registry.addComponent(entity, Velocity{.x = 200, .y = 0} ); }
         }
     );
 

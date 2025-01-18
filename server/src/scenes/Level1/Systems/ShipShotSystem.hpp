@@ -8,14 +8,14 @@
 #ifndef SHIP_SHOT_SYSTEM_HPP_
 #define SHIP_SHOT_SYSTEM_HPP_
 
-#include "BaseSystems/Abstracts/ASystem.hpp"
-#include "engine/RestrictedSceneManager.hpp"
-#include "NetworkModules/ANetworkSceneModule.hpp"
+#include "PremadeModules/Network/ANetworkSceneModule.hpp"
+
+#include "PremadeSystems/Abstracts/ASystem.hpp"
 
 class ShipShotSystem final : public ASystem
 {
 public:
-    explicit ShipShotSystem(ecs::Registry &registry, const std::shared_ptr<ANetworkSceneModule>& net) : ASystem(registry, "ShipShotSystem"), _net(net) {}
+    explicit ShipShotSystem(const std::shared_ptr<ANetworkSceneModule>& net) : ASystem("ShipShotSystem"), _net(net) {}
 
     void execute(const asio::ip::udp::endpoint &source) const;
     

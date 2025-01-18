@@ -7,16 +7,19 @@
 
 #include "Level1.hpp"
 
-#include "Components.hpp"
-#include "BaseComponents.hpp"
-#include "ecs/Registry.hpp"
-#include "Config.hpp"
-#include "PacketTypes.hpp"
+#include "PremadeModules/Network/ANetworkGameModule.hpp"
+#include "PremadeModules/Network/ANetworkSceneModule.hpp"
+
+#include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Projectile.hpp"
+#include "PremadeComponents/Velocity.hpp"
+#include "PremadeComponents/Displayable/Animation.hpp"
+
+#include "SharedComponents/Enemy.hpp"
 
 #include "Sprites/Level1.hpp"
-
-#include "NetworkModules/ANetworkGameModule.hpp"
-#include "NetworkModules/ANetworkSceneModule.hpp"
+#include "Config.hpp"
+#include "PacketTypes.hpp"
 
 void Level1::initialize()
 {
@@ -71,7 +74,7 @@ void Level1::addProjectile(const Transform& transform){
     // _registry.addComponent(projectile, Hitbox{});
     _registry.addComponent(projectile, transform);
     _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = .020, .frameCount = 3, .loop = false, .onEnd = [&](Entity entity){
+    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = .020, .frameCount = 3, .loop = false, .onEnd = [&](const ecs::Entity& entity){
         _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
     }});
     #if DEBUG
