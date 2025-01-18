@@ -12,7 +12,8 @@
 #include <map>
 #include <string>
 
-class ResourcesManager {
+class ResourcesManager
+{
   public:
     ResourcesManager() = default;
     ~ResourcesManager() = default;

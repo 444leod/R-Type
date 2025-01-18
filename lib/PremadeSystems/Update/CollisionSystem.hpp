@@ -18,7 +18,8 @@
 #include <algorithm>
 #include <cmath>
 
-inline bool pointInRectangle(const float& px, const float& py, const float& rx, const float& ry, const float& rw, const float& rh, const float& cosAngle, const float& sinAngle) {
+inline bool pointInRectangle(const float& px, const float& py, const float& rx, const float& ry, const float& rw, const float& rh, const float& cosAngle, const float& sinAngle)
+{
     const float localX = px - rx;
     const float localY = py - ry;
 
@@ -28,20 +29,25 @@ inline bool pointInRectangle(const float& px, const float& py, const float& rx, 
     return std::abs(rotatedX) <= rw / 2 && std::abs(rotatedY) <= rh / 2;
 }
 
-class CollisionSystem final : public AUpdateSystem {
+class CollisionSystem final : public AUpdateSystem
+{
   public:
     explicit CollisionSystem() : AUpdateSystem("CollisionSystem") {}
 
-    void execute(const double&) override {
+    void execute(const double&) override
+    {
         auto view = _registry.view<Hitbox, Transform>();
 
-        for (auto it1 = view.begin(); it1 != view.end(); ++it1) {
+        for (auto it1 = view.begin(); it1 != view.end(); ++it1)
+        {
             auto [entity1, hitbox1, transform1] = *it1;
 
-            for (auto it2 = it1; ++it2 != view.end();) {
+            for (auto it2 = it1; ++it2 != view.end();)
+            {
                 auto [entity2, hitbox2, transform2] = *it2;
 
-                if (checkCollision(hitbox1, transform1, hitbox2, transform2)) {
+                if (checkCollision(hitbox1, transform1, hitbox2, transform2))
+                {
                     hitbox1.onCollision(entity2);
                     hitbox2.onCollision(entity1);
                 }
@@ -50,24 +56,31 @@ class CollisionSystem final : public AUpdateSystem {
     }
 
   private:
-    static bool checkCollision(const Hitbox& hitbox1, const Transform& transform1, const Hitbox& hitbox2, const Transform& transform2) {
-        if (std::holds_alternative<shape::Rectangle>(hitbox1.shape) && std::holds_alternative<shape::Rectangle>(hitbox2.shape)) {
+    static bool checkCollision(const Hitbox& hitbox1, const Transform& transform1, const Hitbox& hitbox2, const Transform& transform2)
+    {
+        if (std::holds_alternative<shape::Rectangle>(hitbox1.shape) && std::holds_alternative<shape::Rectangle>(hitbox2.shape))
+        {
             return checkRectangleCollision(std::get<shape::Rectangle>(hitbox1.shape), transform1, std::get<shape::Rectangle>(hitbox2.shape), transform2);
         }
-        if (std::holds_alternative<shape::Circle>(hitbox1.shape) && std::holds_alternative<shape::Circle>(hitbox2.shape)) {
+        if (std::holds_alternative<shape::Circle>(hitbox1.shape) && std::holds_alternative<shape::Circle>(hitbox2.shape))
+        {
             return checkCircleCollision(std::get<shape::Circle>(hitbox1.shape), transform1, std::get<shape::Circle>(hitbox2.shape), transform2);
         }
-        if (std::holds_alternative<shape::Circle>(hitbox1.shape) && std::holds_alternative<shape::Rectangle>(hitbox2.shape)) {
+        if (std::holds_alternative<shape::Circle>(hitbox1.shape) && std::holds_alternative<shape::Rectangle>(hitbox2.shape))
+        {
             return checkCircleRectangleCollision(std::get<shape::Circle>(hitbox1.shape), transform1, std::get<shape::Rectangle>(hitbox2.shape), transform2);
         }
-        if (std::holds_alternative<shape::Rectangle>(hitbox1.shape) && std::holds_alternative<shape::Circle>(hitbox2.shape)) {
+        if (std::holds_alternative<shape::Rectangle>(hitbox1.shape) && std::holds_alternative<shape::Circle>(hitbox2.shape))
+        {
             return checkCircleRectangleCollision(std::get<shape::Circle>(hitbox2.shape), transform2, std::get<shape::Rectangle>(hitbox1.shape), transform1);
         }
         return false;
     }
 
-    static bool checkRectangleCollision(const shape::Rectangle& rect1, const Transform& transform1, const shape::Rectangle& rect2, const Transform& transform2) {
-        if (transform1.rotation == 0 && transform2.rotation == 0) {
+    static bool checkRectangleCollision(const shape::Rectangle& rect1, const Transform& transform1, const shape::Rectangle& rect2, const Transform& transform2)
+    {
+        if (transform1.rotation == 0 && transform2.rotation == 0)
+        {
             return (transform1.x < transform2.x + rect2.width && transform1.x + rect1.width > transform2.x && transform1.y < transform2.y + rect2.height && transform1.y + rect1.height > transform2.y);
         }
 
@@ -94,28 +107,32 @@ class CollisionSystem final : public AUpdateSystem {
         if (pointInRectangle(transform1.x + rect1TopLeftX, transform1.y + rect1TopLeftY, transform2.x, transform2.y, rect2.width, rect2.height, cosAngle2, sinAngle2) ||
             pointInRectangle(transform1.x + rect1TopRightX, transform1.y + rect1TopRightY, transform2.x, transform2.y, rect2.width, rect2.height, cosAngle2, sinAngle2) ||
             pointInRectangle(transform1.x + rect1BottomLeftX, transform1.y + rect1BottomLeftY, transform2.x, transform2.y, rect2.width, rect2.height, cosAngle2, sinAngle2) ||
-            pointInRectangle(transform1.x + rect1BottomRightX, transform1.y + rect1BottomRightY, transform2.x, transform2.y, rect2.width, rect2.height, cosAngle2, sinAngle2)) {
+            pointInRectangle(transform1.x + rect1BottomRightX, transform1.y + rect1BottomRightY, transform2.x, transform2.y, rect2.width, rect2.height, cosAngle2, sinAngle2))
+        {
             return true;
         }
 
         if (pointInRectangle(transform2.x + rect2TopLeftX, transform2.y + rect2TopLeftY, transform1.x, transform1.y, rect1.width, rect1.height, cosAngle1, sinAngle1) ||
             pointInRectangle(transform2.x + rect2TopRightX, transform2.y + rect2TopRightY, transform1.x, transform1.y, rect1.width, rect1.height, cosAngle1, sinAngle1) ||
             pointInRectangle(transform2.x + rect2BottomLeftX, transform2.y + rect2BottomLeftY, transform1.x, transform1.y, rect1.width, rect1.height, cosAngle1, sinAngle1) ||
-            pointInRectangle(transform2.x + rect2BottomRightX, transform2.y + rect2BottomRightY, transform1.x, transform1.y, rect1.width, rect1.height, cosAngle1, sinAngle1)) {
+            pointInRectangle(transform2.x + rect2BottomRightX, transform2.y + rect2BottomRightY, transform1.x, transform1.y, rect1.width, rect1.height, cosAngle1, sinAngle1))
+        {
             return true;
         }
 
         return false;
     }
 
-    static bool checkCircleCollision(const shape::Circle& circle1, const Transform& transform1, const shape::Circle& circle2, const Transform& transform2) {
+    static bool checkCircleCollision(const shape::Circle& circle1, const Transform& transform1, const shape::Circle& circle2, const Transform& transform2)
+    {
         const double dx = transform1.x - transform2.x;
         const double dy = transform1.y - transform2.y;
         const double distance = std::sqrt(dx * dx + dy * dy);
         return distance < (circle1.radius + circle2.radius);
     }
 
-    static bool checkCircleRectangleCollision(const shape::Circle& circle, const Transform& circleTransform, const shape::Rectangle& rect, const Transform& rectTransform) {
+    static bool checkCircleRectangleCollision(const shape::Circle& circle, const Transform& circleTransform, const shape::Rectangle& rect, const Transform& rectTransform)
+    {
         const double angle = rectTransform.rotation * (M_PI / 180.0f);
         const double cosAngle = std::cos(angle);
         const double sinAngle = std::sin(angle);
@@ -132,17 +149,21 @@ class CollisionSystem final : public AUpdateSystem {
         const double circleDistanceX = std::abs(rotatedCircleX);
         const double circleDistanceY = std::abs(rotatedCircleY);
 
-        if (circleDistanceX > (rect.width / 2 + circle.radius)) {
+        if (circleDistanceX > (rect.width / 2 + circle.radius))
+        {
             return false;
         }
-        if (circleDistanceY > (rect.height / 2 + circle.radius)) {
+        if (circleDistanceY > (rect.height / 2 + circle.radius))
+        {
             return false;
         }
 
-        if (circleDistanceX <= (rect.width / 2)) {
+        if (circleDistanceX <= (rect.width / 2))
+        {
             return true;
         }
-        if (circleDistanceY <= (rect.height / 2)) {
+        if (circleDistanceY <= (rect.height / 2))
+        {
             return true;
         }
 

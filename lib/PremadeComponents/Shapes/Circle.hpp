@@ -10,8 +10,10 @@
 
 #include "PremadeComponents/Color.hpp"
 
-namespace shape {
-struct Circle {
+namespace shape
+{
+struct Circle
+{
     float radius;
     Color fillColor;
     Color outlineColor;

@@ -75,23 +75,27 @@ public:
  *
  * @return The computed hash value as a std::size_t.
  */
-static constexpr std::size_t hash(const char* str) {
+static constexpr std::size_t hash(const char* str)
+{
     std::size_t hash = 0;
-    while (*str) {
+    while (*str)
+    {
         hash = hash * 101 + static_cast<unsigned char>(*str++);
     }
 
     return hash;
 }
 
-static constexpr std::string get_type_name(const char* pretty_function) {
+static constexpr std::string get_type_name(const char* pretty_function)
+{
     const std::string_view name = pretty_function;
     const auto start = name.find("Type = ") + 7;
     const auto end = name.find(';', start);
     return std::string{name.substr(start, end - start)};
 }
 
-namespace ecs {
+namespace ecs
+{
 
 /**
  * @brief A generator structure that provides a unique incrementing value.
@@ -165,7 +169,8 @@ static std::string name() { return typeid(Type).name(); }
  *
  * @tparam T The raw type for which the unique identifier is generated.
  */
-template <typename T> struct GENERATOR_API Family {
+template <typename T> struct GENERATOR_API Family
+{
     using Type = std::decay_t<T>;
     /**
      * @brief Returns the unique identifier for the raw type.

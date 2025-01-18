@@ -10,7 +10,7 @@ fi
 
 format_issues=0
 for file in $files; do
-    diff=$($clang_format_command -i -style=file "$file")
+    diff=$($clang_format_command -style=file "$file" | diff "$file" -)
     if [ -n "$diff" ]; then
         echo "❌ $file needs formatting"
         echo "$diff"

@@ -20,7 +20,8 @@
  * This struct holds the properties and behaviors of an animation, including
  * frame size, duration, and looping behavior.
  */
-struct Animation {
+struct Animation
+{
     /**
      * @brief The time elapsed since the last frame.
      */

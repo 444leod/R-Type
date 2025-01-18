@@ -21,7 +21,8 @@ class SceneManager;
 #include <utility>
 #include <vector>
 
-namespace engine {
+namespace engine
+{
 
 template <typename T>
 concept SceneModule = std::is_base_of_v<ASceneModule, T>;
@@ -29,7 +30,8 @@ concept SceneModule = std::is_base_of_v<ASceneModule, T>;
 template <typename T, typename... Params>
 concept ConstructibleSceneModule = std::constructible_from<T, AScene&, Params...>;
 
-class AScene {
+class AScene
+{
   public:
     explicit AScene(std::string name) : _registry(engine::RestrictedGame::instance().registry()), _manager(engine::RestrictedGame::instance().scenes()), _name(std::move(name)) {}
 
@@ -46,8 +48,10 @@ class AScene {
      */
     virtual void update(const double& deltaTime) = 0;
 
-    template <SceneModule T> [[nodiscard]] std::shared_ptr<T> getModule() {
-        for (auto module : this->_modules) {
+    template <SceneModule T> [[nodiscard]] std::shared_ptr<T> getModule()
+    {
+        for (auto module : this->_modules)
+        {
             auto cast = std::dynamic_pointer_cast<T>(module);
             if (cast != nullptr)
                 return cast;
@@ -90,15 +94,20 @@ class AScene {
      * @param systemName The name of the system to enable
      * @return true if the system was found and enabled, false otherwise
      */
-    bool enableSystem(const std::string& systemName) {
-        for (const auto& system : this->_updateSystems) {
-            if (system->name() == systemName) {
+    bool enableSystem(const std::string& systemName)
+    {
+        for (const auto& system : this->_updateSystems)
+        {
+            if (system->name() == systemName)
+            {
                 system->enable();
                 return true;
             }
         }
-        for (const auto& system : this->_renderSystems) {
-            if (system->name() == systemName) {
+        for (const auto& system : this->_renderSystems)
+        {
+            if (system->name() == systemName)
+            {
                 system->enable();
                 return true;
             }
@@ -111,15 +120,20 @@ class AScene {
      * @param systemName The name of the system to disable
      * @return true if the system was found and disabled, false otherwise
      */
-    bool disableSystem(const std::string& systemName) {
-        for (const auto& system : this->_updateSystems) {
-            if (system->name() == systemName) {
+    bool disableSystem(const std::string& systemName)
+    {
+        for (const auto& system : this->_updateSystems)
+        {
+            if (system->name() == systemName)
+            {
                 system->disable();
                 return true;
             }
         }
-        for (const auto& system : this->_renderSystems) {
-            if (system->name() == systemName) {
+        for (const auto& system : this->_renderSystems)
+        {
+            if (system->name() == systemName)
+            {
                 system->disable();
                 return true;
             }
@@ -129,7 +143,8 @@ class AScene {
 
     template <engine::SceneModule T, typename... Params>
         requires engine::ConstructibleSceneModule<T, Params...>
-    std::shared_ptr<T> addModule(Params&&... params) {
+    std::shared_ptr<T> addModule(Params&&... params)
+    {
         auto module = std::make_shared<T>(*this, std::forward<Params>(params)...);
         this->_modules.push_back(module);
         return module;
@@ -147,9 +162,12 @@ class AScene {
      * @brief Executes all the update systems in the scene
      * @param deltaTime The time between this frame and the last
      */
-    void _executeUpdateSystems(const double& deltaTime) {
-        for (const auto& system : this->_updateSystems) {
-            if (system->isEnabled()) {
+    void _executeUpdateSystems(const double& deltaTime)
+    {
+        for (const auto& system : this->_updateSystems)
+        {
+            if (system->isEnabled())
+            {
                 system->execute(deltaTime);
             }
         }
@@ -159,9 +177,12 @@ class AScene {
      * @brief Executes all the render systems in the scene
      * @param window The window to render to
      */
-    void _executeRenderSystems(sf::RenderWindow& window) {
-        for (const auto& system : this->_renderSystems) {
-            if (system->isEnabled()) {
+    void _executeRenderSystems(sf::RenderWindow& window)
+    {
+        for (const auto& system : this->_renderSystems)
+        {
+            if (system->isEnabled())
+            {
                 system->execute(window);
             }
         }

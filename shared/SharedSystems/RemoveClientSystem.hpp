@@ -16,13 +16,17 @@
 
 #include <asio.hpp>
 
-class RemoveClientSystem final : public ASystem {
+class RemoveClientSystem final : public ASystem
+{
   public:
     explicit RemoveClientSystem() : ASystem("RemoveClientSystem") {}
 
-    void execute(const asio::ip::udp::endpoint& src, const std::shared_ptr<ANetworkSceneModule>& net) const {
-        for (auto& [entity, client] : _registry.view<Client>().each()) {
-            if (client.info.endpoint == src) {
+    void execute(const asio::ip::udp::endpoint& src, const std::shared_ptr<ANetworkSceneModule>& net) const
+    {
+        for (auto& [entity, client] : _registry.view<Client>().each())
+        {
+            if (client.info.endpoint == src)
+            {
                 _registry.remove(entity);
                 break;
             }

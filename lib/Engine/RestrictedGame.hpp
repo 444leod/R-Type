@@ -10,24 +10,29 @@
 #include <stdexcept>
 
 // Forward declaration
-namespace ecs {
+namespace ecs
+{
 class Registry;
 class EventDispatcher;
 }; // namespace ecs
 
-namespace engine {
+namespace engine
+{
 // Forward declaration
 class RestrictedSceneManager;
 
-class RestrictedGame {
+class RestrictedGame
+{
   public:
-    RestrictedGame() {
+    RestrictedGame()
+    {
         if (_instance == nullptr)
             _instance = this;
     };
     virtual ~RestrictedGame() = default;
 
-    static RestrictedGame& instance() {
+    static RestrictedGame& instance()
+    {
         if (_instance == nullptr)
             throw std::runtime_error("No instance of RestrictedGame available");
         return *_instance;

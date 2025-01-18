@@ -13,7 +13,8 @@
 #include <optional>
 #include <string>
 
-struct Sprite {
+struct Sprite
+{
     std::string texture;
     std::pair<float, float> scale;
     std::pair<float, float> origin;

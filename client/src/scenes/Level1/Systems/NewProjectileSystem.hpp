@@ -16,12 +16,15 @@
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
 
-class NewProjectileSystem final : public ASystem {
+class NewProjectileSystem final : public ASystem
+{
   public:
     explicit NewProjectileSystem() : ASystem("NewProjectileSystem") {}
 
-    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity) const {
-        for (auto [_, ship, transform] : _registry.view<Ship, Transform>().each()) {
+    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity) const
+    {
+        for (auto [_, ship, transform] : _registry.view<Ship, Transform>().each())
+        {
             if (ship.id != shipId)
                 continue;
             const auto projectile = _registry.create();

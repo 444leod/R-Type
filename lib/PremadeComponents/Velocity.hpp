@@ -8,7 +8,8 @@
 #ifndef VELOCITY_HPP
 #define VELOCITY_HPP
 
-struct Velocity {
+struct Velocity
+{
     float x, y;
 };
 

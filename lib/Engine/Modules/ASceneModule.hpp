@@ -7,10 +7,12 @@
 
 #pragma once
 
-namespace engine {
+namespace engine
+{
 class AScene;
 
-class ASceneModule {
+class ASceneModule
+{
   public:
     explicit ASceneModule(AScene& scene) : _scene(scene) {}
     virtual ~ASceneModule() = default;

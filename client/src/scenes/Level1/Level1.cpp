@@ -25,7 +25,8 @@ void Level1::initialize() {}
 
 void Level1::update(const double& deltaTime) { _executeUpdateSystems(deltaTime); }
 
-void Level1::onEnter() {
+void Level1::onEnter()
+{
     _registry.clear();
 
     const auto background = _registry.create();
@@ -35,7 +36,8 @@ void Level1::onEnter() {
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 }
 
-void Level1::onEnter(const AScene& lastScene) {
+void Level1::onEnter(const AScene& lastScene)
+{
     _registry.clear();
 
     const auto background = _registry.create();
@@ -45,7 +47,8 @@ void Level1::onEnter(const AScene& lastScene) {
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 }
 
-void Level1::onExit() {
+void Level1::onExit()
+{
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 
@@ -57,7 +60,8 @@ void Level1::onExit() {
 
 void Level1::onExit(const AScene& nextScene) {}
 
-void Level1::addProjectile(const Transform& transform) {
+void Level1::addProjectile(const Transform& transform)
+{
     const auto projectile = _registry.create();
 
     _registry.addComponent(projectile, projectileSprite);
@@ -70,7 +74,8 @@ void Level1::addProjectile(const Transform& transform) {
 #endif
 }
 
-void Level1::addBug(const Transform& transform) {
+void Level1::addBug(const Transform& transform)
+{
     const auto bug = _registry.create();
     _registry.addComponent(bug, bugSprite);
     _registry.addComponent(bug, Bug{});

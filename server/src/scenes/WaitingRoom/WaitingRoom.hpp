@@ -18,7 +18,8 @@
 #include <functional>
 #include <memory>
 
-class WaitingRoom final : public engine::AScene {
+class WaitingRoom final : public engine::AScene
+{
   public:
     explicit WaitingRoom(const std::string& name) : AScene(name) { this->_updateSystems.push_back(std::make_unique<CollisionSystem>()); }
 

@@ -20,7 +20,8 @@
  * @param byte The byte to output.
  * @return std::ostream& The output stream.
  */
-inline std::ostream& operator<<(std::ostream& os, const std::byte& byte) {
+inline std::ostream& operator<<(std::ostream& os, const std::byte& byte)
+{
     os << static_cast<int>(byte);
     return os;
 }
@@ -32,9 +33,11 @@ inline std::ostream& operator<<(std::ostream& os, const std::byte& byte) {
  * @param size The size of the byte array.
  * @return std::string The string representation of the byte array.
  */
-inline std::string print_bytes(const std::byte* bytes, const std::size_t size) {
+inline std::string print_bytes(const std::byte* bytes, const std::size_t size)
+{
     std::string str;
-    for (std::size_t i = 0; i < size; i++) {
+    for (std::size_t i = 0; i < size; i++)
+    {
         str += std::to_string(static_cast<int>(bytes[i])) + " ";
     }
     return str;
@@ -47,22 +50,26 @@ inline std::string print_bytes(const std::byte* bytes, const std::size_t size) {
  * @param bytes The byte vector to output.
  * @return std::ostream& The output stream.
  */
-inline std::ostream& operator<<(std::ostream& os, const std::vector<std::byte>& bytes) {
+inline std::ostream& operator<<(std::ostream& os, const std::vector<std::byte>& bytes)
+{
     if (bytes.empty())
         return os;
     os << bytes[0];
-    for (std::size_t i = 1; i < bytes.size(); i++) {
+    for (std::size_t i = 1; i < bytes.size(); i++)
+    {
         os << " " << bytes[i];
     }
     return os;
 }
 
-namespace ntw {
+namespace ntw
+{
 
 /**
  * @brief Structure representing a UDP packet.
  */
-struct UDPPacket {
+struct UDPPacket
+{
     uint32_t sequence_number = 0;        ///< Sequence number of the packet.
     uint32_t ack_number = 0;             ///< Acknowledgment number of the packet.
     uint16_t payload_length = 0;         ///< Length of the payload.
@@ -72,7 +79,8 @@ struct UDPPacket {
     /**
      * @brief Exception class for UDPPacket errors.
      */
-    class Exception final : public std::exception {
+    class Exception final : public std::exception
+    {
       public:
         /**
          * @brief Construct a new Exception object.
@@ -111,7 +119,8 @@ struct UDPPacket {
      *
      * @return std::vector<uint8_t> The serialized packet.
      */
-    [[nodiscard]] std::vector<uint8_t> serialize() const {
+    [[nodiscard]] std::vector<uint8_t> serialize() const
+    {
         std::vector<uint8_t> buffer;
         buffer.resize(sizeof(sequence_number) + sizeof(ack_number) + sizeof(payload_length) + sizeof(checksum) + payload.size());
 
@@ -134,7 +143,8 @@ struct UDPPacket {
      *
      * @return uint16_t The checksum.
      */
-    [[nodiscard]] uint16_t calculateChecksum() const {
+    [[nodiscard]] uint16_t calculateChecksum() const
+    {
         uint16_t sum = 0;
 
         sum += (sequence_number >> 16) & 0xFFFF;
@@ -145,7 +155,8 @@ struct UDPPacket {
 
         sum += payload_length;
 
-        for (const auto& byte : payload) {
+        for (const auto& byte : payload)
+        {
             sum += static_cast<unsigned short>(byte);
         }
         return sum;
@@ -158,7 +169,8 @@ struct UDPPacket {
      *
      * @return UDPPacket& Reference to the packet.
      */
-    UDPPacket& operator<<(const std::string& str) {
+    UDPPacket& operator<<(const std::string& str)
+    {
         this->raw_append(static_cast<unsigned short>(str.size()));
         this->raw_append(static_cast<unsigned char>(sizeof(char)));
         this->raw_append(str.data(), str.size());
@@ -173,7 +185,8 @@ struct UDPPacket {
      *
      * @return UDPPacket& Reference to the packet.
      */
-    UDPPacket& operator<<(const char* str) {
+    UDPPacket& operator<<(const char* str)
+    {
         *this << std::string(str);
         return *this;
     }
@@ -187,13 +200,15 @@ struct UDPPacket {
      *
      * @return UDPPacket& Reference to the packet.
      */
-    template <typename T> UDPPacket& operator<<(const std::vector<T&>& vector) {
+    template <typename T> UDPPacket& operator<<(const std::vector<T&>& vector)
+    {
         const std::uint16_t len = vector.size();
         const std::uint16_t size = sizeof(T);
 
         this->raw_append(len);
         this->raw_append(size);
-        for (auto item : vector) {
+        for (auto item : vector)
+        {
             this->raw_append(item);
         }
 
@@ -209,7 +224,8 @@ struct UDPPacket {
      *
      * @return UDPPacket& Reference to the packet.
      */
-    template <typename T> UDPPacket& operator<<(T const& data) noexcept {
+    template <typename T> UDPPacket& operator<<(T const& data) noexcept
+    {
         const std::uint8_t size = sizeof(T);
 
         this->append(&data, size);
@@ -227,7 +243,8 @@ struct UDPPacket {
      * @throw Exception If there is no remaining data to unpack.
      * @throw Exception If the data size is invalid.
      */
-    UDPPacket& operator>>(std::string& str) {
+    UDPPacket& operator>>(std::string& str)
+    {
         if (_pos == payload.size())
             throw Exception("No remaining data to unpack.");
 
@@ -269,7 +286,8 @@ struct UDPPacket {
      * @throw Exception If there is no remaining data to unpack.
      * @throw Exception If the data size is invalid.
      */
-    template <typename T> UDPPacket& operator>>(T& data) {
+    template <typename T> UDPPacket& operator>>(T& data)
+    {
         if (_pos == payload.size())
             throw Exception("No remaining data to unpack.");
         const std::uint8_t size = sizeof(T);
@@ -291,7 +309,8 @@ struct UDPPacket {
      * @param data The data to append.
      * @param size The size of the data.
      */
-    void append(const void* data, const std::uint8_t size) noexcept {
+    void append(const void* data, const std::uint8_t size) noexcept
+    {
         const auto* raw_len = reinterpret_cast<const std::byte*>(&size);
         const auto* raw_data = static_cast<const std::byte*>(data);
 
@@ -326,7 +345,8 @@ struct UDPPacket {
      * @brief Compresses the packet payload using RLE compression
      * @return Vector containing the compressed data
      */
-    std::vector<std::byte> compress() const {
+    std::vector<std::byte> compress() const
+    {
         if (payload.empty())
             return {};
 
@@ -338,10 +358,14 @@ struct UDPPacket {
         uint8_t current = serialized[0];
         std::uint8_t count = 1;
 
-        for (size_t i = 1; i < serialized.size(); ++i) {
-            if (serialized[i] == current && count < 255) {
+        for (size_t i = 1; i < serialized.size(); ++i)
+        {
+            if (serialized[i] == current && count < 255)
+            {
                 count++;
-            } else {
+            }
+            else
+            {
                 compressed.push_back(static_cast<std::byte>(count));
                 compressed.push_back(static_cast<std::byte>(current));
                 current = serialized[i];
@@ -362,21 +386,24 @@ struct UDPPacket {
      * @param compressedSize Size of the compressed data
      * @return True if decompression was successful
      */
-    bool decompress(const std::byte* compressed, size_t compressedSize) {
+    bool decompress(const std::byte* compressed, size_t compressedSize)
+    {
         if (compressedSize == 0)
             return true;
 
         std::vector<std::byte> decompressed;
         decompressed.reserve(compressedSize * 2);
 
-        for (size_t i = 0; i < compressedSize; i += 2) {
+        for (size_t i = 0; i < compressedSize; i += 2)
+        {
             if (i + 1 >= compressedSize)
                 return false;
 
             std::uint8_t count = std::to_integer<std::uint8_t>(compressed[i]);
             std::byte value = compressed[i + 1];
 
-            for (std::uint8_t j = 0; j < count; ++j) {
+            for (std::uint8_t j = 0; j < count; ++j)
+            {
                 decompressed.push_back(value);
             }
         }
@@ -392,7 +419,8 @@ struct UDPPacket {
      * @param data The raw data.
      * @param length The length of the raw data.
      */
-    void _deserialize(const char* data, size_t length) {
+    void _deserialize(const char* data, size_t length)
+    {
         size_t offset = 0;
 
         memcpy(&sequence_number, data + offset, sizeof(sequence_number));
@@ -414,7 +442,8 @@ struct UDPPacket {
      * @param data The raw data.
      * @param size The size of the raw data.
      */
-    void raw_append(const std::byte* data, const std::uint8_t& size) {
+    void raw_append(const std::byte* data, const std::uint8_t& size)
+    {
         this->payload.insert(_end, data, data + size);
         this->payload_length += size;
         this->checksum = calculateChecksum();
@@ -427,7 +456,8 @@ struct UDPPacket {
      * @param data The raw data.
      * @param size The size of the raw data.
      */
-    void raw_append(const void* data, const std::uint8_t& size) {
+    void raw_append(const void* data, const std::uint8_t& size)
+    {
         const auto* raw = static_cast<const std::byte*>(data);
         this->raw_append(raw, size);
     }
@@ -448,7 +478,8 @@ struct UDPPacket {
      *
      * @return T The copied data.
      */
-    template <typename T> T raw_copy() {
+    template <typename T> T raw_copy()
+    {
         T var;
         this->raw_copy(&var);
         return var;
@@ -468,7 +499,8 @@ struct UDPPacket {
      * @param dest The destination to copy the data to.
      * @param size The size of the data to copy.
      */
-    void raw_copy(void* dest, const std::uint8_t& size) {
+    void raw_copy(void* dest, const std::uint8_t& size)
+    {
         std::memcpy(dest, &(this->payload[this->_pos]), size);
         _pos += size;
     }
@@ -497,7 +529,8 @@ struct UDPPacket {
      *
      * @return T The raw data.
      */
-    template <typename T> [[nodiscard]] T get() const {
+    template <typename T> [[nodiscard]] T get() const
+    {
         T var;
         this->get(&var);
         return var;
@@ -513,7 +546,8 @@ struct UDPPacket {
      *
      * @return T The raw data.
      */
-    template <typename T> [[nodiscard]] T get_offset(const std::uint8_t offset) {
+    template <typename T> [[nodiscard]] T get_offset(const std::uint8_t offset)
+    {
         T var;
         _pos += offset;
         this->get(&var);

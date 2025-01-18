@@ -10,7 +10,8 @@
 
 #include <string>
 
-namespace engine {
+namespace engine
+{
 // Forward declaration
 class AScene;
 
@@ -18,7 +19,8 @@ class AScene;
  * @class RestrictedSceneManager
  * @brief Interface for managing scenes in the application.
  */
-class RestrictedSceneManager {
+class RestrictedSceneManager
+{
   public:
     RestrictedSceneManager() = default;
     virtual ~RestrictedSceneManager() = default;

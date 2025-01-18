@@ -20,7 +20,8 @@
 
 #include "Config.hpp"
 
-int main() {
+int main()
+{
     auto game = engine::Game();
 
     game.addModule<GameRenderingModule>(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "R-Type - Client");

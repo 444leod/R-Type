@@ -8,7 +8,8 @@
 #ifndef PARALLAX_HPP
 #define PARALLAX_HPP
 
-struct Parallax {
+struct Parallax
+{
     int offsetMultiplier = 0;
     float offset = 0;
 };

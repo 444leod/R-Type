@@ -21,15 +21,18 @@
 #include "Config.hpp"
 #include "PacketTypes.hpp"
 
-static std::optional<ecs::Entity> getEntityBySource(ecs::Registry& registry, const asio::ip::udp::endpoint& source) {
-    for (auto [entity, info] : registry.view<Client>()) {
+static std::optional<ecs::Entity> getEntityBySource(ecs::Registry& registry, const asio::ip::udp::endpoint& source)
+{
+    for (auto [entity, info] : registry.view<Client>())
+    {
         if (info.info.endpoint == source)
             return entity;
     }
     return std::nullopt;
 }
 
-void ShipShotSystem::execute(const asio::ip::udp::endpoint& source) const {
+void ShipShotSystem::execute(const asio::ip::udp::endpoint& source) const
+{
     const auto entityId = getEntityBySource(_registry, source);
     if (!entityId.has_value())
         return;

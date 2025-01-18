@@ -13,12 +13,14 @@
 #include <map>
 #include <vector>
 
-namespace ecs {
+namespace ecs
+{
 
 /**
  * @brief A class used to register events listeners and call events based on a type
  */
-class EventDispatcher {
+class EventDispatcher
+{
   public:
     EventDispatcher() = default;
     ~EventDispatcher() = default;
@@ -28,7 +30,8 @@ class EventDispatcher {
      * @tparam T The type of event to link to
      * @param handler The receiver object
      */
-    template <typename T> void link(IEventHandler* handler) {
+    template <typename T> void link(IEventHandler* handler)
+    {
         const std::size_t type_id = ecs::Family<T>::id();
         if (!this->_links.contains(type_id))
             this->_links[type_id] = {};
@@ -40,7 +43,8 @@ class EventDispatcher {
      * @tparam T The type of event to unlink to
      * @param handler The receiver object
      */
-    template <typename T> void unlink(IEventHandler* handler) {
+    template <typename T> void unlink(IEventHandler* handler)
+    {
         const std::size_t type_id = ecs::Family<T>::id();
         if (this->_links.contains(type_id))
             this->_links.erase(type_id);
@@ -51,10 +55,12 @@ class EventDispatcher {
      * @tparam T The type of event to boradcast
      * @param event The value to pass as event
      */
-    template <typename T> void broadcast(const T& event) {
+    template <typename T> void broadcast(const T& event)
+    {
         const std::size_t type_id = ecs::Family<T>::id();
         auto destinees = this->_links[type_id];
-        for (auto destinee : destinees) {
+        for (auto destinee : destinees)
+        {
             auto handler = dynamic_cast<EventHandler<T>*>(destinee);
             handler->receive(event);
         }

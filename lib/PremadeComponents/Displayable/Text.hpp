@@ -12,7 +12,8 @@
 
 #include <string>
 
-struct Text {
+struct Text
+{
   public:
     std::string font;
     std::string message;

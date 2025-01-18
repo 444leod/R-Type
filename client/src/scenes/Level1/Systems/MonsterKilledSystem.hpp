@@ -18,14 +18,17 @@
 
 #include "SharedComponents/Enemy.hpp"
 
-class MonsterKilledSystem final : public ASystem {
+class MonsterKilledSystem final : public ASystem
+{
   public:
     explicit MonsterKilledSystem() : ASystem("MonsterKilledSystem") {}
 
-    void execute(const std::uint32_t& monsterId, const std::uint32_t& projectileId) const {
+    void execute(const std::uint32_t& monsterId, const std::uint32_t& projectileId) const
+    {
         std::optional<std::tuple<ecs::Entity, Enemy, Transform>> monster = std::nullopt;
 
-        for (auto& [entity, enemy, transform] : _registry.view<Enemy, Transform>().each()) {
+        for (auto& [entity, enemy, transform] : _registry.view<Enemy, Transform>().each())
+        {
             if (enemy.id != monsterId)
                 continue;
 
@@ -38,7 +41,8 @@ class MonsterKilledSystem final : public ASystem {
 
         std::optional<std::tuple<ecs::Entity, Projectile, Transform>> projectile = std::nullopt;
 
-        for (auto& [entity, proj, transform] : _registry.view<Projectile, Transform>().each()) {
+        for (auto& [entity, proj, transform] : _registry.view<Projectile, Transform>().each())
+        {
             if (proj.id != projectileId)
                 continue;
 

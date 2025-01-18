@@ -19,7 +19,8 @@
 #include <tuple>
 #include <vector>
 
-inline std::ostream& operator<<(std::ostream& os, const std::vector<ecs::Entity>& vec) {
+inline std::ostream& operator<<(std::ostream& os, const std::vector<ecs::Entity>& vec)
+{
     if (vec.empty())
         return os << "[]";
     os << "[" << vec[0];
@@ -28,17 +29,22 @@ inline std::ostream& operator<<(std::ostream& os, const std::vector<ecs::Entity>
     return os << "]";
 }
 
-namespace ecs {
+namespace ecs
+{
 
 /**
  * @brief Trait to check if T is in the list of types.
  */
-template <typename T, typename... Types> struct is_part_of : std::false_type {};
+template <typename T, typename... Types> struct is_part_of : std::false_type
+{
+};
 
 /**
  * @brief Recursive case: T is part of the list if it matches the first type or any of the remaining types.
  */
-template <typename T, typename First, typename... Rest> struct is_part_of<T, First, Rest...> : std::conditional_t<std::is_same_v<T, First>, std::true_type, is_part_of<T, Rest...>> {};
+template <typename T, typename First, typename... Rest> struct is_part_of<T, First, Rest...> : std::conditional_t<std::is_same_v<T, First>, std::true_type, is_part_of<T, Rest...>>
+{
+};
 
 /**
  * @brief Helper variable template to simplify usage.
@@ -57,14 +63,16 @@ concept part_of = is_part_of_v<T, Types...>;
  * @tparam Component The main component type.
  * @tparam Others Other component types.
  */
-template <typename Component, typename... Others> class View {
+template <typename Component, typename... Others> class View
+{
   public:
     using ComponentsTuple = std::tuple<Component, Others...>;
 
     /**
      * @brief Iterator class to iterate over entities and their components.
      */
-    class Iterator {
+    class Iterator
+    {
       public:
         /**
          * @brief Constructor to initialize the iterator.
@@ -79,7 +87,8 @@ template <typename Component, typename... Others> class View {
          *
          * @return A tuple containing the entity and its components.
          */
-        std::tuple<const ecs::Entity&, Component&, Others&...> operator*() {
+        std::tuple<const ecs::Entity&, Component&, Others&...> operator*()
+        {
             const ecs::Entity& entity = *_entityIdsIterator;
             return std::tie(entity, this->get<Component>(entity), this->get<Others>(entity)...);
         }
@@ -89,7 +98,8 @@ template <typename Component, typename... Others> class View {
          *
          * @return Reference to the incremented iterator.
          */
-        Iterator& operator++() {
+        Iterator& operator++()
+        {
             ++_entityIdsIterator;
             return *this;
         }
@@ -99,7 +109,8 @@ template <typename Component, typename... Others> class View {
          *
          * @return Copy of the iterator before incrementing.
          */
-        Iterator operator++(int) {
+        Iterator operator++(int)
+        {
             Iterator temp = *this;
             ++(*this);
             return temp;
@@ -144,7 +155,8 @@ template <typename Component, typename... Others> class View {
      *
      * @param sparse_sets Reference to the map of sparse sets.
      */
-    explicit View(std::map<std::size_t, ISparseSet*>& sparse_sets) : _type_ids{Family<Component>::id(), Family<Others>::id()...}, _sparse_sets{sparse_sets} {
+    explicit View(std::map<std::size_t, ISparseSet*>& sparse_sets) : _type_ids{Family<Component>::id(), Family<Others>::id()...}, _sparse_sets{sparse_sets}
+    {
         // std::cout << "View types: " << type<Component>::name();
         // ((std::cout << ", " << type<Others>::name()), ...);
         // std::cout << std::endl;
@@ -188,14 +200,19 @@ template <typename Component, typename... Others> class View {
      * @tparam Func The type of the function to apply.
      * @param func The function to apply to each entity and its components.
      */
-    template <typename Func> void each(Func&& func) {
+    template <typename Func> void each(Func&& func)
+    {
         // std::cout << "each with entities: " << _entities << std::endl;
-        for (auto entity : _entities) {
+        for (auto entity : _entities)
+        {
             if (const auto entity_it = std::ranges::find(_entities, entity); entity_it == _entities.end())
                 continue;
-            if constexpr (std::is_invocable_v<Func, Entity, Component&, Others&...>) {
+            if constexpr (std::is_invocable_v<Func, Entity, Component&, Others&...>)
+            {
                 func(entity, this->get<Component>(entity), this->get<Others>(entity)...);
-            } else {
+            }
+            else
+            {
                 func(this->get<Component>(entity), this->get<Others>(entity)...);
             }
         }
@@ -211,7 +228,8 @@ template <typename Component, typename... Others> class View {
      */
     template <typename T>
         requires part_of<T, Component, Others...>
-    [[nodiscard]] T& get(const ecs::Entity& entity) {
+    [[nodiscard]] T& get(const ecs::Entity& entity)
+    {
         return dynamic_cast<SparseSet<T>&>(*_view_sets.at(Family<T>::id())).at(entity);
     }
 
@@ -220,9 +238,11 @@ template <typename Component, typename... Others> class View {
      *
      * @return Vector of tuples with entities and their components.
      */
-    std::vector<std::tuple<Entity, Component&, Others&...>> each() {
+    std::vector<std::tuple<Entity, Component&, Others&...>> each()
+    {
         std::vector<std::tuple<Entity, Component&, Others&...>> result;
-        for (auto tuple : *this) {
+        for (auto tuple : *this)
+        {
             result.push_back(tuple);
         }
         return result;
@@ -243,7 +263,8 @@ template <typename Component, typename... Others> class View {
      *
      * @return Reference to the output stream.
      */
-    friend std::ostream& operator<<(std::ostream& os, const View& view) {
+    friend std::ostream& operator<<(std::ostream& os, const View& view)
+    {
         std::vector<Entity> identifiers = view._type_ids;
         if (identifiers.empty())
             return os;
@@ -264,8 +285,10 @@ template <typename Component, typename... Others> class View {
         return os;
     }
 
-    void displaySets() {
-        for (const auto& [id, set] : _view_sets) {
+    void displaySets()
+    {
+        for (const auto& [id, set] : _view_sets)
+        {
             std::cout << "Sparse set for component " << id << std::endl;
             set->display();
         }
@@ -281,13 +304,16 @@ template <typename Component, typename... Others> class View {
     /**
      * @brief Query the entities that have the required components.
      */
-    void _queryEntities() {
+    void _queryEntities()
+    {
         std::vector<std::vector<Entity>> entitiesList;
         uint8_t minimum = -1;
         uint8_t index = 0;
 
-        for (const auto& id : _type_ids) {
-            if (!_sparse_sets.contains(id)) {
+        for (const auto& id : _type_ids)
+        {
+            if (!_sparse_sets.contains(id))
+            {
                 // std::cerr << "Component " << id << " is not in the registry" << std::endl;
                 return;
             }
@@ -297,7 +323,8 @@ template <typename Component, typename... Others> class View {
             _view_sets[id] = set;
             auto list = set->entities();
 
-            if (list.size() < minimum) {
+            if (list.size() < minimum)
+            {
                 minimum = list.size();
                 index = entitiesList.size();
             }
@@ -310,15 +337,19 @@ template <typename Component, typename... Others> class View {
         // TODO: optimize
         std::vector<Entity> result;
 
-        for (const auto& element : entitiesListIntersection) {
+        for (const auto& element : entitiesListIntersection)
+        {
             bool foundInAll = true;
-            for (const auto& vec : entitiesList) {
-                if (std::ranges::find(vec, element) == vec.end()) {
+            for (const auto& vec : entitiesList)
+            {
+                if (std::ranges::find(vec, element) == vec.end())
+                {
                     foundInAll = false;
                     break;
                 }
             }
-            if (foundInAll) {
+            if (foundInAll)
+            {
                 result.push_back(element);
             }
         }

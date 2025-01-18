@@ -11,7 +11,8 @@
 #include "ASystem.hpp"
 #include <SFML/Graphics.hpp>
 
-class AEventSystem : public ASystem {
+class AEventSystem : public ASystem
+{
   public:
     explicit AEventSystem(const std::string& name) : ASystem(name) {}
 

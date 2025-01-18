@@ -10,9 +10,11 @@
 
 #include "PremadeModules/Network/ANetworkGameModule.hpp"
 
-namespace waiting_room {
+namespace waiting_room
+{
 
-class PacketHandlerSceneModule final : public APacketHandlerSceneModule {
+class PacketHandlerSceneModule final : public APacketHandlerSceneModule
+{
   public:
     explicit PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net);
     ~PacketHandlerSceneModule() override = default;

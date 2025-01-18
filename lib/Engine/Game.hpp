@@ -19,14 +19,16 @@
 #include <memory>
 #include <thread>
 
-namespace engine {
+namespace engine
+{
 template <typename T>
 concept GameModule = std::is_base_of_v<AGameModule, T>;
 
 template <typename T, typename... Params>
 concept ConstructibleGameModule = std::constructible_from<T, Params...>;
 
-class Game final : public RestrictedGame {
+class Game final : public RestrictedGame
+{
   public:
     Game() = default;
     ~Game() override = default;
@@ -42,7 +44,8 @@ class Game final : public RestrictedGame {
 
     template <GameModule Module, typename... Params>
         requires ConstructibleGameModule<Module, Params...>
-    std::shared_ptr<Module> addModule(Params&&... params) {
+    std::shared_ptr<Module> addModule(Params&&... params)
+    {
         auto module = std::make_shared<Module>(std::forward<Params>(params)...);
         this->_modules.push_back(module);
         return module;
@@ -52,19 +55,22 @@ class Game final : public RestrictedGame {
 
     void run() { this->run(this->_sceneManager.loaded()); }
 
-    void run(const std::string& scene) {
+    void run(const std::string& scene)
+    {
         this->_running = true;
         this->_sceneManager.load(scene);
         this->_sceneManager.update();
         auto before = std::chrono::high_resolution_clock::now();
         double deltaTime = .0;
 
-        for (const auto& module : this->_modules) {
+        for (const auto& module : this->_modules)
+        {
             module->start(this->_sceneManager.current());
             module->refresh(this->_sceneManager.current());
         }
 
-        while (_running) {
+        while (_running)
+        {
             if (this->_sceneManager.update())
                 for (const auto& module : this->_modules)
                     module->refresh(this->_sceneManager.current());

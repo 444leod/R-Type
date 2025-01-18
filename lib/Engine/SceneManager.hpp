@@ -17,7 +17,8 @@
 #include <memory>
 #include <utility>
 
-namespace engine {
+namespace engine
+{
 
 /**
  * @brief Concept to ensure the type is derived from AScene.
@@ -29,13 +30,15 @@ concept SceneType = std::is_base_of_v<AScene, T>;
  * @class SceneManager
  * @brief Manages the scenes in the application.
  */
-class SceneManager final : public RestrictedSceneManager {
+class SceneManager final : public RestrictedSceneManager
+{
   public:
     /**
      * @class Exception
      * @brief Custom exception class for SceneManager.
      */
-    class Exception final : public std::exception {
+    class Exception final : public std::exception
+    {
       public:
         /**
          * @brief Constructor with a message.
@@ -69,7 +72,8 @@ class SceneManager final : public RestrictedSceneManager {
      *
      * @throws Exception if the scene name is empty.
      */
-    template <SceneType T> std::shared_ptr<T> registerScene(const std::string& name) {
+    template <SceneType T> std::shared_ptr<T> registerScene(const std::string& name)
+    {
         if (name.empty())
             throw Exception("Scene name cannot be empty");
         std::shared_ptr<T> scene = std::make_shared<T>(name);
@@ -83,7 +87,8 @@ class SceneManager final : public RestrictedSceneManager {
     /**
      * @brief Resets the scene manager.
      */
-    void reset() {
+    void reset()
+    {
         this->_current = nullptr;
         this->_loadingName = "";
     }
@@ -92,7 +97,8 @@ class SceneManager final : public RestrictedSceneManager {
      * @brief Loads a scene by name.
      * @param name The name of the scene to load.
      */
-    void load(const std::string& name) override {
+    void load(const std::string& name) override
+    {
         if (!this->_running)
             return;
         if (this->_scenes.contains(name))
@@ -102,7 +108,8 @@ class SceneManager final : public RestrictedSceneManager {
     /**
      * @brief Stops the scene manager.
      */
-    void stop() noexcept override {
+    void stop() noexcept override
+    {
         this->_running = false;
         if (this->_current != nullptr)
             this->_current->onExit();
@@ -113,7 +120,8 @@ class SceneManager final : public RestrictedSceneManager {
      *
      * @return true if the scene was updated, false otherwise.
      */
-    bool update() {
+    bool update()
+    {
         if (this->_loadingName.empty() || !this->_scenes.contains(this->_loadingName))
             return false;
 
@@ -133,7 +141,8 @@ class SceneManager final : public RestrictedSceneManager {
      * @brief Gets the currently running scene
      * @return A reference to the currently running scene
      */
-    AScene& current() override {
+    AScene& current() override
+    {
         if (_current == nullptr)
             throw Exception("No scenes currently running.");
         return *this->_current;
@@ -148,7 +157,8 @@ class SceneManager final : public RestrictedSceneManager {
      *
      * @exception Exception if the scene is not found
      */
-    AScene& get(const std::string& name) override {
+    AScene& get(const std::string& name) override
+    {
         if (!this->_scenes.contains(name))
             throw Exception("Scene not found.");
         return *this->_scenes[name];

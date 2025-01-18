@@ -17,9 +17,11 @@
  *
  * @brief The abstract class is enough for the server to handle the Network part of the game
  */
-class NetworkGameModule final : public ANetworkGameModule {
+class NetworkGameModule final : public ANetworkGameModule
+{
   public:
-    explicit NetworkGameModule() {
+    explicit NetworkGameModule()
+    {
         std::cout << "Ip of the host (enter for localhost): " << std::flush;
         std::string ip;
         std::getline(std::cin, ip);

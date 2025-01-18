@@ -8,6 +8,8 @@
 #ifndef DEBUG_HPP
 #define DEBUG_HPP
 
-struct Debug {};
+struct Debug
+{
+};
 
 #endif // DEBUG_HPP

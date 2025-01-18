@@ -11,7 +11,8 @@
 #include "ANetworkGameModule.hpp" // Include full definition of ANetworkGameModule
 #include "Engine/Modules/ASceneModule.hpp"
 
-class ANetworkSceneModule : public engine::ASceneModule {
+class ANetworkSceneModule : public engine::ASceneModule
+{
   public:
     explicit ANetworkSceneModule(engine::AScene& scene, ANetworkGameModule& networkGameModule) : ASceneModule(scene), _networkGameModule(networkGameModule) {}
     ~ANetworkSceneModule() override = default;

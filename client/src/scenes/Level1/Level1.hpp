@@ -25,9 +25,11 @@
 #include <chrono>
 #include <memory>
 
-class Level1 final : public engine::AScene {
+class Level1 final : public engine::AScene
+{
   public:
-    explicit Level1(const std::string& n) : AScene(n) {
+    explicit Level1(const std::string& n) : AScene(n)
+    {
         this->_updateSystems.push_back(std::make_unique<ParallaxSystem>());
         this->_updateSystems.push_back(std::make_unique<MovementSystem>());
         this->_updateSystems.push_back(std::make_unique<AnimateSystem>());

@@ -10,9 +10,11 @@
 
 #include "PremadeComponents/Color.hpp"
 
-namespace shape {
+namespace shape
+{
 
-struct Rectangle {
+struct Rectangle
+{
     float width;
     float height;
     Color fillColor = {0, 0, 0};

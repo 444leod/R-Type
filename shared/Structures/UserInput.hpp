@@ -10,7 +10,8 @@
 
 #include <SFML/Window/Keyboard.hpp>
 
-struct UserInput {
+struct UserInput
+{
     sf::Keyboard::Key key;
     bool pressed;
 };

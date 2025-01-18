@@ -17,7 +17,8 @@
 
 #include "PremadeSystems/Update/CollisionSystem.hpp"
 
-class WaitingRoom final : public engine::AScene {
+class WaitingRoom final : public engine::AScene
+{
   public:
     explicit WaitingRoom(const std::string& name) : AScene(name) { _updateSystems.push_back(std::make_unique<CollisionSystem>()); }
 

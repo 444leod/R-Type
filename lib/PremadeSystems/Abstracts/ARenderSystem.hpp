@@ -11,7 +11,8 @@
 #include "ASystem.hpp"
 #include <SFML/Graphics.hpp>
 
-class ARenderSystem : public ASystem {
+class ARenderSystem : public ASystem
+{
   public:
     explicit ARenderSystem(const std::string& name) : ASystem(name) {}
 

@@ -26,7 +26,8 @@ void Level1::initialize() {}
 
 void Level1::update(const double& deltaTime) { _executeUpdateSystems(deltaTime); }
 
-void Level1::onEnter() {
+void Level1::onEnter()
+{
     _registry.clear();
     const auto spaceship = _registry.create();
 
@@ -46,7 +47,8 @@ void Level1::onEnter() {
     _registry.addComponent(background, Parallax{});
 }
 
-void Level1::onEnter(const AScene& lastScene) {
+void Level1::onEnter(const AScene& lastScene)
+{
     _registry.clear();
 
     const auto background = _registry.create();
@@ -60,7 +62,8 @@ void Level1::onExit() {}
 
 void Level1::onExit(const AScene& nextScene) {}
 
-void Level1::addBug(const Transform& transform) {
+void Level1::addBug(const Transform& transform)
+{
 
     const auto bug = _registry.create();
     _registry.addComponent(bug, bugSprite);

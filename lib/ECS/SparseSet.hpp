@@ -16,9 +16,11 @@
 #include <stdexcept>
 #include <vector>
 
-namespace ecs {
+namespace ecs
+{
 
-class ISparseSet {
+class ISparseSet
+{
   public:
     virtual ~ISparseSet() = default;
 
@@ -36,7 +38,8 @@ class ISparseSet {
  * @brief Class representation of a Sparse Set
  * @tparam T The type of data to be held
  */
-template <typename T> class SparseSet final : public ISparseSet {
+template <typename T> class SparseSet final : public ISparseSet
+{
   public:
     SparseSet() = default;
     ~SparseSet() override = default;
@@ -54,7 +57,8 @@ template <typename T> class SparseSet final : public ISparseSet {
      * @param entity The entity to get the component of
      * @return A reference to an entiy
      */
-    [[nodiscard]] T& at(const ecs::Entity& entity) {
+    [[nodiscard]] T& at(const ecs::Entity& entity)
+    {
         if (!this->contains(entity))
             throw std::out_of_range("Entity " + std::to_string(entity) + " is not in the set");
         return this->_components[this->_sparse[entity]];
@@ -65,10 +69,14 @@ template <typename T> class SparseSet final : public ISparseSet {
      * @param entity The entity to set the component to
      * @param component The component
      */
-    void set(const ecs::Entity& entity, T component) {
-        if (this->contains(entity)) {
+    void set(const ecs::Entity& entity, T component)
+    {
+        if (this->contains(entity))
+        {
             this->_components[this->_sparse[entity]] = component;
-        } else {
+        }
+        else
+        {
             const std::size_t size = this->_dense.size();
             this->_dense.push_back(entity);
             this->_components.push_back(component);
@@ -80,7 +88,8 @@ template <typename T> class SparseSet final : public ISparseSet {
      * @brief Remove an entity from a set
      * @param entity The entity to remove from the set
      */
-    void remove(const ecs::Entity& entity) override {
+    void remove(const ecs::Entity& entity) override
+    {
         if (!this->contains(entity))
             return;
 
@@ -99,7 +108,8 @@ template <typename T> class SparseSet final : public ISparseSet {
     /**
      * @brief Clears the entire set
      */
-    void clear() noexcept override {
+    void clear() noexcept override
+    {
         this->_sparse.clear();
         this->_dense.clear();
         this->_components.clear();
@@ -121,13 +131,16 @@ template <typename T> class SparseSet final : public ISparseSet {
      */
     [[nodiscard]] std::size_t capacity() const noexcept override { return this->_sparse.capacity(); }
 
-    void display() const override {
-        if (this->_dense.empty()) {
+    void display() const override
+    {
+        if (this->_dense.empty())
+        {
             return;
         }
         std::cout << Family<T>::name() << " set:" << std::endl;
         std::cout << "Index | Dense Index | Dense Content | Component" << std::endl;
-        for (std::size_t i = 0; i < this->_dense.size(); i++) {
+        for (std::size_t i = 0; i < this->_dense.size(); i++)
+        {
             std::cout << i << "    | sparse[" << i << "] = " << this->_sparse[i] << " | dense[" << i << "] = " << this->_dense[i] << " | component = " << &this->_components[i] << std::endl;
         }
     }
@@ -138,8 +151,10 @@ template <typename T> class SparseSet final : public ISparseSet {
      * @param entity The entity to add to
      * @param value The value to set to the entity id
      */
-    void _add_in_sparse(const ecs::Entity& entity, std::size_t value) {
-        if (this->_sparse.capacity() <= entity) {
+    void _add_in_sparse(const ecs::Entity& entity, std::size_t value)
+    {
+        if (this->_sparse.capacity() <= entity)
+        {
             this->_sparse.resize(this->_compute_resize(entity));
         }
         this->_sparse[entity] = value;
@@ -149,7 +164,8 @@ template <typename T> class SparseSet final : public ISparseSet {
      * @brief O1 method to compute the necessary size a vector should have (2^n)
      * @param k The minimum size
      */
-    [[nodiscard]] static std::size_t _compute_resize(std::size_t k) {
+    [[nodiscard]] static std::size_t _compute_resize(std::size_t k)
+    {
         if (k == 0)
             return 1;
         k |= k >> 1;
@@ -168,7 +184,8 @@ template <typename T> class SparseSet final : public ISparseSet {
      * @param a The first value to swap
      * @param b The second value to swap
      */
-    template <typename U> static void _swap(U& a, U& b) {
+    template <typename U> static void _swap(U& a, U& b)
+    {
         U tmp = a;
         a = b;
         b = tmp;

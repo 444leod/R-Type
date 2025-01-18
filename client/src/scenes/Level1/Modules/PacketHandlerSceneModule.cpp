@@ -19,9 +19,11 @@
 
 #include "SharedComponents/Client.hpp"
 
-namespace level1 {
+namespace level1
+{
 
-void handleShipMovement(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) {
+void handleShipMovement(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
     static ShipMovementSystem shipMovementSystem{};
 
     std::uint32_t id;
@@ -32,7 +34,8 @@ void handleShipMovement(ecs::Registry&, const std::shared_ptr<ANetworkSceneModul
     shipMovementSystem.execute(id, velocity, position);
 }
 
-void handleNewProjectile(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) {
+void handleNewProjectile(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
     static NewProjectileSystem newProjectileSystem{};
 
     std::uint32_t shipId;
@@ -44,7 +47,8 @@ void handleNewProjectile(ecs::Registry&, const std::shared_ptr<ANetworkSceneModu
     newProjectileSystem.execute(shipId, projectileId, transform, velocity);
 }
 
-void handleCurrentPlayerShip(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) {
+void handleCurrentPlayerShip(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
     static NewShipSystem newShipSystem{};
 
     std::uint32_t id;
@@ -56,7 +60,8 @@ void handleCurrentPlayerShip(ecs::Registry& registry, const std::shared_ptr<ANet
     registry.addComponent(spaceship, Self{});
 }
 
-void handleNewShip(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) {
+void handleNewShip(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
     static NewShipSystem newShipSystem{};
 
     std::uint32_t id;
@@ -67,7 +72,8 @@ void handleNewShip(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, 
     (void)newShipSystem.execute(id, transform, velocity);
 }
 
-void handleNewMonster(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) {
+void handleNewMonster(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
     static NewMonsterSystem newMonsterSystem{};
 
     std::uint32_t id;
@@ -79,7 +85,8 @@ void handleNewMonster(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>
     newMonsterSystem.execute(id, type, transform, velocity);
 }
 
-void handleMonsterKilled(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) {
+void handleMonsterKilled(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
     static MonsterKilledSystem monsterKilledSystem{};
 
     std::uint32_t monsterId;
@@ -91,27 +98,32 @@ void handleMonsterKilled(ecs::Registry&, const std::shared_ptr<ANetworkSceneModu
 
 void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) { engine::RestrictedGame::instance().stop(); }
 
-void handleMessage(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) {
+void handleMessage(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
     std::uint32_t id;
     std::string message;
     packet >> id >> message;
     std::cout << "Message from " << id << ": " << message << std::endl;
 }
 
-void handleClientDisconnected(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) {
+void handleClientDisconnected(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
     std::uint32_t id;
     packet >> id;
     std::cout << "Client disconnected: " << id << std::endl;
 
-    for (auto& [entity, client] : registry.view<Client>().each()) {
-        if (client.info.id == id) {
+    for (auto& [entity, client] : registry.view<Client>().each())
+    {
+        if (client.info.id == id)
+        {
             registry.remove(entity);
             break;
         }
     }
 }
 
-PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net) {
+PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
+{
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::CLIENT_DISCONNECTED, handleClientDisconnected);
 

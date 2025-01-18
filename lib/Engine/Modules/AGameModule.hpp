@@ -7,12 +7,14 @@
 
 #pragma once
 
-namespace engine {
+namespace engine
+{
 // Forward declaration
 class AScene;
 class RestrictedGame;
 
-class AGameModule {
+class AGameModule
+{
   public:
     explicit AGameModule() = default;
     virtual ~AGameModule() = default;

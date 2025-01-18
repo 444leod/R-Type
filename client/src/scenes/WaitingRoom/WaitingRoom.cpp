@@ -21,12 +21,16 @@
 
 void WaitingRoom::initialize() {}
 
-void WaitingRoom::update(const double& deltaTime) {
-    if (_registry.view<Client>().size() != 0) {
+void WaitingRoom::update(const double& deltaTime)
+{
+    if (_registry.view<Client>().size() != 0)
+    {
+    }
+    else
+    {
 
-    } else {
-
-        if (_connectionAttempts > 5) {
+        if (_connectionAttempts > 5)
+        {
             std::cout << "\nFailed to connect to the server" << std::endl;
             engine::RestrictedGame::instance().stop();
             return;
@@ -35,14 +39,16 @@ void WaitingRoom::update(const double& deltaTime) {
         _connectionTimer += deltaTime;
         _pointTimer += deltaTime;
 
-        if (_connectionTimer > 3) {
+        if (_connectionTimer > 3)
+        {
             _connectionTimer = 0;
             _connectionAttempts++;
             const auto net = this->getModule<ANetworkSceneModule>();
             net->resend();
         }
 
-        if (_pointTimer > 1) {
+        if (_pointTimer > 1)
+        {
             _pointTimer = 0;
             _pointNumber = (_pointNumber + 1) % 4;
             std::cout << "\rConnecting to the server" << std::string(_pointNumber, '.') << std::string(3 - _pointNumber, ' ') << std::flush;
@@ -51,7 +57,8 @@ void WaitingRoom::update(const double& deltaTime) {
     this->_executeUpdateSystems(deltaTime);
 }
 
-void WaitingRoom::onEnter() {
+void WaitingRoom::onEnter()
+{
     _registry.clear();
 
     if (this->getModule<ASceneRenderingModule>() == nullptr)

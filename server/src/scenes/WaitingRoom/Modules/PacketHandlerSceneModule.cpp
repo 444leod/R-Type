@@ -9,15 +9,18 @@
 
 #include "SharedSystems/RemoveClientSystem.hpp"
 
-namespace waiting_room {
+namespace waiting_room
+{
 
-void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& src, ntw::UDPPacket&) {
+void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& src, ntw::UDPPacket&)
+{
     static RemoveClientSystem removeClientSystem{};
 
     removeClientSystem.execute(src, net);
 }
 
-void handleConnect(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) {
+void handleConnect(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
+{
     auto clients = net->clients();
 
     const auto client = std::ranges::find_if(clients, [&src](const auto& actualClient) { return actualClient.endpoint == src; });
@@ -48,7 +51,8 @@ void handleConnect(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneM
     registry.addComponent(newClient, Client{clientInfo});
 }
 
-PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net) {
+PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
+{
     this->setHandler(PACKET_TYPE::CONNECT, handleConnect);
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
 }

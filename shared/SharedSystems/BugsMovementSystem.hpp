@@ -14,16 +14,20 @@
 
 #include <cmath>
 
-class BugsMovementSystem final : public AUpdateSystem {
+class BugsMovementSystem final : public AUpdateSystem
+{
   public:
     explicit BugsMovementSystem() : AUpdateSystem("BugsMovementSystem") {}
 
-    void execute(const double& deltaTime) override {
-        _registry.view<Bug, Transform>().each([&](const Bug& bug, Transform& transform) {
-            const auto movementFactor = std::sin(bug.clock.getElapsedTime().asSeconds() / .2);
-            transform.y += movementFactor * 8;
-            transform.rotation = 90 - 45 * movementFactor;
-        });
+    void execute(const double& deltaTime) override
+    {
+        _registry.view<Bug, Transform>().each(
+            [&](const Bug& bug, Transform& transform)
+            {
+                const auto movementFactor = std::sin(bug.clock.getElapsedTime().asSeconds() / .2);
+                transform.y += movementFactor * 8;
+                transform.rotation = 90 - 45 * movementFactor;
+            });
     }
 };
 

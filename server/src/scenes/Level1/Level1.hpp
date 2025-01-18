@@ -22,9 +22,11 @@
 
 #include <chrono>
 
-class Level1 final : public engine::AScene {
+class Level1 final : public engine::AScene
+{
   public:
-    explicit Level1(const std::string& name) : AScene(name) {
+    explicit Level1(const std::string& name) : AScene(name)
+    {
         this->_updateSystems.push_back(std::make_unique<ParallaxSystem>());
         this->_updateSystems.push_back(std::make_unique<MovementSystem>());
         this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>());

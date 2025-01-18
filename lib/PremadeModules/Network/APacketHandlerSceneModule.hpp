@@ -22,7 +22,8 @@
 
 class ANetworkSceneModule;
 
-class APacketHandlerSceneModule : public engine::ASceneModule {
+class APacketHandlerSceneModule : public engine::ASceneModule
+{
   public:
     using PacketHandler = std::function<void(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint&, ntw::UDPPacket&)>;
 
@@ -31,7 +32,8 @@ class APacketHandlerSceneModule : public engine::ASceneModule {
     ~APacketHandlerSceneModule() override = default;
 
   public:
-    void handlePacket(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) {
+    void handlePacket(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
+    {
         PACKET_TYPE type;
         packet >> type;
 
@@ -42,8 +44,10 @@ class APacketHandlerSceneModule : public engine::ASceneModule {
 
     void setHandler(const PACKET_TYPE& type, PacketHandler handler) { this->_packetHandlers.set(static_cast<std::size_t>(type), std::move(handler)); }
 
-    void setHandlers(const std::map<PACKET_TYPE, PacketHandler>& handlers) {
-        for (const auto& [type, handler] : handlers) {
+    void setHandlers(const std::map<PACKET_TYPE, PacketHandler>& handlers)
+    {
+        for (const auto& [type, handler] : handlers)
+        {
             this->setHandler(type, handler);
         }
     }

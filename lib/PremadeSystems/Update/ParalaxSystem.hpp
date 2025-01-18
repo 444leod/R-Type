@@ -13,15 +13,19 @@
 #include "PremadeComponents/Transform.hpp"
 #include "SharedComponents/Parallax.hpp"
 
-class ParallaxSystem final : public AUpdateSystem {
+class ParallaxSystem final : public AUpdateSystem
+{
   public:
     ParallaxSystem() : AUpdateSystem("ParallaxSystem") {}
 
-    void execute(const double& deltaTime) override {
-        _registry.view<Parallax, Transform>().each([deltaTime](Parallax& parallax, Transform& transform) {
-            parallax.offset += static_cast<float>(deltaTime * parallax.offsetMultiplier);
-            transform.x = -parallax.offset;
-        });
+    void execute(const double& deltaTime) override
+    {
+        _registry.view<Parallax, Transform>().each(
+            [deltaTime](Parallax& parallax, Transform& transform)
+            {
+                parallax.offset += static_cast<float>(deltaTime * parallax.offsetMultiplier);
+                transform.x = -parallax.offset;
+            });
     }
 };
 

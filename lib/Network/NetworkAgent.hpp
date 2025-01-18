@@ -15,8 +15,10 @@
 
 #include "UDPPacket.hpp"
 
-namespace ntw {
-struct ClientInformation {
+namespace ntw
+{
+struct ClientInformation
+{
     asio::ip::udp::endpoint endpoint;
     std::string name;
     std::uint32_t id = 0;
@@ -35,13 +37,15 @@ inline std::uint32_t ClientInformation::_lastId = 0;
 /**
  * @brief Class representation of an object connected via socket, that can receive and send packets.
  */
-class NetworkAgent {
+class NetworkAgent
+{
   public:
     /**
      * @brief Constructor for the NetworkAgent class
      * @param port The port to create the agent at
      */
-    explicit NetworkAgent(const std::uint32_t& port = 0) : _socket(this->_ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)) {
+    explicit NetworkAgent(const std::uint32_t& port = 0) : _socket(this->_ctx, asio::ip::udp::endpoint(asio::ip::udp::v4(), port))
+    {
 
         this->_port = this->_socket.local_endpoint().port();
         this->_receivePacket();
@@ -64,7 +68,8 @@ class NetworkAgent {
     /**
      * @brief Stops any asio work from this agent
      */
-    void _stop() {
+    void _stop()
+    {
         if (this->_socket.is_open())
             this->_socket.close();
         if (this->_thread.joinable())
@@ -76,9 +81,11 @@ class NetworkAgent {
      * @param dest The endpoint to send to
      * @param packet The packet to send
      */
-    void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet) {
+    void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet)
+    {
         auto compressed = packet.compress();
-        if (compressed.empty()) {
+        if (compressed.empty())
+        {
             // Uncompressed packet
             std::cout << "Sending uncompressed packet" << std::endl;
             auto serialized = packet.serialize();
@@ -111,7 +118,8 @@ class NetworkAgent {
      * @param e Error code linked to the reception
      * @param bytes The amount of bytes received
      */
-    void _handleReceive(const std::error_code& e, const std::size_t& bytes) {
+    void _handleReceive(const std::error_code& e, const std::size_t& bytes)
+    {
         if (e || bytes == 0)
             return;
 
@@ -120,22 +128,32 @@ class NetworkAgent {
 
         bool isCompressed = (magicNumber == 0xA0CD && bytes > sizeof(magicNumber) + sizeof(uint32_t));
 
-        if (!isCompressed) {
+        if (!isCompressed)
+        {
             UDPPacket packet(this->_buffer.data(), bytes);
-            if (packet.calculateChecksum() == packet.checksum) {
+            if (packet.calculateChecksum() == packet.checksum)
+            {
                 this->_onPacketReceived(this->_client, packet);
-            } else {
+            }
+            else
+            {
                 std::cerr << "Checksum mismatch for uncompressed packet" << std::endl;
             }
-        } else {
+        }
+        else
+        {
             uint32_t compressedSize;
             std::memcpy(&compressedSize, this->_buffer.data() + sizeof(magicNumber), sizeof(compressedSize));
 
             UDPPacket packet;
-            if (packet.decompress(reinterpret_cast<const std::byte*>(this->_buffer.data() + sizeof(magicNumber) + sizeof(compressedSize)), compressedSize)) {
-                if (packet.calculateChecksum() == packet.checksum) {
+            if (packet.decompress(reinterpret_cast<const std::byte*>(this->_buffer.data() + sizeof(magicNumber) + sizeof(compressedSize)), compressedSize))
+            {
+                if (packet.calculateChecksum() == packet.checksum)
+                {
                     this->_onPacketReceived(this->_client, packet);
-                } else {
+                }
+                else
+                {
                     std::cerr << "Checksum mismatch for compressed packet" << std::endl;
                     std::cerr << "Got: " << packet.calculateChecksum() << " Expected: " << packet.checksum << std::endl;
                 }
@@ -150,7 +168,8 @@ class NetworkAgent {
      * @param e Error code linked to the sending
      * @param bytes The amount of bytes sent
      */
-    void _handleSend(const std::error_code& e, std::size_t bytes) {
+    void _handleSend(const std::error_code& e, std::size_t bytes)
+    {
         // TODO: handle send errors
     }
 

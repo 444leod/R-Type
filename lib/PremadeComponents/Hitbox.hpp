@@ -15,7 +15,8 @@
 #include <functional>
 #include <variant>
 
-struct Hitbox {
+struct Hitbox
+{
     std::variant<shape::Rectangle, shape::Circle> shape;
     std::function<void(const ecs::Entity& other)> onCollision;
 };

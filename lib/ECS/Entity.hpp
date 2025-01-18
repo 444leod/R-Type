@@ -10,7 +10,8 @@
 
 #include <cstddef>
 
-namespace ecs {
+namespace ecs
+{
 using Entity = std::size_t;
 }
 

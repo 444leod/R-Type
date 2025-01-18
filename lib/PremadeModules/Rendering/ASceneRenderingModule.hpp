@@ -17,9 +17,11 @@
 #include <memory>
 #include <vector>
 
-class ASceneRenderingModule final : public engine::ASceneModule {
+class ASceneRenderingModule final : public engine::ASceneModule
+{
   public:
-    struct PredicateHandler {
+    struct PredicateHandler
+    {
         std::function<bool(const sf::Event&)> predicate;
         std::function<void(sf::Event&)> handler;
     };
@@ -28,12 +30,14 @@ class ASceneRenderingModule final : public engine::ASceneModule {
     explicit ASceneRenderingModule(engine::AScene& scene) : ASceneModule(scene) {}
     ~ASceneRenderingModule() override = default;
 
-    void executeSystems(sf::RenderWindow& window) const noexcept {
+    void executeSystems(sf::RenderWindow& window) const noexcept
+    {
         for (const auto& system : this->_systems)
             system->execute(window);
     }
 
-    void trigger(sf::Event& event) {
+    void trigger(sf::Event& event)
+    {
         for (const auto& [predicate, handler] : this->_handlers)
             if (predicate(event))
                 handler(event);

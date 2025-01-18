@@ -17,7 +17,8 @@
  *  - MESSAGE: Message packet (temporary
  *  - POSITION: Position packet (temporary)
  */
-enum class PACKET_TYPE {
+enum class PACKET_TYPE
+{
     NONE = 0,
 
     CONNECT,

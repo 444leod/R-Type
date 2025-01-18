@@ -10,9 +10,11 @@
 
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
 
-namespace level1 {
+namespace level1
+{
 
-class PacketHandlerSceneModule final : public APacketHandlerSceneModule {
+class PacketHandlerSceneModule final : public APacketHandlerSceneModule
+{
   public:
     explicit PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net);
     ~PacketHandlerSceneModule() override = default;

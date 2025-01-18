@@ -14,7 +14,8 @@
 #include <string>
 #include <utility>
 
-class ASystem {
+class ASystem
+{
   public:
     explicit ASystem(std::string name) : _registry(engine::RestrictedGame::instance().registry()), _name(std::move(name)) {}
     virtual ~ASystem() = default;

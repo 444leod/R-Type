@@ -19,15 +19,18 @@
 #include <map>
 #include <vector>
 
-namespace ecs {
+namespace ecs
+{
 
 /**
  * @brief The class representation of the  Registry.
  */
-class Registry {
+class Registry
+{
   public:
     Registry() = default;
-    ~Registry() {
+    ~Registry()
+    {
         for (const auto sparse : this->_sparse_sets | std::views::values)
             delete sparse;
     }
@@ -44,7 +47,8 @@ class Registry {
      * @brief Spawns a new Entity, used to attach components to
      * @return An new unique Entity
      */
-    unsigned int create() {
+    unsigned int create()
+    {
         const auto entity = Registry::_get_new_entity_id();
 
         _entities.emplace_back(entity);
@@ -60,8 +64,10 @@ class Registry {
     /**
      * @brief Call the registry flush
      */
-    void flush() {
-        for (auto entity : _queue_remove) {
+    void flush()
+    {
+        for (auto entity : _queue_remove)
+        {
             for (const auto& sparse : _sparse_sets | std::views::values)
                 if (sparse->contains(entity))
                     sparse->remove(entity);
@@ -73,7 +79,8 @@ class Registry {
     /**
      * @brief Removes all the Entities
      */
-    void clear() {
+    void clear()
+    {
         for (auto const& [id, sparse] : _sparse_sets)
             sparse->clear();
         _entities.clear();
@@ -85,8 +92,10 @@ class Registry {
      * @tparam Component The type of component to clear
      * @tparam  OtherComponents Additional types of components to clear
      */
-    template <typename Component, typename... OtherComponents> void clear() {
-        for (const auto types = {Family<Component>::id(), Family<OtherComponents>::id()...}; auto id : types) {
+    template <typename Component, typename... OtherComponents> void clear()
+    {
+        for (const auto types = {Family<Component>::id(), Family<OtherComponents>::id()...}; auto id : types)
+        {
             if (_sparse_sets.contains(id))
                 _sparse_sets.at(id)->clear();
         }
@@ -98,14 +107,17 @@ class Registry {
      * @param entity The Entity to attach to
      * @param component The Component information to attach
      */
-    template <typename T> T& addComponent(Entity entity, const T& component) {
+    template <typename T> T& addComponent(Entity entity, const T& component)
+    {
         const auto id = Family<T>::id();
         SparseSet<T>* set = nullptr;
 
-        if (!this->_sparse_sets.contains(id)) {
+        if (!this->_sparse_sets.contains(id))
+        {
             set = new SparseSet<T>();
             this->_sparse_sets[id] = set;
-        } else
+        }
+        else
             set = dynamic_cast<SparseSet<T>*>(this->_sparse_sets.at(id));
         set->set(entity, component);
         return set->at(entity);
@@ -116,10 +128,12 @@ class Registry {
      * @tparam T The type of component to remove
      * @param entity The Entity to remove from
      */
-    template <typename T> void removeComponent(Entity entity) {
+    template <typename T> void removeComponent(Entity entity)
+    {
         const auto id = Family<T>::id();
 
-        if (!this->_sparse_sets.contains(id)) {
+        if (!this->_sparse_sets.contains(id))
+        {
             return;
         }
         this->_sparse_sets.at(id)->remove(entity);
@@ -128,9 +142,11 @@ class Registry {
     /**
      * @brief Used as debug to print out all the sparse-sets data
      */
-    void displaySparse() const {
+    void displaySparse() const
+    {
         std::cout << "There is a sparse array for the following components: " << std::endl;
-        for (const auto [id, set] : _sparse_sets) {
+        for (const auto [id, set] : _sparse_sets)
+        {
             std::cout << id << std::endl;
             set->display();
         }
@@ -146,9 +162,11 @@ class Registry {
      *
      * @return True if the Entity has the component, false otherwise
      */
-    template <typename Component, typename... OtherComponents> bool has_all_of(const ecs::Entity& entity) {
+    template <typename Component, typename... OtherComponents> bool has_all_of(const ecs::Entity& entity)
+    {
 
-        for (const auto types = {Family<Component>::id(), Family<OtherComponents>::id()...}; auto id : types) {
+        for (const auto types = {Family<Component>::id(), Family<OtherComponents>::id()...}; auto id : types)
+        {
             if (!_sparse_sets.contains(id))
                 return false;
             if (!_sparse_sets.at(id)->contains(entity))
@@ -167,9 +185,11 @@ class Registry {
      *
      * @return True if the Entity has any of the components, false otherwise
      */
-    template <typename Component, typename... OtherComponents> bool has_any_of(const ecs::Entity& entity) {
+    template <typename Component, typename... OtherComponents> bool has_any_of(const ecs::Entity& entity)
+    {
 
-        for (const auto types = {Family<Component>::id(), Family<OtherComponents>::id()...}; auto id : types) {
+        for (const auto types = {Family<Component>::id(), Family<OtherComponents>::id()...}; auto id : types)
+        {
             if (_sparse_sets.contains(id) && _sparse_sets.at(id)->contains(entity))
                 return true;
         }
@@ -185,16 +205,19 @@ class Registry {
      *
      * @return The component
      */
-    template <typename T> T& get(const Entity entity) {
+    template <typename T> T& get(const Entity entity)
+    {
         const auto id = Family<T>::id();
 
-        if (!this->_sparse_sets.contains(id)) {
+        if (!this->_sparse_sets.contains(id))
+        {
             throw std::out_of_range("No such component in the registry:" + Family<T>::name());
         }
 
         const auto set = dynamic_cast<SparseSet<T>*>(this->_sparse_sets.at(id));
 
-        if (!set->contains(entity)) {
+        if (!set->contains(entity))
+        {
             throw std::out_of_range(entity + " does not have the component " + Family<T>::name());
         }
 
@@ -206,7 +229,8 @@ class Registry {
      * @brief Gets a new available Entity ID
      * @return A new unique Entity ID
      */
-    static Entity _get_new_entity_id() {
+    static Entity _get_new_entity_id()
+    {
         static Entity value = 0;
         return value++;
     }

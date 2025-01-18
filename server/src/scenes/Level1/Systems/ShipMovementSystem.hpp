@@ -14,7 +14,8 @@
 
 #include "Structures/UserInput.hpp"
 
-class ShipMovementSystem final : public ASystem {
+class ShipMovementSystem final : public ASystem
+{
   public:
     explicit ShipMovementSystem(const std::shared_ptr<ANetworkSceneModule>& net) : ASystem("ShipMovementSystem"), _net(net) {}
 

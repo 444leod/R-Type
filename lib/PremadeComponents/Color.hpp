@@ -10,7 +10,8 @@
 
 #include <cstdint>
 
-struct Color {
+struct Color
+{
     std::int8_t r;
     std::int8_t g;
     std::int8_t b;

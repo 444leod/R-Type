@@ -16,11 +16,13 @@
 
 #include "SharedComponents/Ship.hpp"
 
-class NewShipSystem final : public ASystem {
+class NewShipSystem final : public ASystem
+{
   public:
     explicit NewShipSystem() : ASystem("NewShipSystem") {}
 
-    ecs::Entity execute(const std::uint32_t& id, const Transform& transform, const Velocity& velocity) const {
+    ecs::Entity execute(const std::uint32_t& id, const Transform& transform, const Velocity& velocity) const
+    {
         const auto spaceship = _registry.create();
         _registry.addComponent(spaceship, Ship{.id = id});
         _registry.addComponent(spaceship, transform);

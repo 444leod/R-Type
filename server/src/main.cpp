@@ -19,7 +19,8 @@
 #include "scenes/Level1/Level1.hpp"
 #include "scenes/Level1/Modules/PacketHandlerSceneModule.hpp"
 
-int main() {
+int main()
+{
     auto game = engine::Game();
 
     // game.addModule<Engine::GameRenderingModule>(800, 600, "R-Type Server");

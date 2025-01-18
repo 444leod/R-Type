@@ -16,11 +16,13 @@
 
 #include "SharedComponents/Enemy.hpp"
 
-class NewMonsterSystem final : public ASystem {
+class NewMonsterSystem final : public ASystem
+{
   public:
     explicit NewMonsterSystem() : ASystem("NewMonsterSystem") {}
 
-    void execute(const std::uint32_t& id, const std::uint8_t& type, const Transform& transform, const Velocity& velocity) const {
+    void execute(const std::uint32_t& id, const std::uint8_t& type, const Transform& transform, const Velocity& velocity) const
+    {
         const auto monster = _registry.create();
         //        auto monsterSprite = sf::Sprite(_bugTex);
         //        monsterSprite.setOrigin(16, 13);
