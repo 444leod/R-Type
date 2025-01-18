@@ -11,6 +11,9 @@
 #include <chrono>
 #include <exception>
 #include <ranges>
+#include <sstream>
+#include <iomanip>
+#include <cmath>
 
 #include "ECS/Registry.hpp"
 #include "Engine/RestrictedGame.hpp"
@@ -35,7 +38,7 @@ public:
 public:
     virtual void start(engine::AScene& scene)
     {
-        this->_window.create(sf::VideoMode(500, 300), "R-Type Profiling");
+        this->_window.create(sf::VideoMode(500, 350), "R-Type Profiling");
         if (!this->_window.isOpen())
             throw std::runtime_error("Failed to open window for Profiler.");
         this->_window.setFramerateLimit(15);
@@ -67,12 +70,15 @@ public:
         this->_window.clear(clear);
         this->_events();
 
+        std::cout << "Scroll: " << this->_scroll << std::endl;
+
         // Draw Content
         this->_runtime();
         this->_updates();
         this->_scene();
         this->_entities();
         this->_components();
+        this->_systems();
         //
 
         this->_window.display();
@@ -84,6 +90,11 @@ private:
         while (this->_window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 this->_window.close();
+            if (event.type == sf::Event::MouseWheelMoved) {
+                this->_scroll += event.mouseWheel.delta * 15.f;
+                if (this->_scroll > 0.f) this->_scroll = 0.f;
+                if (this->_scroll < _maxScroll) this->_scroll = this->_maxScroll;
+            }
         }
     }
 
@@ -105,11 +116,14 @@ private:
         t_value.setFillColor(c_value);
         const auto w_value = t_value.getLocalBounds().width;
 
+        if (y > this->_window.getSize().y)
+            this->_maxScroll = -(y - this->_window.getSize().y + 5); // 5px is arbitrary, it makes bottom text more readable
+        y += this->_scroll;
         if (x >= 0.f) {
             t_key.setPosition(x, y);
             t_value.setPosition(x + w_key, y);
         } else {
-            t_key.setPosition(this->_window.getSize().x - w_value - w_key + x, y);
+            t_key.setPosition(this->_window.getSize().x - w_value - w_key + x, y );
             t_value.setPosition(this->_window.getSize().x - w_value + x, y);
         }
         this->_window.draw(t_key);
@@ -193,11 +207,26 @@ private:
     // Update Systems
     void _systems() {
         const auto& times = engine::ASystem::executionTimes();
+        std::vector<std::pair<std::string, double>> frequencies = {};
+        for (auto entry: times)
+            frequencies.push_back(entry);
+        std::ranges::sort(frequencies, [](const auto& a, const auto& b){ return a.second > b.second; });
+
+        std::uint32_t y = 120;
+        this->_drawKeyValue("Systems' execution times", "", 0, y);
+        for (const auto& [system, time]: frequencies) {
+            y += 20;
+            std::stringstream ss;
+            ss << std::fixed << std::setprecision(2) << time << "us";
+            this->_drawKeyValue(" - " + system, ss.str(), 0, y);
+        }
     }
 
 private:
     sf::Font _font;
     sf::RenderWindow _window;
+    float _scroll = 0.f;
+    float _maxScroll = 0.f;
 
     uint32_t _ticks;
     const uint32_t _jumps;
