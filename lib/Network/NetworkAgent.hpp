@@ -83,10 +83,28 @@ class NetworkAgent
      */
     void _send(const asio::ip::udp::endpoint& dest, const UDPPacket& packet)
     {
-        auto serialized = packet.serialize();
-        // std::cout << "Sending packet to " << dest << " (" << serialized.size() << " bytes)" << std::endl;
-        // std::cout << "Payload: " << packet.payload << std::endl;
-        this->_socket.async_send_to(asio::buffer(serialized), dest, std::bind(&NetworkAgent::_handleSend, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+        auto compressed = packet.compress();
+        if (compressed.empty())
+        {
+            // Uncompressed packet
+            std::cout << "Sending uncompressed packet" << std::endl;
+            auto serialized = packet.serialize();
+            this->_socket.async_send_to(asio::buffer(serialized), dest, std::bind(&NetworkAgent::_handleSend, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
+            return;
+        }
+
+        std::cout << "Sending compressed packet" << std::endl;
+        // Add magic number (0xA0CD) and compressed size
+        std::vector<std::byte> finalPacket;
+        const uint32_t magicNumber = 0xA0CD;
+        const uint32_t compressedSize = compressed.size();
+
+        finalPacket.insert(finalPacket.end(), reinterpret_cast<const std::byte*>(&magicNumber), reinterpret_cast<const std::byte*>(&magicNumber) + sizeof(magicNumber));
+
+        finalPacket.insert(finalPacket.end(), reinterpret_cast<const std::byte*>(&compressedSize), reinterpret_cast<const std::byte*>(&compressedSize) + sizeof(compressedSize));
+        finalPacket.insert(finalPacket.end(), compressed.begin(), compressed.end());
+
+        this->_socket.async_send_to(asio::buffer(finalPacket), dest, std::bind(&NetworkAgent::_handleSend, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
     }
 
   private:
@@ -102,24 +120,46 @@ class NetworkAgent
      */
     void _handleReceive(const std::error_code& e, const std::size_t& bytes)
     {
-        // TODO: handle receive errors
-        if (e)
+        if (e || bytes == 0)
             return;
 
-        if (bytes > 0)
+        uint32_t magicNumber = 0;
+        std::memcpy(&magicNumber, this->_buffer.data(), sizeof(magicNumber));
+
+        bool isCompressed = (magicNumber == 0xA0CD && bytes > sizeof(magicNumber) + sizeof(uint32_t));
+
+        if (!isCompressed)
         {
             UDPPacket packet(this->_buffer.data(), bytes);
-            uint16_t calculated_checksum = packet.calculateChecksum();
-            if (calculated_checksum == packet.checksum)
+            if (packet.calculateChecksum() == packet.checksum)
             {
                 this->_onPacketReceived(this->_client, packet);
             }
             else
             {
-                // TODO: handle corrupted packet
-                std::cerr << "got some corrupted packet :( (checksum mismatch: " << calculated_checksum << " != " << packet.checksum << ")" << std::endl;
+                std::cerr << "Checksum mismatch for uncompressed packet" << std::endl;
             }
         }
+        else
+        {
+            uint32_t compressedSize;
+            std::memcpy(&compressedSize, this->_buffer.data() + sizeof(magicNumber), sizeof(compressedSize));
+
+            UDPPacket packet;
+            if (packet.decompress(reinterpret_cast<const std::byte*>(this->_buffer.data() + sizeof(magicNumber) + sizeof(compressedSize)), compressedSize))
+            {
+                if (packet.calculateChecksum() == packet.checksum)
+                {
+                    this->_onPacketReceived(this->_client, packet);
+                }
+                else
+                {
+                    std::cerr << "Checksum mismatch for compressed packet" << std::endl;
+                    std::cerr << "Got: " << packet.calculateChecksum() << " Expected: " << packet.checksum << std::endl;
+                }
+            }
+        }
+
         this->_receivePacket();
     }
 

@@ -341,6 +341,77 @@ struct UDPPacket
      */
     [[nodiscard]] std::size_t remains() const noexcept { return this->payload_length - this->_pos; }
 
+    /**
+     * @brief Compresses the packet payload using RLE compression
+     * @return Vector containing the compressed data
+     */
+    std::vector<std::byte> compress() const
+    {
+        if (payload.empty())
+            return {};
+
+        auto serialized = serialize();
+
+        std::vector<std::byte> compressed;
+        compressed.reserve(serialized.size());
+
+        uint8_t current = serialized[0];
+        std::uint8_t count = 1;
+
+        for (size_t i = 1; i < serialized.size(); ++i)
+        {
+            if (serialized[i] == current && count < 255)
+            {
+                count++;
+            }
+            else
+            {
+                compressed.push_back(static_cast<std::byte>(count));
+                compressed.push_back(static_cast<std::byte>(current));
+                current = serialized[i];
+                count = 1;
+            }
+        }
+        compressed.push_back(static_cast<std::byte>(count));
+        compressed.push_back(static_cast<std::byte>(current));
+
+        std::cout << "Compressed size: " << compressed.size() << " Serialized size: " << serialized.size() << std::endl;
+        // Only return compressed data if it's actually smaller
+        return compressed.size() < serialized.size() ? compressed : std::vector<std::byte>{};
+    }
+
+    /**
+     * @brief Decompresses RLE compressed data
+     * @param compressed The compressed data
+     * @param compressedSize Size of the compressed data
+     * @return True if decompression was successful
+     */
+    bool decompress(const std::byte* compressed, size_t compressedSize)
+    {
+        if (compressedSize == 0)
+            return true;
+
+        std::vector<std::byte> decompressed;
+        decompressed.reserve(compressedSize * 2);
+
+        for (size_t i = 0; i < compressedSize; i += 2)
+        {
+            if (i + 1 >= compressedSize)
+                return false;
+
+            std::uint8_t count = std::to_integer<std::uint8_t>(compressed[i]);
+            std::byte value = compressed[i + 1];
+
+            for (std::uint8_t j = 0; j < count; ++j)
+            {
+                decompressed.push_back(value);
+            }
+        }
+
+        _deserialize(reinterpret_cast<const char*>(decompressed.data()), decompressed.size());
+        return true;
+    }
+
   private:
     /**
      * @brief Deserialize raw data into the packet.

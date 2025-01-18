@@ -15,6 +15,7 @@
 #include "PremadeComponents/Projectile.hpp"
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
+#include "SharedComponents/Ship.hpp"
 
 class NewProjectileSystem final : public engine::ASystem
 {
