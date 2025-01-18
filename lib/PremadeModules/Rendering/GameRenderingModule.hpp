@@ -10,65 +10,48 @@
 class ResourcesManager;
 
 #include <SFML/Graphics.hpp>
+#include <cstdint>
 #include <utility>
 #include <vector>
-#include <cstdint>
 
 #include "ResourcesManager.hpp"
 
 #include "PremadeSystems/Abstracts/ARenderSystem.hpp"
 
-#include "PremadeSystems/Render/DrawSpritesSystem.hpp"
-#include "PremadeSystems/Render/DrawTextsSystem.hpp"
 #include "PremadeSystems/Render/DebugDrawSystem.hpp"
 #include "PremadeSystems/Render/DrawButtonsSystem.hpp"
 #include "PremadeSystems/Render/DrawShapeSystem.hpp"
+#include "PremadeSystems/Render/DrawSpritesSystem.hpp"
+#include "PremadeSystems/Render/DrawTextsSystem.hpp"
 
 #include "PremadeSystems/Event/ButtonClickedSystem.hpp"
 
-#include "Engine/AScene.hpp"
-#include "Engine/Modules/AGameModule.hpp"
 #include "ASceneRenderingModule.hpp"
+#include "Engine/AScene.hpp"
 #include "Engine/Game.hpp"
+#include "Engine/Modules/AGameModule.hpp"
 
 namespace ecs {
-    class Registry;
+class Registry;
 }
 
-class GameRenderingModule final : public engine::AGameModule
-{
-public:
-    GameRenderingModule(const std::uint32_t& width, const std::uint32_t& height, std::string  title):
-        _title(std::move(title)),
-        _mode(width, height),
-        _spritesSystem(_resourcesManager),
-        _textsSystem(_resourcesManager),
-        _buttonSystem(_resourcesManager),
-        _debugDrawSystem(),
-        _buttonClickedSystem(),
-        _shapeSystem()
-    {}
+class GameRenderingModule final : public engine::AGameModule {
+  public:
+    GameRenderingModule(const std::uint32_t& width, const std::uint32_t& height, std::string title)
+        : _title(std::move(title)), _mode(width, height), _spritesSystem(_resourcesManager), _textsSystem(_resourcesManager), _buttonSystem(_resourcesManager), _debugDrawSystem(), _buttonClickedSystem(), _shapeSystem() {}
     ~GameRenderingModule() override = default;
 
-    void start(engine::AScene&) override
-    {
-        this->_window.create(this->_mode, this->_title);
-    }
+    void start(engine::AScene&) override { this->_window.create(this->_mode, this->_title); }
 
-    void refresh(engine::AScene& scene) override
-    {
+    void refresh(engine::AScene& scene) override {
         this->_target = scene.getModule<ASceneRenderingModule>();
         if (this->_target == nullptr)
             return;
     }
 
-    void stop() override
-    {
-        this->_window.close();
-    }
+    void stop() override { this->_window.close(); }
 
-    void update() override
-    {
+    void update() override {
         sf::Event event{};
         while (this->_window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -95,8 +78,8 @@ public:
         this->_window.display();
     }
 
-protected:
-private:
+  protected:
+  private:
     ResourcesManager _resourcesManager;
 
     std::shared_ptr<ASceneRenderingModule> _target;
@@ -113,4 +96,3 @@ private:
 
     ButtonClickedSystem _buttonClickedSystem;
 };
-

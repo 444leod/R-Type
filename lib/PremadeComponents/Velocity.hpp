@@ -12,4 +12,4 @@ struct Velocity {
     float x, y;
 };
 
-#endif //VELOCITY_HPP
+#endif // VELOCITY_HPP

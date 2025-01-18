@@ -10,4 +10,4 @@
 
 struct Self {};
 
-#endif //SELF_HPP
+#endif // SELF_HPP

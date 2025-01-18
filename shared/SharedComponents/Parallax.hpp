@@ -13,4 +13,4 @@ struct Parallax {
     float offset = 0;
 };
 
-#endif //PARALLAX_HPP
+#endif // PARALLAX_HPP

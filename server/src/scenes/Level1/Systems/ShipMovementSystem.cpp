@@ -7,28 +7,24 @@
 
 #include "ShipMovementSystem.hpp"
 
+#include "PremadeComponents/Hitbox.hpp"
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
-#include "PremadeComponents/Hitbox.hpp"
 
 #include "SharedComponents/Client.hpp"
 #include "SharedComponents/Ship.hpp"
 
 #include "PacketTypes.hpp"
 
-
-static std::optional<ecs::Entity> getEntityBySource(ecs::Registry &registry, const asio::ip::udp::endpoint &source)
-{
-    for (auto [entity, info] : registry.view<Client>())
-    {
+static std::optional<ecs::Entity> getEntityBySource(ecs::Registry& registry, const asio::ip::udp::endpoint& source) {
+    for (auto [entity, info] : registry.view<Client>()) {
         if (info.info.endpoint == source)
             return entity;
     }
     return std::nullopt;
 }
 
-void ShipMovementSystem::execute(const asio::ip::udp::endpoint &source, const UserInput& input) const
-{
+void ShipMovementSystem::execute(const asio::ip::udp::endpoint& source, const UserInput& input) const {
     const auto entityId = getEntityBySource(_registry, source);
     if (!entityId.has_value())
         return;
@@ -37,22 +33,21 @@ void ShipMovementSystem::execute(const asio::ip::udp::endpoint &source, const Us
     auto velocity = _registry.get<Velocity>(*entityId);
     const auto pos = _registry.get<Transform>(*entityId);
 
-    switch (input.key)
-    {
-        case sf::Keyboard::Key::Up:
-            velocity.y += input.pressed ? -75 : 75;
+    switch (input.key) {
+    case sf::Keyboard::Key::Up:
+        velocity.y += input.pressed ? -75 : 75;
         break;
-        case sf::Keyboard::Key::Down:
-            velocity.y += input.pressed ? 75 : -75;
+    case sf::Keyboard::Key::Down:
+        velocity.y += input.pressed ? 75 : -75;
         break;
-        case sf::Keyboard::Key::Left:
-            velocity.x += input.pressed ? -75 : 75;
+    case sf::Keyboard::Key::Left:
+        velocity.x += input.pressed ? -75 : 75;
         break;
-        case sf::Keyboard::Key::Right:
-            velocity.x += input.pressed ? 75 : -75;
+    case sf::Keyboard::Key::Right:
+        velocity.x += input.pressed ? 75 : -75;
         break;
-        default:
-            break;
+    default:
+        break;
     }
 
     ntw::UDPPacket packet;

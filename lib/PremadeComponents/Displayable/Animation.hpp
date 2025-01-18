@@ -10,8 +10,8 @@
 
 #include "ECS/Entity.hpp"
 
-#include <functional>
 #include <cstdint>
+#include <functional>
 
 /**
  * @struct Animation
@@ -61,4 +61,4 @@ struct Animation {
     std::function<void(const ecs::Entity& entity)> onEnd = [](const ecs::Entity&) {};
 };
 
-#endif //ANIMATION_HPP
+#endif // ANIMATION_HPP

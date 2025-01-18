@@ -12,22 +12,21 @@
 
 #include "PremadeSystems/Abstracts/ARenderSystem.hpp"
 
-#include "PremadeComponents/Tags/Debug.hpp"
 #include "PremadeComponents/Hitbox.hpp"
+#include "PremadeComponents/Tags/Debug.hpp"
 #include "PremadeComponents/Transform.hpp"
 
-class DebugDrawSystem final : public ARenderSystem
-{
-public:
+class DebugDrawSystem final : public ARenderSystem {
+  public:
     DebugDrawSystem() : ARenderSystem("DebugDrawSystem") {}
 
-    void execute(sf::RenderWindow &window) override {
+    void execute(sf::RenderWindow& window) override {
 
         auto view = _registry.view<Debug, Hitbox, Transform>();
 
-        view.each([&] (const ecs::Entity& entity, const Debug&, const Hitbox& hitbox, const Transform& transform) {
+        view.each([&](const ecs::Entity& entity, const Debug&, const Hitbox& hitbox, const Transform& transform) {
             if (std::holds_alternative<shape::Rectangle>(hitbox.shape)) {
-                const auto&[width, height, fillColor, outlineColor, outlineThickness] = std::get<shape::Rectangle>(hitbox.shape);
+                const auto& [width, height, fillColor, outlineColor, outlineThickness] = std::get<shape::Rectangle>(hitbox.shape);
                 sf::RectangleShape shape(sf::Vector2f(width, height));
                 shape.setPosition(transform.x + width / 2, transform.y + height / 2);
                 shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b, fillColor.a));
@@ -37,7 +36,7 @@ public:
                 shape.setOrigin(width / 2, height / 2);
                 window.draw(shape);
             } else if (std::holds_alternative<shape::Circle>(hitbox.shape)) {
-                const auto&[radius, fillColor, outlineColor, outlineThickness] = std::get<shape::Circle>(hitbox.shape);
+                const auto& [radius, fillColor, outlineColor, outlineThickness] = std::get<shape::Circle>(hitbox.shape);
                 sf::CircleShape shape(radius);
                 shape.setPosition(transform.x, transform.y);
                 shape.setFillColor(sf::Color(fillColor.r, fillColor.g, fillColor.b, fillColor.a));
@@ -47,9 +46,9 @@ public:
                 window.draw(shape);
             }
         });
-
     }
-private:
+
+  private:
 };
 
 #endif /* !DEBUG_DRAW_SYSTEM_HPP_ */

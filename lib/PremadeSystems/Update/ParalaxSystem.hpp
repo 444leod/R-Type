@@ -10,12 +10,11 @@
 
 #include "PremadeSystems/Abstracts/AUpdateSystem.hpp"
 
-#include "SharedComponents/Parallax.hpp"
 #include "PremadeComponents/Transform.hpp"
+#include "SharedComponents/Parallax.hpp"
 
-class ParallaxSystem final : public AUpdateSystem
-{
-public:
+class ParallaxSystem final : public AUpdateSystem {
+  public:
     ParallaxSystem() : AUpdateSystem("ParallaxSystem") {}
 
     void execute(const double& deltaTime) override {

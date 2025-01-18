@@ -10,30 +10,27 @@
 
 #include "ECS/Entity.hpp"
 
-#include "PremadeSystems/Abstracts/ARenderSystem.hpp"
 #include "PremadeModules/Rendering/ResourcesManager.hpp"
+#include "PremadeSystems/Abstracts/ARenderSystem.hpp"
 
 #include "PremadeComponents/Displayable/Button.hpp"
 #include "PremadeComponents/Transform.hpp"
 
-class DrawButtonsSystem final : public ARenderSystem
-{
-public:
+class DrawButtonsSystem final : public ARenderSystem {
+  public:
     explicit DrawButtonsSystem(ResourcesManager& resourcesManager) : ARenderSystem("DrawButtonsSystem"), _textures(resourcesManager.textures()), _fonts(resourcesManager.fonts()) {}
 
-    void execute(sf::RenderWindow &window) override
-    {
+    void execute(sf::RenderWindow& window) override {
         sf::RectangleShape rectangle;
         sf::Sprite sprite;
         sf::Text label;
-        _registry.view<Button, Transform>().each([&] (const ecs::Entity& entity, Button& button, const Transform& transform) {
+        _registry.view<Button, Transform>().each([&](const ecs::Entity& entity, Button& button, const Transform& transform) {
             auto& [shape, _, text] = button;
             auto& [x, y, z, rotation] = transform;
 
             float shapeWidth, shapeHeight;
 
-            if (std::holds_alternative<shape::Rectangle>(shape))
-            {
+            if (std::holds_alternative<shape::Rectangle>(shape)) {
                 auto [width, height, fillColor, outlineColor, outlineThickness] = std::get<shape::Rectangle>(button.shape);
 
                 rectangle.setSize({width, height});
@@ -46,11 +43,9 @@ public:
                 shapeHeight = height;
 
                 window.draw(rectangle);
-            } else
-            {
+            } else {
                 auto& sp = std::get<Sprite>(button.shape);
-                if (!_textures.contains(sp.texture))
-                {
+                if (!_textures.contains(sp.texture)) {
                     sf::Texture texture;
                     if (!texture.loadFromFile(sp.texture))
                         std::cerr << "Failed to load texture: " << sp.texture << std::endl;
@@ -59,8 +54,7 @@ public:
 
                 const auto tex = _textures.at(sp.texture);
 
-                if (!sp.textureRect.has_value())
-                {
+                if (!sp.textureRect.has_value()) {
                     sp.textureRect = IntRect(0, 0, tex.getSize().x, tex.getSize().y);
                 }
 
@@ -78,8 +72,7 @@ public:
             if (!text.has_value())
                 return;
 
-            if (!_fonts.contains(text->font))
-            {
+            if (!_fonts.contains(text->font)) {
                 sf::Font font;
                 if (!font.loadFromFile(text->font))
                     std::cerr << "Failed to load font: " << text->font << std::endl;
@@ -95,7 +88,7 @@ public:
         });
     }
 
-private:
+  private:
     std::map<std::string, sf::Texture> _textures;
     std::map<std::string, sf::Font> _fonts;
 };

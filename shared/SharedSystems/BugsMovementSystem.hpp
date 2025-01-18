@@ -14,9 +14,8 @@
 
 #include <cmath>
 
-class BugsMovementSystem final : public AUpdateSystem
-{
-public:
+class BugsMovementSystem final : public AUpdateSystem {
+  public:
     explicit BugsMovementSystem() : AUpdateSystem("BugsMovementSystem") {}
 
     void execute(const double& deltaTime) override {

@@ -18,14 +18,12 @@
 #include <SFML/Graphics.hpp>
 #include <map>
 
-class DrawTextsSystem final : public ARenderSystem
-{
-public:
+class DrawTextsSystem final : public ARenderSystem {
+  public:
     explicit DrawTextsSystem(ResourcesManager& resourceManager) : ARenderSystem("DrawTextsSystem"), _fonts(resourceManager.fonts()) {}
 
-    void execute(sf::RenderWindow &window) override
-    {
-        this->_registry.view<Transform, Text>().each([&](const auto &, auto &transform, auto &text) {
+    void execute(sf::RenderWindow& window) override {
+        this->_registry.view<Transform, Text>().each([&](const auto&, auto& transform, auto& text) {
             if (!this->_fonts.contains(text.font)) {
                 auto font = sf::Font{};
                 if (!font.loadFromFile(text.font))
@@ -42,7 +40,7 @@ public:
         });
     }
 
-private:
+  private:
     sf::Text _text;
     std::map<std::string, sf::Font>& _fonts;
 };

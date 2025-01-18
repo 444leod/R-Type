@@ -21,4 +21,4 @@ struct Button {
     std::optional<Text> label = std::nullopt;
 };
 
-#endif //BUTTON_HPP
+#endif // BUTTON_HPP

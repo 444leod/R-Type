@@ -10,10 +10,9 @@
 
 #include <SFML/Window/Keyboard.hpp>
 
-struct UserInput
-{
+struct UserInput {
     sf::Keyboard::Key key;
     bool pressed;
 };
 
-#endif //USERINPUT_HPP
+#endif // USERINPUT_HPP

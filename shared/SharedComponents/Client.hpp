@@ -10,12 +10,11 @@
 
 #include "Network/NetworkAgent.hpp"
 
-struct Client
-{
+struct Client {
     ntw::ClientInformation info;
 
     explicit Client(const ntw::ClientInformation& info) : info(info) {}
     Client(const Client& other) = default;
 };
 
-#endif //CLIENT_HPP
+#endif // CLIENT_HPP

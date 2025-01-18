@@ -14,14 +14,13 @@
 
 #include "Structures/UserInput.hpp"
 
-class ShipMovementSystem final : public ASystem
-{
-public:
+class ShipMovementSystem final : public ASystem {
+  public:
     explicit ShipMovementSystem(const std::shared_ptr<ANetworkSceneModule>& net) : ASystem("ShipMovementSystem"), _net(net) {}
 
-    void execute(const asio::ip::udp::endpoint &source, const UserInput& input) const;
+    void execute(const asio::ip::udp::endpoint& source, const UserInput& input) const;
 
-private:
+  private:
     const std::shared_ptr<ANetworkSceneModule>& _net;
 };
 

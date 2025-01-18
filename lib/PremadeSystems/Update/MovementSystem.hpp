@@ -15,10 +15,8 @@
 
 #include "Config.hpp"
 
-
-class MovementSystem final : public AUpdateSystem
-{
-public:
+class MovementSystem final : public AUpdateSystem {
+  public:
     explicit MovementSystem() : AUpdateSystem("MovementSystem") {}
 
     void execute(const double& deltaTime) override {

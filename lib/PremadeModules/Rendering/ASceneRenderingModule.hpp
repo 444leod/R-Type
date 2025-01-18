@@ -13,43 +13,37 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
+#include <functional>
 #include <memory>
 #include <vector>
-#include <functional>
 
-class ASceneRenderingModule final : public engine::ASceneModule
-{
-public:
+class ASceneRenderingModule final : public engine::ASceneModule {
+  public:
     struct PredicateHandler {
-        std::function<bool(const sf::Event &)> predicate;
-        std::function<void(sf::Event &)> handler;
+        std::function<bool(const sf::Event&)> predicate;
+        std::function<void(sf::Event&)> handler;
     };
 
-public:
-    explicit ASceneRenderingModule(engine::AScene& scene): ASceneModule(scene) {}
+  public:
+    explicit ASceneRenderingModule(engine::AScene& scene) : ASceneModule(scene) {}
     ~ASceneRenderingModule() override = default;
 
-    void executeSystems(sf::RenderWindow& window) const noexcept
-    {
+    void executeSystems(sf::RenderWindow& window) const noexcept {
         for (const auto& system : this->_systems)
             system->execute(window);
     }
 
-    void trigger(sf::Event &event)
-    {
-        for (const auto& [predicate, handler]: this->_handlers)
+    void trigger(sf::Event& event) {
+        for (const auto& [predicate, handler] : this->_handlers)
             if (predicate(event))
                 handler(event);
     }
 
-    void addHandler(const std::function<bool(const sf::Event &)>& predicate, const std::function<void(sf::Event &)>& handler)
-    {
-        this->_handlers.push_back(PredicateHandler { predicate, handler });
-    }
+    void addHandler(const std::function<bool(const sf::Event&)>& predicate, const std::function<void(sf::Event&)>& handler) { this->_handlers.push_back(PredicateHandler{predicate, handler}); }
 
     std::vector<std::unique_ptr<ARenderSystem>>& systems() noexcept { return this->_systems; }
 
-private:
+  private:
     std::vector<PredicateHandler> _handlers;
     std::vector<std::unique_ptr<ARenderSystem>> _systems;
 };

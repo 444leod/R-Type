@@ -10,15 +10,14 @@
 
 #include "Utils/IntRect.hpp"
 
-#include <string>
 #include <optional>
+#include <string>
 
-struct Sprite
-{
+struct Sprite {
     std::string texture;
     std::pair<float, float> scale;
     std::pair<float, float> origin;
     std::optional<IntRect> textureRect = std::nullopt;
 };
 
-#endif //SPRITE_HPP
+#endif // SPRITE_HPP

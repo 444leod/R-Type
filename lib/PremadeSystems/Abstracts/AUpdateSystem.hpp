@@ -10,9 +10,8 @@
 
 #include "ASystem.hpp"
 
-class AUpdateSystem : public ASystem
-{
-public:
+class AUpdateSystem : public ASystem {
+  public:
     explicit AUpdateSystem(const std::string& name) : ASystem(name) {}
 
     /**

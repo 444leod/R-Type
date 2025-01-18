@@ -8,16 +8,16 @@
 #ifndef A_SYSTEM_HPP
 #define A_SYSTEM_HPP
 
-#include <Engine/RestrictedGame.hpp>
 #include <ECS/Registry.hpp>
+#include <Engine/RestrictedGame.hpp>
 
 #include <string>
 #include <utility>
 
 class ASystem {
-public:
-    explicit ASystem(std::string  name) : _registry(engine::RestrictedGame::instance().registry()), _name(std::move(name)) {}
-    virtual~ASystem() = default;
+  public:
+    explicit ASystem(std::string name) : _registry(engine::RestrictedGame::instance().registry()), _name(std::move(name)) {}
+    virtual ~ASystem() = default;
 
     /**
      * @brief Disables the system
@@ -41,11 +41,10 @@ public:
      */
     [[nodiscard]] std::string name() const { return _name; }
 
-protected:
+  protected:
     ecs::Registry& _registry;
     bool _enabled = true;
     const std::string _name;
 };
 
-#endif //A_SYSTEM_HPP
-
+#endif // A_SYSTEM_HPP

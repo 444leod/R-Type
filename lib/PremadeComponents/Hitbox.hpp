@@ -9,16 +9,15 @@
 #define HITBOX_HPP
 
 #include "ECS/Entity.hpp"
-#include "Shapes/Rectangle.hpp"
 #include "Shapes/Circle.hpp"
+#include "Shapes/Rectangle.hpp"
 
 #include <functional>
 #include <variant>
 
-struct Hitbox
-{
+struct Hitbox {
     std::variant<shape::Rectangle, shape::Circle> shape;
     std::function<void(const ecs::Entity& other)> onCollision;
 };
 
-#endif //HITBOX_HPP
+#endif // HITBOX_HPP

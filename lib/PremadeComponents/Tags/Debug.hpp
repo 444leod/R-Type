@@ -10,4 +10,4 @@
 
 struct Debug {};
 
-#endif //DEBUG_HPP
+#endif // DEBUG_HPP

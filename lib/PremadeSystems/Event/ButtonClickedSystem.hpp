@@ -13,24 +13,21 @@
 #include "PremadeComponents/Displayable/Button.hpp"
 #include "PremadeComponents/Transform.hpp"
 
-class ButtonClickedSystem final : public AEventSystem
-{
-public:
+class ButtonClickedSystem final : public AEventSystem {
+  public:
     explicit ButtonClickedSystem() : AEventSystem("ButtonClickedSystem") {}
 
-    void execute(sf::Event& event) override
-    {
+    void execute(sf::Event& event) override {
         if (event.type != sf::Event::MouseButtonPressed)
             return;
         if (event.mouseButton.button != sf::Mouse::Left)
             return;
 
-        _registry.view<Transform, Button>().each([&] (const Transform& transform, const Button& button) {
+        _registry.view<Transform, Button>().each([&](const Transform& transform, const Button& button) {
             auto& [shape, onClick, text] = button;
             auto& [x, y, z, rotation] = transform;
 
-            if (std::holds_alternative<shape::Rectangle>(shape))
-            {
+            if (std::holds_alternative<shape::Rectangle>(shape)) {
                 auto [width, height, fillColor, outlineColor, outlineThickness] = std::get<shape::Rectangle>(shape);
 
                 if (event.mouseButton.x < x || event.mouseButton.x > x + width)
@@ -38,8 +35,7 @@ public:
 
                 if (event.mouseButton.y < y || event.mouseButton.y > y + height)
                     return;
-            } else
-            {
+            } else {
                 const auto sp = std::get<Sprite>(shape);
 
                 if (!sp.textureRect.has_value())
@@ -60,5 +56,4 @@ public:
     }
 };
 
-
-#endif //BUTTON_CLICKED_SYSTEM_HPP
+#endif // BUTTON_CLICKED_SYSTEM_HPP

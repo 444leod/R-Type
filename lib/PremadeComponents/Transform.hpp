@@ -13,4 +13,4 @@ struct Transform {
     float rotation;
 };
 
-#endif //TRANSFORM_HPP
+#endif // TRANSFORM_HPP

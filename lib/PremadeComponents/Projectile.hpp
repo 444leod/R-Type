@@ -15,4 +15,4 @@ struct Projectile {
     std::uint32_t id;
 };
 
-#endif //PROJECTILE_HPP
+#endif // PROJECTILE_HPP

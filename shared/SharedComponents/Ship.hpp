@@ -14,4 +14,4 @@ struct Ship {
     std::uint32_t id;
 };
 
-#endif //SHIP_HPP
+#endif // SHIP_HPP

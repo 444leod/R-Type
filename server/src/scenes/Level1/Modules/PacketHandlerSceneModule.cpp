@@ -14,38 +14,30 @@
 
 #include "Structures/UserInput.hpp"
 
-namespace level1
-{
+namespace level1 {
 
-void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& src, ntw::UDPPacket&)
-{
+void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& src, ntw::UDPPacket&) {
     static RemoveClientSystem removeClientSystem{};
 
     removeClientSystem.execute(src, net);
 }
 
-void handleUserInput(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& source, ntw::UDPPacket& packet)
-{
+void handleUserInput(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& source, ntw::UDPPacket& packet) {
     UserInput input{};
     packet >> input;
 
-    if (input.key >= sf::Keyboard::Left && input.key <= sf::Keyboard::Down)
-    {
+    if (input.key >= sf::Keyboard::Left && input.key <= sf::Keyboard::Down) {
         static ShipMovementSystem shipMovementSystem(net);
         shipMovementSystem.execute(source, input);
-    }
-    else if (input.key == sf::Keyboard::Space)
-    {
+    } else if (input.key == sf::Keyboard::Space) {
         static ShipShotSystem shipShotSystem(net);
         shipShotSystem.execute(source);
     }
 }
 
-PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
-{
+PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net) {
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::USER_INPUT, handleUserInput);
-
 }
 
-}
+} // namespace level1

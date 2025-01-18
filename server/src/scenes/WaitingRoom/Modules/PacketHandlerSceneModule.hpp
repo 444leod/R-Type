@@ -10,16 +10,14 @@
 
 #include "PremadeModules/Network/APacketHandlerSceneModule.hpp"
 
-namespace waiting_room
-{
+namespace waiting_room {
 
-class PacketHandlerSceneModule final : public APacketHandlerSceneModule
-{
-public:
+class PacketHandlerSceneModule final : public APacketHandlerSceneModule {
+  public:
     explicit PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net);
     ~PacketHandlerSceneModule() override = default;
 };
 
-}
+} // namespace waiting_room
 
-#endif //WAITING_ROOM_PACKET_HANDLER_SCENE_MODULE_HPP
+#endif // WAITING_ROOM_PACKET_HANDLER_SCENE_MODULE_HPP

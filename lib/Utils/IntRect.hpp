@@ -15,4 +15,4 @@ struct IntRect {
     unsigned int height;
 };
 
-#endif //INTRECT_HPP
+#endif // INTRECT_HPP

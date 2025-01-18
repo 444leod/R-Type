@@ -15,13 +15,12 @@
 #include "PremadeComponents/Displayable/Animation.hpp"
 #include "PremadeComponents/Displayable/Sprite.hpp"
 
-class AnimateSystem final : public AUpdateSystem
-{
-public:
+class AnimateSystem final : public AUpdateSystem {
+  public:
     explicit AnimateSystem() : AUpdateSystem("AnimateSystem") {}
 
     void execute(const double& deltaTime) override {
-        _registry.view<Animation, Sprite>().each([&](const ecs::Entity& entity, Animation & animation, Sprite &sprite) {
+        _registry.view<Animation, Sprite>().each([&](const ecs::Entity& entity, Animation& animation, Sprite& sprite) {
             if (animation.currentFrame == animation.frameCount) {
                 if (animation.loop) {
                     animation.currentFrame = 0;

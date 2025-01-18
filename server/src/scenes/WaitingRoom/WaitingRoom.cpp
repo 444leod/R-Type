@@ -15,11 +15,10 @@
 
 #include "PacketTypes.hpp"
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
-inline bool isInputAvailable()
-{
+inline bool isInputAvailable() {
     fd_set readfds;
     struct timeval tv{};
     FD_ZERO(&readfds);
@@ -29,31 +28,22 @@ inline bool isInputAvailable()
     return select(STDIN_FILENO + 1, &readfds, nullptr, nullptr, &tv) > 0;
 }
 
-void WaitingRoom::initialize()
-{
+void WaitingRoom::initialize() {
     std::cout << "Game is running..." << std::endl;
     std::cout << "> " << std::flush;
 }
 
-void WaitingRoom::update(const double& deltaTime)
-{
+void WaitingRoom::update(const double& deltaTime) {
     if (isInputAvailable()) {
-        if (std::string input;!std::getline(std::cin, input))
-        {
-            if (std::cin.eof())
-            {
+        if (std::string input; !std::getline(std::cin, input)) {
+            if (std::cin.eof()) {
                 _command_handlers["exit"]({});
-            }
-            else
-            {
+            } else {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
-        }
-        else
-        {
-            if (_command_handlers.contains(input))
-            {
+        } else {
+            if (_command_handlers.contains(input)) {
                 std::vector<std::string> args;
                 std::istringstream iss(input);
                 std::string arg;
@@ -69,38 +59,32 @@ void WaitingRoom::update(const double& deltaTime)
     this->_executeUpdateSystems(deltaTime);
 }
 
-void WaitingRoom::onEnter()
-{
+void WaitingRoom::onEnter() {
     _registry.clear();
 
     auto exitButtonEntity = _registry.create();
-    _registry.addComponent<Transform>(exitButtonEntity, Transform { .x = 20.0f, .y = 20.0f});
+    _registry.addComponent<Transform>(exitButtonEntity, Transform{.x = 20.0f, .y = 20.0f});
     sf::RectangleShape exitButtonShape({100.0f, 40.0f});
     exitButtonShape.setFillColor(sf::Color::Red);
     // _registry.addComponent<Button>(exitButtonEntity, {.shape exitButtonShape, "Exit", [this](){ game::RestrictedGame::instance().stop(); }});
 
     auto startButtonEntity = _registry.create();
-    _registry.addComponent<Transform>(startButtonEntity, Transform { .x = 140.0f, .y = 20.0f});
+    _registry.addComponent<Transform>(startButtonEntity, Transform{.x = 140.0f, .y = 20.0f});
     sf::RectangleShape startButtonShape({100.0f, 40.0f});
     startButtonShape.setFillColor(sf::Color::Green);
     // _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){
     //    //TODO: start the game
     // }});
 
-    if (this->getModule<ANetworkSceneModule>() == nullptr)
-    {
+    if (this->getModule<ANetworkSceneModule>() == nullptr) {
         std::cout << "No Network module found, exiting..." << std::endl;
         throw std::runtime_error("No Network module found");
     }
 }
 
-void WaitingRoom::onEnter(const AScene& lastScene)
-{
-    this->onEnter();
-}
+void WaitingRoom::onEnter(const AScene& lastScene) { this->onEnter(); }
 
-void WaitingRoom::onExit()
-{
+void WaitingRoom::onExit() {
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 
@@ -111,17 +95,12 @@ void WaitingRoom::onExit()
     net->sendPacket(packet);
 }
 
-void WaitingRoom::onExit(const AScene& nextScene)
-{
-    std::cout << "Exiting to " << nextScene.name() << std::endl;
-}
+void WaitingRoom::onExit(const AScene& nextScene) { std::cout << "Exiting to " << nextScene.name() << std::endl; }
 
-void WaitingRoom::_startGame(const std::vector<std::string> &)
-{
+void WaitingRoom::_startGame(const std::vector<std::string>&) {
     const auto net = this->getModule<ANetworkSceneModule>();
 
-    if (net->clients().size() < 1)
-    {
+    if (net->clients().size() < 1) {
         std::cout << "Not enough players to start the game" << std::endl;
         return;
     }

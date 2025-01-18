@@ -11,9 +11,8 @@
 #include "ASystem.hpp"
 #include <SFML/Graphics.hpp>
 
-class AEventSystem : public ASystem
-{
-public:
+class AEventSystem : public ASystem {
+  public:
     explicit AEventSystem(const std::string& name) : ASystem(name) {}
 
     /**
@@ -24,4 +23,4 @@ public:
     virtual void execute(sf::Event& event) = 0;
 };
 
-#endif //A_EVENT_SYSTEM_HPP
+#endif // A_EVENT_SYSTEM_HPP
