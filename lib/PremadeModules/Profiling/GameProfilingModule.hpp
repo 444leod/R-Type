@@ -23,10 +23,22 @@
 
 #define P_STR(x) std::to_string(x)
 
+/**
+ * @brief The GameProfilingModule adds an external window
+ * that displays many kind of information about the currently running game that is using the R-Type engine.
+ * @note The module itself does not rely on the engine to display information on screen, this is standalone.
+ * @note A font is required for this module to work, as it will display text information.
+ */
 class GameProfilingModule final: public engine::AGameModule
 {
 public:
-    GameProfilingModule(uint32_t updateJumps, const std::string& path): _jumps(updateJumps)
+    /**
+     * @warning To add a module to a game, use the `Game::addModule` method
+     * @brief Creates a new GameProfilingModule
+     * @param path The path to the font-file to load to display text information
+     * @param updateJumps The amount of update it will jump before displaying new information
+     */
+    GameProfilingModule(const std::string& path, uint32_t updateJumps = 10): _jumps(updateJumps)
     {
         this->_lastUpdate = std::chrono::high_resolution_clock::now();
         if (!this->_font.loadFromFile(path))
@@ -36,7 +48,11 @@ public:
     ~GameProfilingModule() = default;
 
 public:
-    virtual void start(engine::AScene& scene)
+    /**
+     * @brief Called when the module starts
+     * @param scene The scene it is referncing
+     */
+    virtual void start([[maybe_unused]] engine::AScene& scene)
     {
         this->_window.create(sf::VideoMode(500, 350), "R-Type Profiling");
         if (!this->_window.isOpen())
@@ -44,13 +60,22 @@ public:
         this->_window.setFramerateLimit(15);
     }
 
-    virtual void refresh(engine::AScene& scene) {};
+    /**
+     * @brief Unused
+     */
+    virtual void refresh([[maybe_unused]] engine::AScene& scene) {};
 
+    /**
+     * @brief Called when the module will be stopped
+     */
     virtual void stop()
     {
         this->_window.close();
     }
 
+    /**
+     * @brief Called every tick, like any other module
+     */
     virtual void update()
     {
         if (!this->_window.isOpen())
@@ -83,6 +108,9 @@ public:
     }
 
 private:
+    /**
+     * @brief Handles the different events of the profiling render window
+     */
     void _events() {
         sf::Event event;
         while (this->_window.pollEvent(event)) {
@@ -96,6 +124,13 @@ private:
         }
     }
 
+    /**
+     * @brief Draws a text with a grey title (key) and a black text (value) at a given position
+     * @param key The key text (in grey)
+     * @param value The value text (in black)
+     * @param x The x component of the coordinate
+     * @param y The y component of the coordinate
+     */
     void _drawKeyValue(const std::string& key, const std::string& value, float x, float y) {
         static sf::Text t_key;
         static sf::Text t_value;
@@ -129,6 +164,12 @@ private:
     }
 
 private:
+
+    /**!
+     *          ALL THE FUNCTIONS BELOW REFER TO THE
+     *          QUERYING AND THE DRAWING OF A SPECIFIC
+     *          PART / VALUE TO BE DISPLAYED
+     */
 
     // Runtime
     std::chrono::_V2::system_clock::time_point _startTime = std::chrono::high_resolution_clock::now();

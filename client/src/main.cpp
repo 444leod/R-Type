@@ -25,7 +25,7 @@ int main()
     auto game = engine::Game();
 
     game.addModule<GameRenderingModule>(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "R-Type - Client");
-    game.addModule<GameProfilingModule>(10, "assets/arial.ttf");
+    game.addModule<GameProfilingModule>("assets/arial.ttf");
 
     const auto networkGameModule = game.addModule<NetworkGameModule>();
 

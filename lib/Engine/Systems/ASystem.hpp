@@ -52,6 +52,11 @@ public:
     [[nodiscard]] static const std::map<std::string, double>& executionTimes() { return _executionTimes; }
 
 protected:
+    /**
+     * @brief Sets / Replace the saved execution time for a given system
+     * @param system The system's name
+     * @param time The execution time value
+     */
     void _setExecutionTime(const std::string& system, double time) {
         _executionTimes[system] = time;
     }
