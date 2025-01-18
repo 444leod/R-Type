@@ -8,7 +8,9 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "Engine/Modules/AGameModule.hpp"
+#include <Engine/Modules/AGameModule.hpp>
+#include <Engine/RestrictedGame.hpp>
+#include <Engine/SceneManager.hpp>
 
 #include "RestrictedGame.hpp"
 #include "SceneManager.hpp"

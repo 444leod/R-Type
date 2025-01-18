@@ -75,15 +75,15 @@ void WaitingRoom::onEnter()
     _registry.clear();
 
     auto exitButtonEntity = _registry.create();
-    _registry.addComponent<Transform>(exitButtonEntity, Transform{.x = 20.0f, .y = 20.0f});
-    sf::RectangleShape exitButtonShape({100.0f, 40.0f});
-    exitButtonShape.setFillColor(sf::Color::Red);
+    // _registry.addComponent<Transform>(exitButtonEntity, Transform { .x = 20.0f, .y = 20.0f});
+    // sf::RectangleShape exitButtonShape({100.0f, 40.0f});
+    // exitButtonShape.setFillColor(sf::Color::Red);
     // _registry.addComponent<Button>(exitButtonEntity, {.shape exitButtonShape, "Exit", [this](){ game::RestrictedGame::instance().stop(); }});
 
     auto startButtonEntity = _registry.create();
-    _registry.addComponent<Transform>(startButtonEntity, Transform{.x = 140.0f, .y = 20.0f});
-    sf::RectangleShape startButtonShape({100.0f, 40.0f});
-    startButtonShape.setFillColor(sf::Color::Green);
+    // _registry.addComponent<Transform>(startButtonEntity, Transform { .x = 140.0f, .y = 20.0f});
+    // sf::RectangleShape startButtonShape({100.0f, 40.0f});
+    // startButtonShape.setFillColor(sf::Color::Green);
     // _registry.addComponent<Button>(startButtonEntity, {startButtonShape, "Start", [this](){
     //    //TODO: start the game
     // }});

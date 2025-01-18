@@ -8,7 +8,7 @@
 #ifndef NEW_MONSTER_SYSTEM_HPP_
 #define NEW_MONSTER_SYSTEM_HPP_
 
-#include "PremadeSystems/Abstracts/ASystem.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
 #include "PremadeComponents/Hitbox.hpp"
 #include "PremadeComponents/Transform.hpp"
@@ -16,7 +16,7 @@
 
 #include "SharedComponents/Enemy.hpp"
 
-class NewMonsterSystem final : public ASystem
+class NewMonsterSystem final : public engine::ASystem
 {
   public:
     explicit NewMonsterSystem() : ASystem("NewMonsterSystem") {}

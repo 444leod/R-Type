@@ -8,13 +8,13 @@
 #ifndef MOVEMENT_BUGS_SYSTEM_HPP_
 #define MOVEMENT_BUGS_SYSTEM_HPP_
 
-#include "PremadeSystems/Abstracts/AUpdateSystem.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
 
 #include "SharedComponents/Bug.hpp"
 
 #include <cmath>
 
-class BugsMovementSystem final : public AUpdateSystem
+class BugsMovementSystem final : public engine::AUpdateSystem
 {
   public:
     explicit BugsMovementSystem() : AUpdateSystem("BugsMovementSystem") {}

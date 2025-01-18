@@ -8,9 +8,12 @@
 #ifndef A_UPDATE_SYSTEM_HPP_
 #define A_UPDATE_SYSTEM_HPP_
 
-#include "ASystem.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
-class AUpdateSystem : public ASystem
+namespace engine
+{
+
+class AUpdateSystem : public engine::ASystem
 {
   public:
     explicit AUpdateSystem(const std::string& name) : ASystem(name) {}
@@ -21,5 +24,7 @@ class AUpdateSystem : public ASystem
      */
     virtual void execute(const double& deltaTime) = 0;
 };
+
+}
 
 #endif /* !A_UPDATE_SYSTEM_HPP_ */

@@ -8,7 +8,7 @@
 #ifndef NEW_PROJECTILE_SYSTEM_HPP_
 #define NEW_PROJECTILE_SYSTEM_HPP_
 
-#include "PremadeSystems/Abstracts/ASystem.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
 #include "PremadeComponents/Displayable/Animation.hpp"
 #include "PremadeComponents/Hitbox.hpp"
@@ -16,7 +16,7 @@
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
 
-class NewProjectileSystem final : public ASystem
+class NewProjectileSystem final : public engine::ASystem
 {
   public:
     explicit NewProjectileSystem() : ASystem("NewProjectileSystem") {}

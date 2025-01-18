@@ -10,7 +10,7 @@
 
 #include <ECS/Entity.hpp>
 
-#include "PremadeSystems/Abstracts/ASystem.hpp"
+#include <Engine/Systems/ASystem.hpp>
 
 #include "PremadeComponents/Displayable/Animation.hpp"
 #include "PremadeComponents/Projectile.hpp"
@@ -18,7 +18,7 @@
 
 #include "SharedComponents/Enemy.hpp"
 
-class MonsterKilledSystem final : public ASystem
+class MonsterKilledSystem final : public engine::ASystem
 {
   public:
     explicit MonsterKilledSystem() : ASystem("MonsterKilledSystem") {}

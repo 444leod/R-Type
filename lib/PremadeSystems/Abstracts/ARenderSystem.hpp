@@ -8,10 +8,10 @@
 #ifndef A_RENDER_SYSTEM_HPP_
 #define A_RENDER_SYSTEM_HPP_
 
-#include "ASystem.hpp"
+#include <Engine/Systems/ASystem.hpp>
 #include <SFML/Graphics.hpp>
 
-class ARenderSystem : public ASystem
+class ARenderSystem : public engine::ASystem
 {
   public:
     explicit ARenderSystem(const std::string& name) : ASystem(name) {}

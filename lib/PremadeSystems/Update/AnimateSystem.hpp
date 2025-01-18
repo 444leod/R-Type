@@ -10,12 +10,12 @@
 
 #include "ECS/Entity.hpp"
 
-#include "PremadeSystems/Abstracts/AUpdateSystem.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
 
 #include "PremadeComponents/Displayable/Animation.hpp"
 #include "PremadeComponents/Displayable/Sprite.hpp"
 
-class AnimateSystem final : public AUpdateSystem
+class AnimateSystem final : public engine::AUpdateSystem
 {
   public:
     explicit AnimateSystem() : AUpdateSystem("AnimateSystem") {}

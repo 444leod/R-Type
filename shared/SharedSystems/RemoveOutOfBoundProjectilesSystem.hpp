@@ -8,7 +8,7 @@
 #ifndef REMOVE_OUT_OF_BOUND_PROJECTILES_SYSTEM_HPP_
 #define REMOVE_OUT_OF_BOUND_PROJECTILES_SYSTEM_HPP_
 
-#include "PremadeSystems/Abstracts/AUpdateSystem.hpp"
+#include <Engine/Systems/AUpdateSystem.hpp>
 
 #include "PremadeComponents/Projectile.hpp"
 #include "PremadeComponents/Transform.hpp"
@@ -16,7 +16,7 @@
 
 #include "Config.hpp"
 
-class RemoveOutOfBoundProjectilesSystem final : public AUpdateSystem
+class RemoveOutOfBoundProjectilesSystem final : public engine::AUpdateSystem
 {
   public:
     explicit RemoveOutOfBoundProjectilesSystem() : AUpdateSystem("RemoveOutOfBoundProjectilesSystem") {}
