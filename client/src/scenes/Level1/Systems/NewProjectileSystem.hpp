@@ -51,7 +51,7 @@ class NewProjectileSystem final : public engine::ASystem
 
                 auto &sprite = _registry.addComponent(projectile, projectileSprite);
                 _registry.addComponent(projectile, transform);
-                _registry.addComponent(projectile, Projectile{charge > 20, SCALE * SCREEN_WIDTH + 80, projectileId});
+                _registry.addComponent(projectile, Projectile{charge > 20, SCALE * SCREEN_WIDTH + 80, static_cast<std::uint8_t>(projectileId)});
                 if (charge <= 20) {
                     hitboxShape = {
                         .width = 80,
