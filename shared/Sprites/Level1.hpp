@@ -9,6 +9,7 @@
 #define LEVEL1_SPRITES_HPP
 
 #include "PremadeComponents/Displayable/Sprite.hpp"
+#include "Config.hpp"
 
 inline const auto spaceshipSprite = Sprite{"assets/r-typesheet42.gif", {SCALE, SCALE}, {0, 0}, IntRect(0, 0, 34, 18)};
 

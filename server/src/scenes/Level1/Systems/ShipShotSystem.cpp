@@ -22,6 +22,7 @@
 #include "PacketTypes.hpp"
 
 #include <Sprites/Level1.hpp>
+#include <cmath>
 
 static std::optional<ecs::Entity> getEntityBySource(ecs::Registry& registry, const asio::ip::udp::endpoint& source)
 {
@@ -65,4 +66,12 @@ void ShipShotSystem::execute(const asio::ip::udp::endpoint& source, std::uint32_
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::NEW_PROJECTILE << id << projectileId << shootTransform << charge;
     _net->sendPacket(packet);
+
+    std::uint32_t mId = projectileId + 69;
+    std::uint8_t type = 69;
+    Transform transform = Transform{SCALE * SCREEN_WIDTH, static_cast<float>(std::rand() % static_cast<int>(std::round(SCREEN_HEIGHT * SCALE / .75))), 0, 0};
+    Velocity velocity{};
+    ntw::UDPPacket mob;
+    mob << PACKET_TYPE::NEW_MONSTER << mId << type << transform << Velocity{.x = -100, .y = 0};
+    _net->sendPacket(mob);
 }

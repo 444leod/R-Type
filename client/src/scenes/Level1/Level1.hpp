@@ -22,6 +22,7 @@
 #include "SharedSystems/BugsMovementSystem.hpp"
 #include "SharedSystems/RemoveOutOfBoundProjectilesSystem.hpp"
 
+#include <PremadeSystems/Update/CollisionSystem.hpp>
 #include <chrono>
 #include <memory>
 
@@ -35,6 +36,7 @@ class Level1 final : public engine::AScene
         this->_updateSystems.push_back(std::make_unique<AnimateSystem>());
         this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>());
         this->_updateSystems.push_back(std::make_unique<BugsMovementSystem>());
+        this->_updateSystems.push_back(std::make_unique<CollisionSystem>());
     }
 
     void initialize() override;

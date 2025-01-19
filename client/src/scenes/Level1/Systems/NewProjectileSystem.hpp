@@ -60,6 +60,17 @@ class NewProjectileSystem final : public engine::ASystem
                     _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameDuration = .050, .frameCount = 2, .loop = true});
                     _registry.addComponent(projectile, Velocity{.x = 200, .y = 0});
                 }
+                _registry.addComponent(projectile, Hitbox{
+                    .shape = shape::Rectangle{
+                        .width = 80,
+                        .height = 16,
+                    },
+                    .onCollision = [this] (const ecs::Entity entity) {
+                        if (_registry.has_any_of<Enemy>(entity)) {
+                            _registry.remove(entity);
+                        }
+                    },
+                });
                 return;
             }
         } catch (const std::exception& e) {
