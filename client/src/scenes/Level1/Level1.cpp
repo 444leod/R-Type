@@ -83,7 +83,11 @@ void Level1::onEnter(const AScene& lastScene)
     );
     sceneRenderingModule->addHandler(
         [this] (const sf::Event& e) {
-            return e.key.code == sf::Keyboard::Up || e.key.code == sf::Keyboard::Down || e.key.code == sf::Keyboard::Left || e.key.code == sf::Keyboard::Right;
+            return (e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased) && 
+                   (e.key.code == sf::Keyboard::Up || 
+                    e.key.code == sf::Keyboard::Down || 
+                    e.key.code == sf::Keyboard::Left || 
+                    e.key.code == sf::Keyboard::Right);
         },
         [this] (sf::Event& e) {
             ntw::UDPPacket packet;
