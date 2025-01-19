@@ -28,6 +28,10 @@
     - [Player Movement](#player-movement)
     - [Weapon Firing](#weapon-firing)
     - [Monster Spawn](#monster-spawn)
+  - [Data Serialization and Deserialization](#data-serialization-and-deserialization)
+    - [Packet Serialization Format](#packet-serialization-format)
+    - [Strings and Arrays](#strings-and-arrays)
+    - [Complex Example](#complex-example)
 
 ## Introduction
 This document outlines the specification of the R-Type network protocol, used for client-server communication in the R-Type game implementation.
@@ -263,4 +267,49 @@ Server -> All: NEW_MONSTER {
     z: float
     rotation: float
 }
+```
+
+## Data Serialization and Deserialization
+
+### Packet Serialization Format
+
+Each serialized packet contains:
+```
+[4 bytes] Sequence number
+[4 bytes] Acknowledgment number
+[2 bytes] Payload length
+[2 bytes] Checksum
+[N bytes] Payload data
+```
+### Strings and Arrays
+
+For variable-length data (strings, arrays):
+```
+[2 bytes] Length of the sequence
+[1 byte] Size of each element
+[N bytes] Data content
+```
+
+Example with string "Hello":
+```
+[2 bytes] Length = 5
+[1 byte] Size = 1 (char)
+[5 bytes] "Hello"
+```
+
+Example with array of 2 int32:
+```
+[2 bytes] Length = 2
+[1 byte] Size = 4 (int32)
+[8 bytes] Two integers
+```
+
+### Complex Example
+Packet containing an int32 followed by a string:
+```
+[1 byte] Size = 4
+[4 bytes] Integer value
+[2 bytes] String length
+[1 byte] Element size = 1
+[N bytes] String content
 ```
