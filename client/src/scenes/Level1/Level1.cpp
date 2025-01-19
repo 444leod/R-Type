@@ -21,15 +21,19 @@
 #include "PacketTypes.hpp"
 #include "Sprites/Level1.hpp"
 
-#include "Systems/NewShipSystem.hpp"
-
 #include <PremadeComponents/Tags/Self.hpp>
 #include <PremadeModules/Rendering/ASceneRenderingModule.hpp>
 #include <Structures/UserInput.hpp>
+#include "PremadeComponents/Displayable/Text.hpp"
+
 
 void Level1::initialize() {}
 
-void Level1::update(const double& deltaTime) { _executeUpdateSystems(deltaTime); }
+void Level1::update(const double& deltaTime)
+{    
+    _executeUpdateSystems(deltaTime);
+    _updateBeamBarSystem.execute(_spaceClock);
+}
 
 void Level1::onEnter()
 {
@@ -45,6 +49,43 @@ void Level1::onEnter(const AScene& lastScene)
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
+
+    const auto beamBar = _registry.create();
+    const auto beamBarSkeleton = _registry.create();
+    const auto beamText = _registry.create();
+
+    _registry.addComponent(beamBar, BeamBar{});
+    _registry.addComponent(beamBar, Transform{.x = SCALE * ((SCREEN_WIDTH - 100) / 2), .y = SCALE * (SCREEN_HEIGHT - 50), .z = 1, .rotation = 0});
+    _registry.addComponent(beamBar,
+        shape::Rectangle{
+            .width = 0,
+            .height = 12 * SCALE,
+            .fillColor = {31, 81, 255, 255},
+            .outlineColor = {0, 0, 0, 0},
+            .outlineThickness = 0
+        }
+    );
+
+    _registry.addComponent(beamBarSkeleton, Transform{.x = SCALE * ((SCREEN_WIDTH - 100) / 2), .y = SCALE * (SCREEN_HEIGHT - 50), .z = 1, .rotation = 0});
+    _registry.addComponent(beamBarSkeleton,
+        shape::Rectangle{
+            .width = 100 * SCALE,
+            .height = 12 * SCALE,
+            .fillColor = {0, 0, 0, 0},
+            .outlineColor = {255, 255, 255, 255},
+            .outlineThickness = 2
+        }
+    );
+
+    _registry.addComponent(beamText, Transform{.x = SCALE * ((SCREEN_WIDTH - 150) / 2), .y = SCALE * (SCREEN_HEIGHT - 50), .z = 1, .rotation = 0});
+    _registry.addComponent(beamText, 
+        Text{
+            .font = "./assets/arial.ttf",
+            .message = "Beam",
+            .fontSize = 30u,
+            .color = Color(31, 81, 255)
+        }
+    );
 
     const auto sceneRenderingModule = this->getModule<ASceneRenderingModule>();
     if (!sceneRenderingModule)

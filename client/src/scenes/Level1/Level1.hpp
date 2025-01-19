@@ -22,13 +22,12 @@
 #include "SharedSystems/BugsMovementSystem.hpp"
 #include "SharedSystems/RemoveOutOfBoundProjectilesSystem.hpp"
 
-#include <chrono>
-#include <memory>
+#include "Systems/UpdateBeamBarSystem.hpp"
 
 class Level1 final : public engine::AScene
 {
   public:
-    explicit Level1(const std::string& n) : AScene(n)
+    explicit Level1(const std::string& n) : AScene(n), _updateBeamBarSystem(UpdateBeamBarSystem())
     {
         this->_updateSystems.push_back(std::make_unique<ParallaxSystem>());
         this->_updateSystems.push_back(std::make_unique<MovementSystem>());
@@ -55,6 +54,7 @@ class Level1 final : public engine::AScene
   public:
   private:
     std::shared_ptr<sf::Clock> _spaceClock;
+    UpdateBeamBarSystem _updateBeamBarSystem;
 };
 
 #endif // GAME_HPP
