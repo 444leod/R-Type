@@ -9,26 +9,22 @@
 
 #include "PremadeModules/Network/ANetworkGameModule.hpp"
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
+#include "PremadeModules/Audio/ASceneAudioModule.hpp"
 
+#include "PremadeComponents/Displayable/Animation.hpp"
 #include "PremadeComponents/Hitbox.hpp"
 #include "PremadeComponents/Projectile.hpp"
 #include "PremadeComponents/Velocity.hpp"
-#include "PremadeComponents/Displayable/Animation.hpp"
 
 #include "SharedComponents/Enemy.hpp"
 
-#include "Sprites/Level1.hpp"
 #include "Config.hpp"
 #include "PacketTypes.hpp"
+#include "Sprites/Level1.hpp"
 
-void Level1::initialize()
-{
-}
+void Level1::initialize() {}
 
-void Level1::update(const double& deltaTime)
-{
-    _executeUpdateSystems(deltaTime);
-}
+void Level1::update(const double& deltaTime) { _executeUpdateSystems(deltaTime); }
 
 void Level1::onEnter()
 {
@@ -43,6 +39,12 @@ void Level1::onEnter()
 
 void Level1::onEnter(const AScene& lastScene)
 {
+    const auto audio = this->getModule<ASceneAudioModule>();
+    if (audio != nullptr) {
+        audio->playMusic("assets/space.wav", true);
+        audio->playSound("assets/laser.wav");
+    }
+
     _registry.clear();
 
     const auto background = _registry.create();
@@ -63,26 +65,29 @@ void Level1::onExit()
     net->sendPacket(packet);
 }
 
-void Level1::onExit(const AScene& nextScene)
-{
-}
+void Level1::onExit(const AScene& nextScene) {}
 
-void Level1::addProjectile(const Transform& transform){
+void Level1::addProjectile(const Transform& transform)
+{
+    const auto audio = this->getModule<ASceneAudioModule>();
+    if (audio != nullptr) {
+        audio->playSound("assets/laser.wav");
+    }
+
     const auto projectile = _registry.create();
 
     _registry.addComponent(projectile, projectileSprite);
     // _registry.addComponent(projectile, Hitbox{});
     _registry.addComponent(projectile, transform);
     _registry.addComponent(projectile, Projectile{});
-    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = .020, .frameCount = 3, .loop = false, .onEnd = [&](const ecs::Entity& entity){
-        _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
-    }});
-    #if DEBUG
-        _registry.addComponent(projectile, Debug{});
-    #endif
+    _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = .020, .frameCount = 3, .loop = false, .onEnd = [&](const ecs::Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }});
+#if DEBUG
+    _registry.addComponent(projectile, Debug{});
+#endif
 }
 
-void Level1::addBug(const Transform& transform) {
+void Level1::addBug(const Transform& transform)
+{
     const auto bug = _registry.create();
     _registry.addComponent(bug, bugSprite);
     _registry.addComponent(bug, Bug{});
@@ -90,7 +95,7 @@ void Level1::addBug(const Transform& transform) {
     _registry.addComponent(bug, transform);
     _registry.addComponent(bug, Velocity{.x = -100, .y = 0});
     _registry.addComponent(bug, Hitbox{});
-    #if DEBUG
-        _registry.addComponent(bug, Debug{});
-    #endif
+#if DEBUG
+    _registry.addComponent(bug, Debug{});
+#endif
 }

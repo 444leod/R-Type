@@ -10,8 +10,9 @@
 
 #include <cstddef>
 
-namespace ecs {
-    using Entity = std::size_t;
+namespace ecs
+{
+using Entity = std::size_t;
 }
 
 #endif // ENTITY_HPP

@@ -10,9 +10,9 @@
 
 #include <Engine/Systems/AUpdateSystem.hpp>
 
+#include "PremadeComponents/Projectile.hpp"
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
-#include "PremadeComponents/Projectile.hpp"
 
 #include "Config.hpp"
 
@@ -20,7 +20,7 @@
 
 class RemoveOutOfBoundProjectilesSystem final : public engine::AUpdateSystem
 {
-public:
+  public:
     explicit RemoveOutOfBoundProjectilesSystem() : AUpdateSystem("RemoveOutOfBoundProjectilesSystem") {}
 
     void execute(const double& deltaTime) override {

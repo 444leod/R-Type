@@ -7,11 +7,11 @@
 
 #include "PacketHandlerSceneModule.hpp"
 
-#include "../Systems/ShipMovementSystem.hpp"
+#include "../Systems/MonsterKilledSystem.hpp"
+#include "../Systems/NewMonsterSystem.hpp"
 #include "../Systems/NewProjectileSystem.hpp"
 #include "../Systems/NewShipSystem.hpp"
-#include "../Systems/NewMonsterSystem.hpp"
-#include "../Systems/MonsterKilledSystem.hpp"
+#include "../Systems/ShipMovementSystem.hpp"
 
 #include "PremadeComponents/Tags/Self.hpp"
 #include "PremadeComponents/Transform.hpp"
@@ -96,10 +96,7 @@ void handleMonsterKilled(ecs::Registry&, const std::shared_ptr<ANetworkSceneModu
     monsterKilledSystem.execute(monsterId, projectileId);
 }
 
-void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
-{
-    engine::RestrictedGame::instance().stop();
-}
+void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet) { engine::RestrictedGame::instance().stop(); }
 
 void handleMessage(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
 {
@@ -115,16 +112,18 @@ void handleClientDisconnected(ecs::Registry& registry, const std::shared_ptr<ANe
     packet >> id;
     std::cout << "Client disconnected: " << id << std::endl;
 
-    for (auto& [entity, client] : registry.view<Client>().each() )
+    for (auto& [entity, client] : registry.view<Client>().each())
     {
-        if (client.info.id == id) {
+        if (client.info.id == id)
+        {
             registry.remove(entity);
             break;
         }
     }
 }
 
-PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net) {
+PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
+{
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::CLIENT_DISCONNECTED, handleClientDisconnected);
 
@@ -140,4 +139,4 @@ PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const 
     this->setHandler(PACKET_TYPE::MESSAGE, handleMessage);
 }
 
-}
+} // namespace level1

@@ -10,8 +10,9 @@
 
 #include <cstdint>
 
-struct Enemy {
+struct Enemy
+{
     std::uint32_t id;
 };
 
-#endif //ENEMY_HPP
+#endif // ENEMY_HPP

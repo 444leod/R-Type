@@ -15,8 +15,8 @@
 
 #include "PacketTypes.hpp"
 
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 inline bool isInputAvailable()
 {
@@ -37,8 +37,9 @@ void WaitingRoom::initialize()
 
 void WaitingRoom::update(const double& deltaTime)
 {
-    if (isInputAvailable()) {
-        if (std::string input;!std::getline(std::cin, input))
+    if (isInputAvailable())
+    {
+        if (std::string input; !std::getline(std::cin, input))
         {
             if (std::cin.eof())
             {
@@ -94,10 +95,7 @@ void WaitingRoom::onEnter()
     }
 }
 
-void WaitingRoom::onEnter(const AScene& lastScene)
-{
-    this->onEnter();
-}
+void WaitingRoom::onEnter(const AScene& lastScene) { this->onEnter(); }
 
 void WaitingRoom::onExit()
 {
@@ -111,12 +109,9 @@ void WaitingRoom::onExit()
     net->sendPacket(packet);
 }
 
-void WaitingRoom::onExit(const AScene& nextScene)
-{
-    std::cout << "Exiting to " << nextScene.name() << std::endl;
-}
+void WaitingRoom::onExit(const AScene& nextScene) { std::cout << "Exiting to " << nextScene.name() << std::endl; }
 
-void WaitingRoom::_startGame(const std::vector<std::string> &)
+void WaitingRoom::_startGame(const std::vector<std::string>&)
 {
     const auto net = this->getModule<ANetworkSceneModule>();
 

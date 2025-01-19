@@ -8,9 +8,10 @@
 #ifndef TRANSFORM_HPP
 #define TRANSFORM_HPP
 
-struct Transform {
+struct Transform
+{
     float x, y, z;
     float rotation;
 };
 
-#endif //TRANSFORM_HPP
+#endif // TRANSFORM_HPP

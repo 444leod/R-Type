@@ -15,11 +15,11 @@ namespace level1
 
 class PacketHandlerSceneModule final : public APacketHandlerSceneModule
 {
-public:
+  public:
     explicit PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net);
     ~PacketHandlerSceneModule() override = default;
 };
 
-}
+} // namespace level1
 
-#endif //LEVEL1_PACKET_HANDLER_SCENE_MODULE_HPP
+#endif // LEVEL1_PACKET_HANDLER_SCENE_MODULE_HPP

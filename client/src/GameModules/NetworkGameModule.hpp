@@ -13,12 +13,13 @@
 #include "PacketTypes.hpp"
 
 /**
-* @class NetworkGameModule
-*
-* @brief The abstract class is enough for the server to handle the Network part of the game
-*/
-class NetworkGameModule final : public ANetworkGameModule {
-public:
+ * @class NetworkGameModule
+ *
+ * @brief The abstract class is enough for the server to handle the Network part of the game
+ */
+class NetworkGameModule final : public ANetworkGameModule
+{
+  public:
     explicit NetworkGameModule()
     {
         std::cout << "Ip of the host (enter for localhost): " << std::flush;
@@ -55,8 +56,7 @@ public:
     }
     ~NetworkGameModule() override = default;
 
-private:
-
+  private:
 };
 
-#endif //NETWORK_GAME_MODULE_HPP
+#endif // NETWORK_GAME_MODULE_HPP

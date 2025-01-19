@@ -23,9 +23,7 @@ void handleConnect(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneM
 {
     auto clients = net->clients();
 
-    const auto client = std::ranges::find_if(clients, [&src](const auto& actualClient) {
-        return actualClient.endpoint == src;
-    });
+    const auto client = std::ranges::find_if(clients, [&src](const auto& actualClient) { return actualClient.endpoint == src; });
 
     if (client != clients.end())
         return;
@@ -50,7 +48,7 @@ void handleConnect(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneM
     net->sendPacket(src, response);
 
     const auto newClient = registry.create();
-    registry.addComponent(newClient, Client{ clientInfo });
+    registry.addComponent(newClient, Client{clientInfo});
 }
 
 PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
@@ -59,4 +57,4 @@ PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const 
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
 }
 
-}
+} // namespace waiting_room

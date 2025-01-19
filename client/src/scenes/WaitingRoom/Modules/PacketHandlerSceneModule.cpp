@@ -20,10 +20,7 @@ void handleGameStart(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&
     engine::RestrictedGame::instance().scenes().load("game");
 }
 
-void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket&)
-{
-    engine::RestrictedGame::instance().stop();
-}
+void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket&) { engine::RestrictedGame::instance().stop(); }
 
 void handleAuthenticated(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
 {
@@ -33,7 +30,7 @@ void handleAuthenticated(ecs::Registry& registry, const std::shared_ptr<ANetwork
     std::cout << "Authenticated: " << name << " (" << id << ")" << std::endl;
 
     const auto entity = registry.create();
-    registry.addComponent(entity, Client{ ntw::ClientInformation(src, id, name) });
+    registry.addComponent(entity, Client{ntw::ClientInformation(src, id, name)});
     registry.addComponent(entity, Self{});
 }
 
@@ -45,7 +42,7 @@ void handlerNewClient(ecs::Registry& registry, const std::shared_ptr<ANetworkSce
     std::cout << "New client: " << name << " (" << id << ")" << std::endl;
 
     const auto entity = registry.create();
-    registry.addComponent(entity, Client{ ntw::ClientInformation(src, id, name) });
+    registry.addComponent(entity, Client{ntw::ClientInformation(src, id, name)});
 }
 
 void handleMessage(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet)
@@ -62,16 +59,18 @@ void handleClientDisconnected(ecs::Registry& registry, const std::shared_ptr<ANe
     packet >> id;
     std::cout << "Client disconnected: " << id << std::endl;
 
-    for (auto& [entity, client] : registry.view<Client>().each() )
+    for (auto& [entity, client] : registry.view<Client>().each())
     {
-        if (client.info.id == id) {
+        if (client.info.id == id)
+        {
             registry.remove(entity);
             break;
         }
     }
 }
 
-PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net) {
+PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
+{
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::AUTHENTICATED, handleAuthenticated);
     this->setHandler(PACKET_TYPE::NEW_CLIENT, handlerNewClient);
@@ -83,4 +82,4 @@ PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const 
     this->setHandler(PACKET_TYPE::CLIENT_DISCONNECTED, handleClientDisconnected);
 }
 
-}
+} // namespace waiting_room
