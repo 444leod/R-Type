@@ -26,16 +26,22 @@ public:
 
     void refresh(engine::AScene& scene) override
     {
-        std::cout << "Playing music in GameModule " << std::endl;
+        if (_sceneAudioModule != nullptr) {
+            _sceneAudioModule->stop();
+        }
         _sceneAudioModule = scene.getModule<ASceneAudioModule>();
-        _sceneAudioModule->playMusic("assets/space.wav");
     }
 
-    void stop() override {}
+    void stop() override {
+        if (_sceneAudioModule != nullptr) {
+            _sceneAudioModule->stop();
+        }
+    }
 
     void update() override {
-        _sceneAudioModule->playSound("assets/laser.wav");
-        _sceneAudioModule->update();
+        if (_sceneAudioModule != nullptr) {
+            _sceneAudioModule->update();
+        }
     }
 
 protected:

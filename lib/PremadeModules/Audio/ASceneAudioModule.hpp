@@ -87,6 +87,14 @@ public:
             [](const std::unique_ptr<sf::Sound>& sound) { return sound->getStatus() == sf::Sound::Stopped; }),
             _activeSounds.end());
     }
+
+    void stop()
+    {
+        _music.reset();
+        _soundBuffers.clear();
+        _activeSounds.clear();
+    }
+
 private:
     std::unique_ptr<sf::Music> _music;
     std::map<std::string, std::shared_ptr<sf::SoundBuffer>> _soundBuffers;

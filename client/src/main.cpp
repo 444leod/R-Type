@@ -44,7 +44,7 @@ int main()
         const auto net = level1->addModule<ANetworkSceneModule>(*networkGameModule);
         level1->addModule<level1::PacketHandlerSceneModule>(net);
         level1->addModule<ASceneRenderingModule>();
-        main->addModule<ASceneAudioModule>();
+        level1->addModule<ASceneAudioModule>();
     }
 
     game.run();
