@@ -42,9 +42,10 @@ void handleNewProjectile(ecs::Registry&, const std::shared_ptr<ANetworkSceneModu
     std::uint32_t projectileId;
     Transform transform{};
     Velocity velocity{};
-    packet >> shipId >> projectileId >> transform >> velocity;
+    std::uint32_t charge{};
+    packet >> shipId >> projectileId >> transform >> velocity >> charge;
 
-    newProjectileSystem.execute(shipId, projectileId, transform, velocity);
+    newProjectileSystem.execute(shipId, projectileId, transform, velocity, charge);
 }
 
 void handleCurrentPlayerShip(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)

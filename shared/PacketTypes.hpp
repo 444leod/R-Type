@@ -31,6 +31,7 @@ enum class PACKET_TYPE
 
     START,
 
+    LOAD_SCENE,
     POSITION,
     YOUR_SHIP,
     NEW_SHIP,

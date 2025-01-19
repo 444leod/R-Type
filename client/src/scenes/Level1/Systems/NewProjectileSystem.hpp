@@ -17,12 +17,16 @@
 #include "PremadeComponents/Velocity.hpp"
 #include "SharedComponents/Ship.hpp"
 
+#include <Config.hpp>
+#include <Sprites/Level1.hpp>
+#include <Utils/IntRect.hpp>
+
 class NewProjectileSystem final : public engine::ASystem
 {
   public:
     explicit NewProjectileSystem() : ASystem("NewProjectileSystem") {}
 
-    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity) const
+    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity, const short charge) const
     {
         for (auto [_, ship, transform] : _registry.view<Ship, Transform>().each())
         {
@@ -30,19 +34,19 @@ class NewProjectileSystem final : public engine::ASystem
                 continue;
             const auto projectile = _registry.create();
 
-            // TODO: update
-
-            // auto projectileSprite = sf::Sprite(projectileTex);
-            // projectileSprite.setOrigin(0, 0);
-            // projectileSprite.setScale(SCALE, SCALE);
-            // projectileSprite.setPosition(shootTransform.x, shootTransform.y);
-            // projectileSprite.setTextureRect(sf::IntRect(0, 0, 16, 16));
-            // _registry.addComponent(projectile, projectileSprite);
-
-            _registry.addComponent(projectile, Hitbox{});
+            auto &sprite = _registry.addComponent(projectile, projectileSprite);
             _registry.addComponent(projectile, transform);
-            _registry.addComponent(projectile, Projectile{.id = projectileId});
-            _registry.addComponent(projectile, Animation{.frameSize = {16, 16}, .frameDuration = 0.02, .frameCount = 3, .loop = false, .onEnd = [&](const ecs::Entity& entity) { _registry.addComponent(entity, Velocity{.x = 200, .y = 0}); }});
+            _registry.addComponent(projectile, Projectile{charge > 20, SCALE * SCREEN_WIDTH + 80, 0});
+            if (charge <= 20) {
+                sprite.textureRect = IntRect(0, 84, 80, 16);
+                _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameDuration = .030, .frameCount = 3, .loop = false, .onEnd = [&](ecs::Entity entity){
+                    _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
+                }});
+            } else {
+                sprite.textureRect = IntRect(0, 84 + 16 * (charge / 20), 80, 16);
+                _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameDuration = .050, .frameCount = 2, .loop = true});
+                _registry.addComponent(projectile, Velocity{.x = 200, .y = 0});
+            }
             return;
         }
     }

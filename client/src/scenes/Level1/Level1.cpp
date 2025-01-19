@@ -23,7 +23,9 @@
 
 #include "Systems/NewShipSystem.hpp"
 
+#include <PremadeComponents/Tags/Self.hpp>
 #include <PremadeModules/Rendering/ASceneRenderingModule.hpp>
+#include <Structures/UserInput.hpp>
 
 void Level1::initialize() {}
 
@@ -68,11 +70,37 @@ void Level1::onEnter(const AScene& lastScene)
         [this] (sf::Event& e) {
             if (!this->_spaceClock)
                 return;
-            const auto chargePercentage = std::min(static_cast<int>(this->_spaceClock->getElapsedTime().asSeconds() * 100), 100);
-            this->addProjectile(Transform{.x = 100, .y = 100, .z = 0, .rotation = 0}, chargePercentage);
+            const std::uint32_t chargePercentage = std::min(static_cast<int>(this->_spaceClock->getElapsedTime().asSeconds() * 100), 100);
+            ntw::UDPPacket packet;
+            packet << PACKET_TYPE::NEW_PROJECTILE << chargePercentage;
+
+            const auto net = this->getModule<ANetworkSceneModule>();
+            if (net == nullptr)
+                return;
+            net->sendPacket(packet);
             this->_spaceClock = nullptr;
         }
     );
+    sceneRenderingModule->addHandler(
+        [this] (const sf::Event& e) {
+            return e.key.code == sf::Keyboard::Up || e.key.code == sf::Keyboard::Down || e.key.code == sf::Keyboard::Left || e.key.code == sf::Keyboard::Right;
+        },
+        [this] (sf::Event& e) {
+            ntw::UDPPacket packet;
+            packet << PACKET_TYPE::USER_INPUT << UserInput{.key = e.key.code, .pressed = e.type != sf::Event::KeyPressed};
+
+            const auto net = this->getModule<ANetworkSceneModule>();
+            if (net == nullptr)
+                return;
+            net->sendPacket(packet);
+        }
+    );
+    ntw::UDPPacket readyPacket;
+    readyPacket << PACKET_TYPE::LOAD_SCENE;
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (net == nullptr)
+            return;
+    net->sendPacket(readyPacket);
 }
 
 void Level1::onExit()
@@ -87,28 +115,6 @@ void Level1::onExit()
 }
 
 void Level1::onExit(const AScene& nextScene) {}
-
-void Level1::addProjectile(const Transform& transform, const int charge) const
-{
-    const auto projectile = _registry.create();
-
-    auto &sprite = _registry.addComponent(projectile, projectileSprite);
-    _registry.addComponent(projectile, transform);
-    _registry.addComponent(projectile, Projectile{charge > 20, SCALE * SCREEN_WIDTH + 80, 0});
-    if (charge <= 20) {
-        sprite.textureRect = IntRect(0, 84, 80, 16);
-        _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameDuration = .030, .frameCount = 3, .loop = false, .onEnd = [&](ecs::Entity entity){
-            _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
-        }});
-    } else {
-        sprite.textureRect = IntRect(0, 84 + 16 * (charge / 20), 80, 16);
-        _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameDuration = .050, .frameCount = 2, .loop = true});
-        _registry.addComponent(projectile, Velocity{.x = 200, .y = 0});
-    }
-#if DEBUG
-    _registry.addComponent(projectile, Debug{});
-#endif
-}
 
 void Level1::addBug(const Transform& transform)
 {
