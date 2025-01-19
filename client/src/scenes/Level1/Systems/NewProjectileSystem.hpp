@@ -26,9 +26,9 @@ class NewProjectileSystem final : public engine::ASystem
   public:
     explicit NewProjectileSystem() : ASystem("NewProjectileSystem") {}
 
-    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const Velocity& velocity, const short charge) const
+    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const std::uint32_t charge) const
     {
-        for (auto [_, ship, transform] : _registry.view<Ship, Transform>().each())
+        for (auto [_, ship, sTransform] : _registry.view<Ship, Transform>().each())
         {
             if (ship.id != shipId)
                 continue;
@@ -36,7 +36,7 @@ class NewProjectileSystem final : public engine::ASystem
 
             auto &sprite = _registry.addComponent(projectile, projectileSprite);
             _registry.addComponent(projectile, transform);
-            _registry.addComponent(projectile, Projectile{charge > 20, SCALE * SCREEN_WIDTH + 80, 0});
+            _registry.addComponent(projectile, Projectile{charge > 20, SCALE * SCREEN_WIDTH + 80, projectileId});
             if (charge <= 20) {
                 sprite.textureRect = IntRect(0, 84, 80, 16);
                 _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameDuration = .030, .frameCount = 3, .loop = false, .onEnd = [&](ecs::Entity entity){
