@@ -39,7 +39,7 @@ class NewMonsterSystem final : public engine::ASystem
         },
         .onCollision = [this] (const ecs::Entity entity)
         {
-          if (_registry.has_any_of<Projectile>(entity) && !_registry.get<Projectile>(entity).piercing)
+          if (_registry.has_any_of<Projectile>(entity))
             _registry.remove(entity);
         }
       });
