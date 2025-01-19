@@ -5,8 +5,8 @@
 ** Game
 */
 
-#ifndef GAME_HPP
-#define GAME_HPP
+#ifndef ENGINE_GAME_HPP
+#define ENGINE_GAME_HPP
 
 #include <Engine/Modules/AGameModule.hpp>
 #include <Engine/RestrictedGame.hpp>

@@ -74,3 +74,4 @@ documentation/doxygen/css/awesome.css
 .cache
 
 package-lock.json
+/conan_provider.cmake

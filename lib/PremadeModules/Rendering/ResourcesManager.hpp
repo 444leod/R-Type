@@ -18,8 +18,8 @@ class ResourcesManager
     ResourcesManager() = default;
     ~ResourcesManager() = default;
 
-    std::map<std::string, sf::Texture>& textures() { return this->_textures; }
-    std::map<std::string, sf::Font>& fonts() { return this->_fonts; }
+  std::map<std::string, sf::Texture>& textures() { return this->_textures; }
+  std::map<std::string, sf::Font>& fonts() { return this->_fonts; }
 
   private:
     std::map<std::string, sf::Texture> _textures;

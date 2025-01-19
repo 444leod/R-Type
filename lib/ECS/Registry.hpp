@@ -102,6 +102,23 @@ class Registry
     }
 
     /**
+     * @brief Clears all the components except the given types
+     *
+     * @tparam Component The type of component to keep
+     * @tparam OtherComponents Additional types of components to keep
+     */
+    template <typename Component, typename... OtherComponents>
+    void clear_except()
+    {
+        const auto types = { Family<Component>::id(), Family<OtherComponents>::id()... };
+        for (auto const &[id, sparse] : _sparse_sets)
+        {
+            if (std::ranges::find(types, id) == types.end())
+                sparse->clear();
+        }
+    }
+
+    /**
      * @brief Attaches a Component to an Entity
      * @tparam T The type of component to attach. Can be deduced by the parameter
      * @param entity The Entity to attach to
