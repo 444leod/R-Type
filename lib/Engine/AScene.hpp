@@ -134,6 +134,9 @@ namespace engine
             return module;
         }
 
+        ecs::Registry& registry() { return _registry; }
+        const ecs::Registry& registry() const { return _registry; }
+
     protected:
 
     protected:

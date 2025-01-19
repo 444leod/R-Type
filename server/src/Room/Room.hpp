@@ -5,7 +5,6 @@
 #include <vector>
 #include <memory>
 #include "Network/NetworkAgent.hpp"
-#include "ECS/Registry.hpp"
 #include "../scenes/Level1/Level1.hpp"
 
 struct Room {
@@ -14,7 +13,6 @@ struct Room {
     std::uint8_t maxPlayers;
     bool isStarted = false;
     std::vector<ntw::ClientInformation> players;
-    ecs::Registry registry;
     std::shared_ptr<Level1> gameScene;
 };
 

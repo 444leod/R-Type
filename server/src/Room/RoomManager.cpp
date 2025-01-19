@@ -18,18 +18,21 @@ RoomManager& RoomManager::instance()
 void RoomManager::_initializeGameEntities(Room& room)
 {
     std::cout << "Initializing game entities for room " << room.id << std::endl;
+
+    auto& registry = room.gameScene->registry();
+
     for (const auto& player : room.players)
     {
-        const auto ship = room.registry.create();
-        room.registry.addComponent(ship, Ship{.id = player.id});
-        room.registry.addComponent(ship, Transform{.x = 100.0f, .y = static_cast<float>(100 * (player.id + 1)), .z = 1.0f});
-        room.registry.addComponent(ship, Velocity{});
-        room.registry.addComponent(ship, Hitbox{});
+        const auto ship = registry.create();
+        registry.addComponent(ship, Ship{.id = player.id});
+        registry.addComponent(ship, Transform{
+            .x = 100.0f,
+            .y = static_cast<float>(100 * (player.id + 1)),
+            .z = 1.0f
+        });
+        registry.addComponent(ship, Velocity{});
+        registry.addComponent(ship, Hitbox{});
     }
-
-    const auto background = room.registry.create();
-    room.registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1});
-    room.registry.addComponent(background, Parallax{.offsetMultiplier = 25});
     std::cout << "Game entities initialized for room " << room.id << std::endl;
 }
 
@@ -45,11 +48,12 @@ void RoomManager::startRoom(std::uint32_t roomId, const std::shared_ptr<ANetwork
 
     room.isStarted = true;
     room.gameScene = std::make_shared<Level1>("game_" + std::to_string(roomId));
-    // room.gameScene->setRegistry(&room.registry);
     room.gameScene->addModule<level1::PacketHandlerSceneModule>(net);
     room.gameScene->initialize();
 
-    // _initializeGameEntities(room);
+    engine::RestrictedGame::instance().scenes().load("game_" + std::to_string(roomId));
+
+    _initializeGameEntities(room);
 
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::ROOM_STARTED << roomId;
