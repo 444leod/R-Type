@@ -55,6 +55,7 @@ class Level1 final : public engine::AScene
   public:
   private:
     std::shared_ptr<sf::Clock> _spaceClock;
+    double _lastShotTime{0.0};
 };
 
 #endif // GAME_HPP
