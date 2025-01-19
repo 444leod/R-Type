@@ -12,6 +12,7 @@
 
 struct Projectile
 {
+    bool piercing;
     double range;
     std::uint8_t pierce;
     std::int32_t damage;

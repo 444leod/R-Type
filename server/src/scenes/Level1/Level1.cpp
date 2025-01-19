@@ -18,6 +18,9 @@
 #include "SharedComponents/Enemy.hpp"
 #include "SharedComponents/Parallax.hpp"
 
+#include <PremadeModules/Network/ANetworkSceneModule.hpp>
+#include <SharedComponents/Client.hpp>
+#include <SharedComponents/Ship.hpp>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -45,6 +48,38 @@ void Level1::onEnter()
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
     _registry.addComponent(background, Parallax{});
+
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (net == nullptr)
+    {
+        std::cerr << "No network module found, exiting..." << std::endl;
+        throw std::runtime_error("No network module found");
+    }
+
+    for (auto& client : net->clients())
+    {
+        const auto spaceship = _registry.create();
+
+        _registry.addComponent(spaceship, spaceshipSprite);
+        _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
+        _registry.addComponent(spaceship, Hitbox{});
+        _registry.addComponent(spaceship, Velocity{.x = 0, .y = 0});
+        _registry.addComponent(spaceship, Ship{.id = client.id});
+        _registry.addComponent(spaceship, Client{client});
+
+        ntw::UDPPacket packet;
+        packet << PACKET_TYPE::YOUR_SHIP << client.id << _registry.get<Transform>(spaceship) << _registry.get<Velocity>(spaceship);
+        net->sendPacket(client.endpoint, packet);
+
+        ntw::UDPPacket broadcast;
+        broadcast << PACKET_TYPE::NEW_SHIP << client.id << _registry.get<Transform>(spaceship) << _registry.get<Velocity>(spaceship);
+        for (const auto& otherClient : net->clients())
+        {
+            if (otherClient.id == client.id)
+                continue;
+            net->sendPacket(otherClient.endpoint, broadcast);
+        }
+    }
 }
 
 void Level1::onEnter(const AScene& lastScene)
@@ -56,6 +91,38 @@ void Level1::onEnter(const AScene& lastScene)
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
+
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (net == nullptr)
+    {
+        std::cerr << "No network module found, exiting..." << std::endl;
+        throw std::runtime_error("No network module found");
+    }
+
+    for (auto& client : net->clients())
+    {
+        const auto spaceship = _registry.create();
+
+        _registry.addComponent(spaceship, spaceshipSprite);
+        _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
+        _registry.addComponent(spaceship, Hitbox{});
+        _registry.addComponent(spaceship, Velocity{.x = 0, .y = 0});
+        _registry.addComponent(spaceship, Ship{.id = client.id});
+        _registry.addComponent(spaceship, Client{client});
+
+        ntw::UDPPacket packet;
+        packet << PACKET_TYPE::YOUR_SHIP << client.id << _registry.get<Transform>(spaceship) << _registry.get<Velocity>(spaceship);
+        net->sendPacket(client.endpoint, packet);
+
+        ntw::UDPPacket broadcast;
+        broadcast << PACKET_TYPE::NEW_SHIP << client.id << _registry.get<Transform>(spaceship) << _registry.get<Velocity>(spaceship);
+        for (const auto& otherClient : net->clients())
+        {
+            if (otherClient.id == client.id)
+                continue;
+            net->sendPacket(otherClient.endpoint, broadcast);
+        }
+    }
 }
 
 void Level1::onExit() {}
