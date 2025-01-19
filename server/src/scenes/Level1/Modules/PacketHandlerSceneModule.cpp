@@ -34,16 +34,21 @@ void handleUserInput(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&
         static ShipMovementSystem shipMovementSystem(net);
         shipMovementSystem.execute(source, input);
     }
-    else if (input.key == sf::Keyboard::Space)
-    {
-        static ShipShotSystem shipShotSystem(net);
-        shipShotSystem.execute(source);
-    }
+}
+
+void handleProjectile(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& source, ntw::UDPPacket& packet)
+{
+    std::uint32_t id;
+    packet >> id;
+
+    static ShipShotSystem shipShotSystem{net};
+    shipShotSystem.execute(source, id);
 }
 
 PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
 {
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
+    this->setHandler(PACKET_TYPE::NEW_PROJECTILE, handleProjectile);
     this->setHandler(PACKET_TYPE::USER_INPUT, handleUserInput);
 }
 
