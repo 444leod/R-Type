@@ -8,8 +8,6 @@
 #ifndef A_SCENE_HPP
 #define A_SCENE_HPP
 
-class SceneManager;
-
 #include <ECS/Registry.hpp>
 
 #include <Engine/Modules/ASceneModule.hpp>

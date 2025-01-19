@@ -9,7 +9,8 @@
 
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
 #include "PremadeModules/Rendering/GameRenderingModule.hpp"
-#include "PremadeModules/Profiling/GameProfilingModule.hpp"
+#include "PremadeModules/Profiling/GameProfilingModule.hpp"#include "PremadeModules/Audio/GameAudioModule.hpp"
+
 #include "GameModules/NetworkGameModule.hpp"
 
 #include "scenes/Level1/Level1.hpp"
@@ -29,11 +30,14 @@ int main()
 
     const auto networkGameModule = game.addModule<NetworkGameModule>();
 
+    game.addModule<GameAudioModule>();
+
     const auto main = game.registerScene<WaitingRoom>("main");
     {
         const auto net = main->addModule<ANetworkSceneModule>(*networkGameModule);
         main->addModule<waiting_room::PacketHandlerSceneModule>(net);
         main->addModule<ASceneRenderingModule>();
+        main->addModule<ASceneAudioModule>();
     }
 
     const auto level1 = game.registerScene<Level1>("game");
@@ -41,6 +45,7 @@ int main()
         const auto net = level1->addModule<ANetworkSceneModule>(*networkGameModule);
         level1->addModule<level1::PacketHandlerSceneModule>(net);
         level1->addModule<ASceneRenderingModule>();
+        level1->addModule<ASceneAudioModule>();
     }
 
     game.run();

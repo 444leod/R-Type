@@ -10,6 +10,7 @@
 
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
 #include "PremadeModules/Rendering/ASceneRenderingModule.hpp"
+#include "PremadeModules/Audio/ASceneAudioModule.hpp"
 
 #include "PremadeComponents/Displayable/Button.hpp"
 #include "PremadeComponents/Displayable/Text.hpp"
@@ -59,6 +60,11 @@ void WaitingRoom::update(const double& deltaTime)
 
 void WaitingRoom::onEnter()
 {
+    const auto audio = this->getModule<ASceneAudioModule>();
+    if (audio != nullptr) {
+        audio->playMusic("assets/elevator.wav", true);
+    }
+
     _registry.clear();
 
     if (this->getModule<ASceneRenderingModule>() == nullptr)

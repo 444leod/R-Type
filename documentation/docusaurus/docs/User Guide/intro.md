@@ -30,7 +30,7 @@ The goal is to kill the enemies and reach the end of the level.
 
 Shoot the enemies to kill them.
 
-[one](../../static/img/image.png)
+![one](../../static/img/image.png)
 
 
-[one](../../static/img/enemy_dead.png)
+![one](../../static/img/enemy_dead.png)
