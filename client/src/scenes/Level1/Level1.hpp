@@ -23,6 +23,9 @@
 #include "SharedSystems/RemoveOutOfBoundProjectilesSystem.hpp"
 
 #include "Systems/UpdateBeamBarSystem.hpp"
+#include <PremadeSystems/Update/CollisionSystem.hpp>
+#include <chrono>
+#include <memory>
 
 class Level1 final : public engine::AScene
 {
@@ -34,6 +37,7 @@ class Level1 final : public engine::AScene
         this->_updateSystems.push_back(std::make_unique<AnimateSystem>());
         this->_updateSystems.push_back(std::make_unique<RemoveOutOfBoundProjectilesSystem>());
         this->_updateSystems.push_back(std::make_unique<BugsMovementSystem>());
+        this->_updateSystems.push_back(std::make_unique<CollisionSystem>());
     }
 
     void initialize() override;
@@ -55,6 +59,7 @@ class Level1 final : public engine::AScene
   private:
     std::shared_ptr<sf::Clock> _spaceClock;
     UpdateBeamBarSystem _updateBeamBarSystem;
+    double _lastShotTime{0.0};
 };
 
 #endif // GAME_HPP

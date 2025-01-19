@@ -43,9 +43,9 @@ void Level1::onEnter()
 void Level1::onEnter(const AScene& lastScene)
 {
     _registry.clear();
+    _lastShotTime = 0.0;  // Initialisation du timer de tir
 
     const auto background = _registry.create();
-
     _registry.addComponent(background, backgroundSprite);
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
@@ -111,7 +111,22 @@ void Level1::onEnter(const AScene& lastScene)
         [this] (sf::Event& e) {
             if (!this->_spaceClock)
                 return;
-            const std::uint32_t chargePercentage = std::min(static_cast<int>(this->_spaceClock->getElapsedTime().asSeconds() * 100), 100);
+
+            const auto currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()
+            ).count() / 1000.0;
+
+            // Limiter la cadence de tir à 5 tirs par seconde
+            if (currentTime - _lastShotTime < 0.2) {
+                this->_spaceClock = nullptr;
+                return;
+            }
+            _lastShotTime = currentTime;
+
+            const std::uint32_t chargePercentage = std::min(
+                static_cast<int>(this->_spaceClock->getElapsedTime().asSeconds() * 100), 
+                100
+            );
             ntw::UDPPacket packet;
             packet << PACKET_TYPE::NEW_PROJECTILE << chargePercentage;
 
@@ -119,6 +134,7 @@ void Level1::onEnter(const AScene& lastScene)
             if (net == nullptr)
                 return;
             net->sendPacket(packet);
+
             this->_spaceClock = nullptr;
         }
     );

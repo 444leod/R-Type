@@ -7,7 +7,6 @@
 
 #include "PacketHandlerSceneModule.hpp"
 
-#include "../../../../../client/src/scenes/Level1/Systems/NewProjectileSystem.hpp"
 #include "SharedSystems/RemoveClientSystem.hpp"
 
 #include "../Systems/ShipMovementSystem.hpp"

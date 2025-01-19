@@ -35,37 +35,52 @@ class DrawSpritesSystem final : public ARenderSystem
         view.each(
             [&](const ecs::Entity& entity, Sprite& sprite, const Transform& transform)
             {
-                if (!_textures.contains(sprite.texture))
-                {
-                    sf::Texture texture;
-                    if (!texture.loadFromFile(sprite.texture))
-                        std::cerr << "Failed to load texture: " << sprite.texture << std::endl;
-                    _textures[sprite.texture] = texture;
-                }
+                try {
+                    if (!_textures.contains(sprite.texture))
+                    {
+                        sf::Texture texture;
+                        if (!texture.loadFromFile(sprite.texture)) {
+                            std::cerr << "Failed to load texture: " << sprite.texture << std::endl;
+                            return;  // Skip this entity if texture loading fails
+                        }
+                        _textures[sprite.texture] = texture;
+                    }
 
-                const auto tex = _textures.at(sprite.texture);
-
-                if (!sprite.textureRect.has_value())
-                {
-                    sprite.textureRect = IntRect(0, 0, tex.getSize().x, tex.getSize().y);
+                    const auto& tex = _textures.at(sprite.texture);
+                    if (!sprite.textureRect.has_value()) {
+                        sprite.textureRect = IntRect(0, 0, tex.getSize().x, tex.getSize().y);
+                    }
+                    vec.emplace_back(entity, sprite, transform);
+                } catch (const std::exception& e) {
+                    std::cerr << "Error processing sprite for entity " << entity << ": " << e.what() << std::endl;
                 }
-                vec.emplace_back(entity, sprite, transform);
             });
 
         std::ranges::sort(vec, [](const auto& a, const auto& b) { return std::get<2>(a).z < std::get<2>(b).z; });
 
         for (const auto& [entity, sprite, transform] : vec)
         {
-            sp.setTexture(_textures.at(sprite.texture));
-            sp.setScale(sprite.scale.first, sprite.scale.second);
-            sp.setOrigin(sprite.origin.first, sprite.origin.second);
-            sp.setPosition(transform.x, transform.y);
-            sp.setRotation(transform.rotation);
-            if (sprite.textureRect.has_value())
-            {
-                sp.setTextureRect(sf::IntRect(sprite.textureRect->left, sprite.textureRect->top, sprite.textureRect->width, sprite.textureRect->height));
+            try {
+                if (!_textures.contains(sprite.texture)) continue;
+                
+                sp.setTexture(_textures.at(sprite.texture));
+                sp.setScale(sprite.scale.first, sprite.scale.second);
+                sp.setOrigin(sprite.origin.first, sprite.origin.second);
+                sp.setPosition(transform.x, transform.y);
+                sp.setRotation(transform.rotation);
+                if (sprite.textureRect.has_value())
+                {
+                    sp.setTextureRect(sf::IntRect(
+                        sprite.textureRect->left,
+                        sprite.textureRect->top,
+                        sprite.textureRect->width,
+                        sprite.textureRect->height
+                    ));
+                }
+                window.draw(sp);
+            } catch (const std::exception& e) {
+                std::cerr << "Error drawing sprite for entity " << entity << ": " << e.what() << std::endl;
             }
-            window.draw(sp);
         }
     }
 
