@@ -30,7 +30,6 @@ class UpdateBeamBarSystem final : public engine::ASystem
 
         if (spaceClock != nullptr) {
             pourcentage = std::min(static_cast<int>(spaceClock->getElapsedTime().asSeconds() * 100), 100);
-            std::cout << "pourcentage" << pourcentage * SCALE << std::endl;
         }
         _registry.view<shape::Rectangle, BeamBar>().each(
             [pourcentage](auto& rectangle, auto& beamBar) {
