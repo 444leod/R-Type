@@ -13,7 +13,10 @@ const config = {
   title: "R-Type Docs",
   tagline: "R-Type goes brrrr",
   favicon: "img/favicon.ico",
-
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid'],
   url: "https://rtype-docs.a1ex.fr",
   baseUrl: "/",
 
