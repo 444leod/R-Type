@@ -21,6 +21,8 @@
 #include "PacketTypes.hpp"
 #include "Sprites/Level1.hpp"
 
+#include "Systems/NewShipSystem.hpp"
+
 #include <PremadeModules/Rendering/ASceneRenderingModule.hpp>
 
 void Level1::initialize() {}
@@ -42,29 +44,35 @@ void Level1::onEnter(const AScene& lastScene)
     _registry.addComponent(background, Transform{.x = 0, .y = 0, .z = -1, .rotation = 0});
     _registry.addComponent(background, Parallax{.offsetMultiplier = 25});
 
-    auto rendering = this->getModule<ASceneRenderingModule>();
-    if (rendering != nullptr) {
-        rendering->addHandler(
-            [this] (const sf::Event& e) {
-                return e.type == sf::Event::KeyPressed || e.type == sf::Event::KeyReleased && e.key.code == sf::Keyboard::Space;
-            },
-            [this] (sf::Event& e) {
-                if (e.type == sf::Event::KeyPressed && this->_spaceClock == nullptr)
-                {
-                    this->_spaceClock = std::make_shared<sf::Clock>();
-                }
-                else
-                {
-                    const auto chargePercentage = std::min(static_cast<int>(this->_spaceClock->getElapsedTime().asSeconds() * 100), 100);
-                    this->addProjectile(Transform{.x = 100, .y = 100, .z = 0, .rotation = 0}, chargePercentage);
-                    this->_spaceClock = nullptr;
-                }
-                    
-            }
-        );
-    } else {
-        std::cout << "No module for type ASceneRenderingModule" << std::endl;
+    const auto sceneRenderingModule = this->getModule<ASceneRenderingModule>();
+    if (!sceneRenderingModule)
+    {
+        engine::RestrictedGame::instance().stop();
+        std::cerr << "No events module found, exiting..." << std::endl;
     }
+    sceneRenderingModule->addHandler(
+        [this] (const sf::Event& e) {
+            return e.type == sf::Event::KeyPressed
+                && e.key.code == sf::Keyboard::Space;
+        },
+        [this] (sf::Event& e) {
+            if (this->_spaceClock == nullptr)
+                this->_spaceClock = std::make_shared<sf::Clock>();
+        }
+    );
+    sceneRenderingModule->addHandler(
+        [this] (const sf::Event& e) {
+            return e.type == sf::Event::KeyReleased
+                && e.key.code == sf::Keyboard::Space;
+        },
+        [this] (sf::Event& e) {
+            if (!this->_spaceClock)
+                return;
+            const auto chargePercentage = std::min(static_cast<int>(this->_spaceClock->getElapsedTime().asSeconds() * 100), 100);
+            this->addProjectile(Transform{.x = 100, .y = 100, .z = 0, .rotation = 0}, chargePercentage);
+            this->_spaceClock = nullptr;
+        }
+    );
 }
 
 void Level1::onExit()
