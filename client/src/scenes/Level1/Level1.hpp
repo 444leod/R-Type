@@ -50,11 +50,12 @@ class Level1 final : public engine::AScene
     void onExit(const AScene& nextScene) override;
 
   private:
-    void addProjectile(const Transform& transform);
+    void addProjectile(const Transform& transform, const int charge = 0) const;
     void addBug(const Transform& transform);
 
   public:
   private:
+    std::shared_ptr<sf::Clock> _spaceClock;
 };
 
 #endif // GAME_HPP

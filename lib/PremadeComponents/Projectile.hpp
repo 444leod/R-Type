@@ -12,6 +12,7 @@
 
 struct Projectile
 {
+    bool piercing;
     double range;
     std::uint32_t id;
 };

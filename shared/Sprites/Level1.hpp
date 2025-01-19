@@ -12,7 +12,7 @@
 
 inline const auto spaceshipSprite = Sprite{"assets/r-typesheet42.gif", {SCALE, SCALE}, {0, 0}, IntRect(0, 0, 34, 18)};
 
-inline const auto projectileSprite = Sprite{"assets/r-typesheet1.gif", {SCALE, SCALE}, {0, 0}, IntRect(0, 91, 48, 16)};
+inline const auto projectileSprite = Sprite{"assets/r-typesheet1.gif", {SCALE, SCALE}, {0, 0}, IntRect(0, 0, 0, 0)};
 
 inline const auto backgroundSprite = Sprite{"assets/rtype-background.png", {SCALE, SCALE}, {0, 0}, IntRect(0, 243, 3072, 205)};
 
