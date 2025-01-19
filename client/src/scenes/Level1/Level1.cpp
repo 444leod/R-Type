@@ -87,7 +87,7 @@ void Level1::onEnter(const AScene& lastScene)
         },
         [this] (sf::Event& e) {
             ntw::UDPPacket packet;
-            packet << PACKET_TYPE::USER_INPUT << UserInput{.key = e.key.code, .pressed = e.type != sf::Event::KeyPressed};
+            packet << PACKET_TYPE::USER_INPUT << UserInput{.key = e.key.code, .pressed = e.type == sf::Event::KeyPressed};
 
             const auto net = this->getModule<ANetworkSceneModule>();
             if (net == nullptr)
