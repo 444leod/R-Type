@@ -11,6 +11,7 @@
 #include <Engine/Systems/AUpdateSystem.hpp>
 
 #include "SharedComponents/Bug.hpp"
+#include "PremadeComponents/Transform.hpp"
 
 #include <cmath>
 

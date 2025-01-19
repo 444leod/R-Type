@@ -45,6 +45,10 @@ private:
     std::uint8_t _connectionAttempts = 0;
     double _pointTimer = 0;
     std::uint8_t _pointNumber = 0;
+
+    void handleCommand(const std::string& command);
+    void joinRoom(std::uint32_t roomId);
+    void showHelp();
 };
 
 

@@ -39,6 +39,11 @@ public:
 
 private:
     void _startGame(const std::vector<std::string>& args);
+    void handleCommand(const std::string& command);
+    void listRooms();
+    void startRoom(std::uint32_t roomId);
+    void createRoom(const std::string& name, std::uint8_t maxPlayers);
+    void showHelp();
 
 public:
 private:

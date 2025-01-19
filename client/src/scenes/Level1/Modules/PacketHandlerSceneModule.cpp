@@ -136,8 +136,5 @@ PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const 
     this->setHandler(PACKET_TYPE::MONSTER_KILLED, handleMonsterKilled);
 
     this->setHandler(PACKET_TYPE::MESSAGE, handleMessage);
-
-    this->setHandler(PACKET_TYPE::MESSAGE, handleMessage);
-}
-
+    }
 }

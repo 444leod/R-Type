@@ -71,6 +71,21 @@ void handleClientDisconnected(ecs::Registry& registry, const std::shared_ptr<ANe
     }
 }
 
+void handleRoomJoined(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
+    std::uint32_t roomId;
+    packet >> roomId;
+    std::cout << "Joined room " << roomId << std::endl;
+}
+
+void handleRoomStarted(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
+    std::uint32_t roomId;
+    packet >> roomId;
+    std::cout << "Room " << roomId << " started!" << std::endl;
+    engine::RestrictedGame::instance().scenes().load("game");
+}
+
 PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net) {
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
     this->setHandler(PACKET_TYPE::AUTHENTICATED, handleAuthenticated);
@@ -81,6 +96,9 @@ PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const 
     this->setHandler(PACKET_TYPE::START, handleGameStart);
 
     this->setHandler(PACKET_TYPE::CLIENT_DISCONNECTED, handleClientDisconnected);
+
+    this->setHandler(PACKET_TYPE::ROOM_JOINED, handleRoomJoined);
+    this->setHandler(PACKET_TYPE::ROOM_STARTED, handleRoomStarted);
 }
 
 }

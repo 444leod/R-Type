@@ -9,17 +9,19 @@
 #define WAITING_ROOM_PACKET_HANDLER_SCENE_MODULE_HPP
 
 #include "PremadeModules/Network/APacketHandlerSceneModule.hpp"
+#include <map>
+#include <asio.hpp>
 
 namespace waiting_room
 {
+    extern std::map<asio::ip::udp::endpoint, std::uint32_t> playerRooms;
 
-class PacketHandlerSceneModule final : public APacketHandlerSceneModule
-{
-public:
-    explicit PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net);
-    ~PacketHandlerSceneModule() override = default;
-};
-
+    class PacketHandlerSceneModule final : public APacketHandlerSceneModule
+    {
+      public:
+        explicit PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net);
+        ~PacketHandlerSceneModule() override = default;
+    };
 }
 
-#endif //WAITING_ROOM_PACKET_HANDLER_SCENE_MODULE_HPP
+#endif // WAITING_ROOM_PACKET_HANDLER_SCENE_MODULE_HPP

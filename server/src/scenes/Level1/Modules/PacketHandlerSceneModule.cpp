@@ -13,6 +13,8 @@
 #include "../Systems/ShipShotSystem.hpp"
 
 #include "Structures/UserInput.hpp"
+#include "../../WaitingRoom/Modules/PacketHandlerSceneModule.hpp"
+#include "../../../Room/RoomManager.hpp"
 
 namespace level1
 {
@@ -24,13 +26,16 @@ void handleDisconnect(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>
     removeClientSystem.execute(src, net);
 }
 
-void handleUserInput(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& source, ntw::UDPPacket& packet)
+void handleUserInput(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>& net, const asio::ip::udp::endpoint& source, ntw::UDPPacket& packet)
 {
+    auto roomId = waiting_room::playerRooms[source];
+    auto room = RoomManager::instance().getRoom(roomId);
+    if (!room || !room->isStarted) return;
+
     UserInput input{};
     packet >> input;
 
-    if (input.key >= sf::Keyboard::Left && input.key <= sf::Keyboard::Down)
-    {
+    if (input.key >= sf::Keyboard::Left && input.key <= sf::Keyboard::Down) {
         static ShipMovementSystem shipMovementSystem(net);
         shipMovementSystem.execute(source, input);
     }
@@ -48,4 +53,4 @@ PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const 
 
 }
 
-}
+} // namespace level1

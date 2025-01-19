@@ -6,6 +6,8 @@
 */
 
 #include "WaitingRoom.hpp"
+#include "../../Room/RoomManager.hpp"
+#include <sstream>
 
 #include <ECS/Registry.hpp>
 
@@ -37,36 +39,84 @@ void WaitingRoom::initialize()
 
 void WaitingRoom::update(const double& deltaTime)
 {
-    if (isInputAvailable()) {
-        if (std::string input;!std::getline(std::cin, input))
-        {
-            if (std::cin.eof())
-            {
-                _command_handlers["exit"]({});
-            }
-            else
-            {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            }
-        }
-        else
-        {
-            if (_command_handlers.contains(input))
-            {
-                std::vector<std::string> args;
-                std::istringstream iss(input);
-                std::string arg;
-                while (iss >> arg)
-                    args.push_back(arg);
-                _command_handlers.at(input)(args);
-            }
-        }
+    _executeUpdateSystems(deltaTime);
 
-        std::cout << "> " << std::flush;
+    auto& roomManager = RoomManager::instance();
+    for (const auto& room : roomManager.getRooms()) {
+        // if (room.isStarted && room.gameScene) {
+        //     room.gameScene->update(deltaTime);
+        //     roomManager.broadcastRoomState(room.id, getModule<ANetworkSceneModule>());
+        // }
     }
 
-    this->_executeUpdateSystems(deltaTime);
+    if (isInputAvailable()) {
+        std::string command;
+        std::getline(std::cin, command);
+        handleCommand(command);
+        std::cout << "> " << std::flush;
+    }
+}
+
+void WaitingRoom::handleCommand(const std::string& command) {
+    std::istringstream iss(command);
+    std::string cmd;
+    iss >> cmd;
+
+    if (cmd == "rooms") {
+        listRooms();
+    } else if (cmd == "create") {
+        std::string name;
+        int maxPlayersTemp;
+        if (iss >> name >> maxPlayersTemp) {
+            if (maxPlayersTemp < 0 || maxPlayersTemp > 255) {
+                std::cout << "Invalid number of players" << std::endl;
+                return;
+            }
+            std::cout << "Creating room " << name << " with " << static_cast<int>(maxPlayersTemp) << " players" << std::endl;
+            createRoom(name, static_cast<std::uint8_t>(maxPlayersTemp));
+        } else {
+            std::cout << "Usage: create <room_name> <max_players>" << std::endl;
+        }
+    } else if (cmd == "start") {
+        int roomIdTemp;
+        if (iss >> roomIdTemp) {
+            if (roomIdTemp < 0) {
+                std::cout << "Invalid room ID" << std::endl;
+                return;
+            }
+            std::cout << "Starting room " << roomIdTemp << std::endl;
+            startRoom(static_cast<std::uint32_t>(roomIdTemp));
+        } else {
+            std::cout << "Usage: start <room_id>" << std::endl;
+        }
+    } else if (cmd == "help") {
+        showHelp();
+    }
+}
+
+void WaitingRoom::listRooms() {
+    auto rooms = RoomManager::instance().getRooms();
+    if (rooms.empty()) {
+        std::cout << "No rooms available" << std::endl;
+        return;
+    }
+
+    std::cout << "Available rooms:" << std::endl;
+    for (const auto& room : rooms) {
+        std::cout << "Room " << room.id << " (" << room.name << "): "
+                 << room.players.size() << "/" << static_cast<int>(room.maxPlayers)
+                 << " players" << (room.isStarted ? " [STARTED]" : "[WAITING FOR START]") << std::endl;
+    }
+}
+
+void WaitingRoom::startRoom(std::uint32_t roomId) {
+    const auto net = this->getModule<ANetworkSceneModule>();
+    if (!net) {
+        std::cout << "Network module not found" << std::endl;
+        return;
+    }
+
+    RoomManager::instance().startRoom(roomId, net);
 }
 
 void WaitingRoom::onEnter()
@@ -113,7 +163,7 @@ void WaitingRoom::onExit()
 
 void WaitingRoom::onExit(const AScene& nextScene)
 {
-    std::cout << "Exiting to " << nextScene.name() << std::endl;
+    _registry.clear();
 }
 
 void WaitingRoom::_startGame(const std::vector<std::string> &)
@@ -133,4 +183,26 @@ void WaitingRoom::_startGame(const std::vector<std::string> &)
     packet << PACKET_TYPE::START;
 
     net->sendPacket(packet);
+}
+
+void WaitingRoom::createRoom(const std::string& name, std::uint8_t maxPlayers) {
+    if (maxPlayers < 1) {
+        std::cout << "Room must allow at least 1 players" << std::endl;
+        return;
+    }
+    if (maxPlayers > 10) { // lets be crazy
+        std::cout << "Room cannot have more than 10 players" << std::endl;
+        return;
+    }
+
+    auto room = RoomManager::instance().createRoom(name, maxPlayers);
+    std::cout << "Created room " << room->id << " (" << name << ") for " << static_cast<int>(maxPlayers) << " players" << std::endl;
+}
+
+void WaitingRoom::showHelp() {
+    std::cout << "Available commands:" << std::endl
+              << "  rooms                          - List all rooms" << std::endl
+              << "  create <name> <max_players>    - Create a new room" << std::endl
+              << "  start <room_id>               - Start a room" << std::endl
+              << "  help                          - Show this help" << std::endl;
 }
