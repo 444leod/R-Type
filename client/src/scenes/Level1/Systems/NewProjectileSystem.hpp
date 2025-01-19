@@ -17,6 +17,7 @@
 #include "PremadeComponents/Velocity.hpp"
 #include "SharedComponents/Ship.hpp"
 
+#include "SharedComponents/Enemy.hpp"
 #include <Config.hpp>
 #include <Sprites/Level1.hpp>
 #include <Utils/IntRect.hpp>
@@ -41,36 +42,45 @@ class NewProjectileSystem final : public engine::ASystem
         _lastShotTime = currentTime;
 
         try {
-            for (auto [_, ship, sTransform] : _registry.view<Ship, Transform>().each())
+            for (auto [entity, ship, sTransform] : _registry.view<Ship, Transform>().each())
             {
                 if (ship.id != shipId)
                     continue;
+                shape::Rectangle hitboxShape = {};
                 const auto projectile = _registry.create();
 
                 auto &sprite = _registry.addComponent(projectile, projectileSprite);
                 _registry.addComponent(projectile, transform);
                 _registry.addComponent(projectile, Projectile{charge > 20, SCALE * SCREEN_WIDTH + 80, projectileId});
                 if (charge <= 20) {
+                    hitboxShape = {
+                        .width = 80,
+                        .height = 50,
+                    };
                     sprite.textureRect = IntRect(0, 84, 80, 16);
-                    _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameDuration = .030, .frameCount = 3, .loop = false, .onEnd = [&](ecs::Entity entity){
-                        _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
+                    _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameDuration = .030, .frameCount = 3, .loop = false, .onEnd = [this](ecs::Entity entity){
+                        if (_registry.has_any_of<Transform>(entity)) {
+                            _registry.addComponent(entity, Velocity{.x = 200, .y = 0});
+                        }
                     }});
                 } else {
                     sprite.textureRect = IntRect(0, 84 + 16 * (charge / 20), 80, 16);
+                    hitboxShape = {
+                        .width = 40 * static_cast<float>(charge) / 15,
+                        .height = 50,
+                    };
                     _registry.addComponent(projectile, Animation{.frameSize = {80, 16}, .frameDuration = .050, .frameCount = 2, .loop = true});
                     _registry.addComponent(projectile, Velocity{.x = 200, .y = 0});
                 }
                 _registry.addComponent(projectile, Hitbox{
-                    .shape = shape::Rectangle{
-                        .width = 80,
-                        .height = 16,
-                    },
-                    .onCollision = [this] (const ecs::Entity entity) {
-                        if (_registry.has_any_of<Enemy>(entity)) {
+                    .shape = hitboxShape,
+                    .onCollision = [this](const ecs::Entity entity) {
+                        if (_registry.has_any_of<Transform, Enemy>(entity)) {
                             _registry.remove(entity);
                         }
-                    },
+                    }
                 });
+
                 return;
             }
         } catch (const std::exception& e) {

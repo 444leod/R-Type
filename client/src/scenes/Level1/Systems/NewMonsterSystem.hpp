@@ -13,7 +13,7 @@
 #include "PremadeComponents/Hitbox.hpp"
 #include "PremadeComponents/Transform.hpp"
 #include "PremadeComponents/Velocity.hpp"
-
+#include "PremadeComponents/Projectile.hpp"
 #include "SharedComponents/Enemy.hpp"
 
 #include <SharedComponents/Bug.hpp>
@@ -34,13 +34,13 @@ class NewMonsterSystem final : public engine::ASystem
       _registry.addComponent(monster, Bug{});
       _registry.addComponent(monster, Hitbox{
         .shape = shape::Circle{
-          .radius = 20,
+          .radius = 45,
           .fillColor = {100, 100, 100, 80}
         },
-        .onCollision = [this] (const ecs::Entity entity)
-        {
-          if (_registry.has_any_of<Projectile>(entity))
+        .onCollision = [this](const ecs::Entity entity) {
+          if (_registry.has_any_of<Projectile>(entity)) {
             _registry.remove(entity);
+          }
         }
       });
     };

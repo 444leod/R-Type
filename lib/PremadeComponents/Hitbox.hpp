@@ -18,7 +18,7 @@
 struct Hitbox
 {
     std::variant<shape::Rectangle, shape::Circle> shape;
-    std::function<void(const ecs::Entity& other)> onCollision;
+    std::function<void(const ecs::Entity)> onCollision = [](const ecs::Entity){};
 };
 
 #endif // HITBOX_HPP

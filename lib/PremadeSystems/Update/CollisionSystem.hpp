@@ -14,6 +14,7 @@
 #include "PremadeComponents/Transform.hpp"
 
 #include <cmath>
+#include <vector>
 
 inline bool pointInRectangle(const float& px, const float& py, const float& rx, const float& ry, const float& rw, const float& rh, const float& cosAngle, const float& sinAngle)
 {
@@ -34,6 +35,7 @@ class CollisionSystem final : public engine::AUpdateSystem
     void execute(const double&) override
     {
         auto view = _registry.view<Hitbox, Transform>();
+        std::vector<std::pair<ecs::Entity, ecs::Entity>> collisions;
 
         for (auto it1 = view.begin(); it1 != view.end(); ++it1)
         {
@@ -45,9 +47,20 @@ class CollisionSystem final : public engine::AUpdateSystem
 
                 if (checkCollision(hitbox1, transform1, hitbox2, transform2))
                 {
-                    hitbox1.onCollision(entity2);
-                    hitbox2.onCollision(entity1);
+                    collisions.emplace_back(entity1, entity2);
                 }
+            }
+        }
+
+        for (const auto& [entity1, entity2] : collisions)
+        {
+            if (_registry.has_any_of<Hitbox>(entity1)) {
+                auto& hitbox1 = _registry.get<Hitbox>(entity1);
+                hitbox1.onCollision(entity2);
+            }
+            if (_registry.has_any_of<Hitbox>(entity2)) {
+                auto& hitbox2 = _registry.get<Hitbox>(entity2);
+                hitbox2.onCollision(entity1);
             }
         }
     }
