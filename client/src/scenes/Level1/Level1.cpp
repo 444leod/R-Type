@@ -9,6 +9,7 @@
 
 #include "PremadeModules/Network/ANetworkGameModule.hpp"
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
+#include "PremadeModules/Audio/ASceneAudioModule.hpp"
 
 #include "PremadeComponents/Displayable/Animation.hpp"
 #include "PremadeComponents/Hitbox.hpp"
@@ -42,6 +43,12 @@ void Level1::onEnter()
 
 void Level1::onEnter(const AScene& lastScene)
 {
+    const auto audio = this->getModule<ASceneAudioModule>();
+    if (audio != nullptr) {
+        audio->playMusic("assets/space.wav", true);
+        audio->playSound("assets/laser.wav");
+    }
+
     _registry.clear();
     _lastShotTime = 0.0;  // Initialisation du timer de tir
 

@@ -12,3 +12,4 @@ find_package(asio CONFIG REQUIRED)
 
 add_subdirectory(client)
 add_subdirectory(server)
+add_subdirectory(orchera)
