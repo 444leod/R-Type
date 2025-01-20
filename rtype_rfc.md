@@ -6,6 +6,12 @@
   - [Introduction](#introduction)
   - [Features](#features)
   - [Packet Structure](#packet-structure)
+    - [Basic Packet Format](#basic-packet-format)
+    - [Compression](#compression)
+      - [Uncompressed Packet](#uncompressed-packet)
+      - [Compressed Packet](#compressed-packet)
+      - [RLE Compression Format](#rle-compression-format)
+      - [Compression Rules](#compression-rules)
   - [Packet Types](#packet-types)
   - [Network Communication](#network-communication)
     - [Client Information Structure](#client-information-structure)
@@ -22,8 +28,8 @@
     - [Player Movement](#player-movement)
     - [Weapon Firing](#weapon-firing)
     - [Monster Spawn](#monster-spawn)
-  - [Data Serialization](#data-serialization)
-    - [Basic Types](#basic-types)
+  - [Data Serialization and Deserialization](#data-serialization-and-deserialization)
+    - [Packet Serialization Format](#packet-serialization-format)
     - [Strings and Arrays](#strings-and-arrays)
     - [Complex Example](#complex-example)
 
@@ -41,12 +47,68 @@ The R-Type network protocol supports the following features:
 
 ## Packet Structure
 
-All network communication is done through UDP packets. Each packet contains:
-- A checksum for packet validation
-- A packet type identifier
-- A payload containing the actual data
+### Basic Packet Format
+Each packet starts with:
+```
+[4 bytes] Magic number (0xA0CD if compressed)
+[4 bytes] Packet size
+[2 bytes] Checksum
+[N bytes] Payload
+```
 
-The server validates incoming packets by comparing the calculated checksum with the provided one.
+### Compression
+
+The protocol uses RLE (Run-Length Encoding) compression for large packets. 
+
+#### Uncompressed Packet
+When sending uncompressed data:
+```
+[N bytes] Raw serialized data
+```
+
+#### Compressed Packet
+When compression is used:
+```
+[4 bytes] Magic number (0xA0CD)
+[4 bytes] Compressed data size
+[N bytes] RLE compressed data
+```
+
+#### RLE Compression Format
+Compressed data consists of sequences:
+```
+[1 byte] Count (1-255)
+[1 byte] Value
+```
+
+Example:
+```
+Original:   AAAAABBBCC
+Compressed: [0x05]A [0x03]B [0x02]C
+```
+
+#### Compression Rules
+
+1. Compression is attempted every time a packet is sent
+
+2. Compression is used when:
+   - Compressed size < Original size
+
+3. Packet Processing:
+   ```cpp
+   if (magicNumber == 0xA0CD) {
+       // Read compressed size
+       // Decompress data
+       // Verify checksum
+   } else {
+       // Process as uncompressed
+   }
+   ```
+
+4. Error Handling:
+   - Invalid magic number: treat as uncompressed
+   - Checksum mismatch for uncompressed or compressed packet: discard packet
+   - Decompression failure: discard packet
 
 ## Packet Types
 
@@ -207,24 +269,20 @@ Server -> All: NEW_MONSTER {
 }
 ```
 
-## Data Serialization
+## Data Serialization and Deserialization
 
-The protocol uses a specific format for serializing different data types in packet payloads:
+### Packet Serialization Format
 
-### Basic Types
-For basic types (int, float, etc.):
+Each serialized packet contains:
 ```
-[1 byte] Data size
-[N bytes] Data content
+[4 bytes] Sequence number
+[4 bytes] Acknowledgment number
+[2 bytes] Payload length
+[2 bytes] Checksum
+[N bytes] Payload data
 ```
-
-Example with int32:
-```
-[1 byte] Size = 4
-[4 bytes] Integer value
-```
-
 ### Strings and Arrays
+
 For variable-length data (strings, arrays):
 ```
 [2 bytes] Length of the sequence
