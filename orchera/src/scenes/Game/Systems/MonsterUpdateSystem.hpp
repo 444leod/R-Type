@@ -63,7 +63,7 @@ public:
     {
     }
 
-    void execute(const double& deltaTime) override
+    void _execution(double deltaTime) override
     {
         spawnMonster(deltaTime);
         updateVelocity();

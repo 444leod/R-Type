@@ -23,7 +23,7 @@ public:
     {
     }
 
-    void execute(const double& deltaTime)
+    void _execution(double deltaTime) override
     {
         _registry.view<DamageProtection>().each([&](const ecs::Entity& entity, DamageProtection& damageProtection) {
             damageProtection.duration -= deltaTime;

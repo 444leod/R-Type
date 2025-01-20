@@ -81,7 +81,7 @@ class AUpdateSystem : public engine::ASystem
      * @brief Execute a 'update' system's logic
      * @param deltaTime The time between the last frame and the current one
      */
-    virtual void execute(const double& deltaTime) = 0;
+    virtual void execute(double deltaTime) = 0;
 };
 ```
 

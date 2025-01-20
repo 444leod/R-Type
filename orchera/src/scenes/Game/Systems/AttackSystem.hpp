@@ -40,7 +40,7 @@ public:
     {
     }
 
-    void execute(const double& deltaTime)
+    void _execution(double deltaTime)
     {
         _registry.view<Transform, Weapon, Target>().each([&](const ecs::Entity& entity, const Transform& transform, Weapon& weapon, const Target& target) {
             std::visit([&](auto& weaponType) {

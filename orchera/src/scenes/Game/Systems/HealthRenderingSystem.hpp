@@ -24,7 +24,7 @@ public:
     {
     }
 
-    void execute(sf::RenderWindow &window) override
+    void _execution(sf::RenderWindow &window) override
     {
         _registry.view<Transform, Health>().each([&](const ecs::Entity& entity, const Transform& transform, const Health& health) {
             if (health.health <= 0)

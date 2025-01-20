@@ -28,7 +28,7 @@ public:
     {
     }
 
-    void execute(const double& deltaTime)
+    void _execution(double deltaTime) override
     {
         const auto& borders = _registry.view<Transform, Border>().each();
         _registry.view<Monster, Transform, Velocity>().each([&](const ecs::Entity& entity, const Monster& monster, Transform &transform, const Velocity &velocity) {
