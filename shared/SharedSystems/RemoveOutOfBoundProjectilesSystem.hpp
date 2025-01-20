@@ -23,6 +23,7 @@ class RemoveOutOfBoundProjectilesSystem final : public engine::AUpdateSystem
 public:
     explicit RemoveOutOfBoundProjectilesSystem() : AUpdateSystem("RemoveOutOfBoundProjectilesSystem") {}
 
+private:
     void _execution(double deltaTime) override {
         _registry.view<Projectile, Velocity, Transform>().each([&](const ecs::Entity& entity, Projectile& projectile, const Velocity& velocity, const Transform& transform) {
         double distanceTraveled = std::sqrt(std::pow(velocity.x * SCALE * deltaTime, 2) + std::pow(velocity.y * SCALE * deltaTime, 2));
