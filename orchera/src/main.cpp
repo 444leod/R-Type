@@ -10,6 +10,7 @@
 
 #include "PremadeModules/Rendering/GameRenderingModule.hpp"
 #include "PremadeModules/Rendering/ASceneRenderingModule.hpp"
+#include "PremadeModules/Profiling/GameProfilingModule.hpp"
 
 #include "scenes/HomeScreen/HomeScreen.hpp"
 
@@ -17,6 +18,7 @@ int main() {
     auto game = engine::Game();
 
     game.addModule<GameRenderingModule>(598, 1012, "Orchera");
+    game.addModule<GameProfilingModule>("assets/arial.ttf");
 
     const auto homeScreen = game.registerScene<HomeScreen>("home screen");
     {
