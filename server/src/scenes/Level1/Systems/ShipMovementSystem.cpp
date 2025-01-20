@@ -33,22 +33,22 @@ void ShipMovementSystem::execute(const asio::ip::udp::endpoint& source, const Us
         return;
 
     const auto [id] = _registry.get<Ship>(*entityId);
-    auto velocity = _registry.get<Velocity>(*entityId);
+    auto& velocity = _registry.get<Velocity>(*entityId);
     const auto pos = _registry.get<Transform>(*entityId);
 
     switch (input.key)
     {
     case sf::Keyboard::Key::Up:
-        velocity.y += input.pressed ? -75 : 75;
+        velocity.y = input.pressed ? -75 : 0;
         break;
     case sf::Keyboard::Key::Down:
-        velocity.y += input.pressed ? 75 : -75;
+        velocity.y = input.pressed ? 75 : 0;
         break;
     case sf::Keyboard::Key::Left:
-        velocity.x += input.pressed ? -75 : 75;
+        velocity.x = input.pressed ? -75 : 0;
         break;
     case sf::Keyboard::Key::Right:
-        velocity.x += input.pressed ? 75 : -75;
+        velocity.x = input.pressed ? 75 : 0;
         break;
     default:
         break;
