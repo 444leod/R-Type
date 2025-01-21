@@ -21,7 +21,7 @@ class DrawShapeSystem final : public ARenderSystem
   public:
     DrawShapeSystem() : ARenderSystem("DrawShapeSystem") {}
 
-    void execute(sf::RenderWindow& window) override
+    void _execution(sf::RenderWindow& window) override
     {
 
         auto view = _registry.view<shape::Circle, Transform>();

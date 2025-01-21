@@ -21,7 +21,7 @@ class DrawButtonsSystem final : public ARenderSystem
   public:
     explicit DrawButtonsSystem(ResourcesManager& resourcesManager) : ARenderSystem("DrawButtonsSystem"), _textures(resourcesManager.textures()), _fonts(resourcesManager.fonts()) {}
 
-    void execute(sf::RenderWindow& window) override
+    void _execution(sf::RenderWindow& window) override
     {
         sf::RectangleShape rectangle;
         sf::Sprite sprite;

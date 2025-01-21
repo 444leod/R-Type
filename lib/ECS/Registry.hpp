@@ -51,6 +51,7 @@ class Registry
     {
         const auto entity = Registry::_get_new_entity_id();
 
+        _instances++;
         _entities.emplace_back(entity);
         return entity;
     }
@@ -59,7 +60,11 @@ class Registry
      * @brief Deletes an Entity and all attached components
      * @param entity The Entity to delete
      */
-    void remove(const Entity entity) { _queue_remove.push_back(entity); }
+    void remove(const Entity entity)
+    {
+        _deletions++;
+        _queue_remove.push_back(entity);
+    }
 
     /**
      * @brief Call the registry flush
@@ -83,6 +88,7 @@ class Registry
     {
         for (auto const& [id, sparse] : _sparse_sets)
             sparse->clear();
+        _deletions += _entities.size();
         _entities.clear();
     }
 
@@ -241,6 +247,12 @@ class Registry
         return set->at(entity);
     }
 
+
+    const std::map<std::size_t, ISparseSet *>& sparseSets() const noexcept { return this->_sparse_sets; }
+    const std::vector<Entity>& entities() const noexcept { return this->_entities; }
+    uint32_t instances() const noexcept { return this->_instances; }
+    uint32_t deletions() const noexcept { return this->_deletions; }
+
   private:
     /**
      * @brief Gets a new available Entity ID
@@ -255,6 +267,9 @@ class Registry
     std::vector<Entity> _queue_remove = {};
     std::vector<Entity> _entities = {};
     std::map<std::size_t, ISparseSet*> _sparse_sets = {};
+
+    uint32_t _instances = 0;
+    uint32_t _deletions = 0;
 };
 } // namespace ecs
 

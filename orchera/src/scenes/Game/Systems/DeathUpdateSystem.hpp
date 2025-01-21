@@ -48,7 +48,7 @@ public:
     {
     }
 
-    void execute(const double& deltaTme) override
+    void _execution(double deltaTme) override
     {
         _registry.view<Health>().each([&](const ecs::Entity& entity, Health& health) {
             if (health.health <= 0)

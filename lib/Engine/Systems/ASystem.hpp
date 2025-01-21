@@ -11,6 +11,7 @@
 #include <ECS/Registry.hpp>
 #include <Engine/RestrictedGame.hpp>
 
+#include <map>
 #include <string>
 #include <utility>
 
@@ -18,7 +19,7 @@ namespace engine
 {
 class ASystem
 {
-  public:
+public:
     explicit ASystem(std::string name) : _registry(engine::RestrictedGame::instance().registry()), _name(std::move(name)) {}
     virtual ~ASystem() = default;
 
@@ -44,12 +45,34 @@ class ASystem
      */
     [[nodiscard]] std::string name() const { return _name; }
 
-  protected:
+    /**
+     * @brief Gets a reference of all the systems execution times
+     * @return The execution times
+     */
+    [[nodiscard]] static const std::map<std::string, double>& executionTimes() { return _executionTimes; }
+
+protected:
+    /**
+     * @brief Sets / Replace the saved execution time for a given system
+     * @param system The system's name
+     * @param time The execution time value
+     */
+    void _setExecutionTime(const std::string& system, double time) {
+        _executionTimes[system] = time;
+    }
+
+protected:
     ecs::Registry& _registry;
     bool _enabled = true;
     const std::string _name;
+
+private:
+    static std::map<std::string, double> _executionTimes; // this is like a big time registry
 };
 
 } // namespace engine
+
+// Default declaration
+inline std::map<std::string, double> engine::ASystem::_executionTimes = {};
 
 #endif // A_SYSTEM_HPP

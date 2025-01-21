@@ -9,6 +9,7 @@
 
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
 #include "PremadeModules/Rendering/GameRenderingModule.hpp"
+#include "PremadeModules/Profiling/GameProfilingModule.hpp"
 #include "PremadeModules/Audio/GameAudioModule.hpp"
 
 #include "GameModules/NetworkGameModule.hpp"
@@ -26,6 +27,7 @@ int main()
     auto game = engine::Game();
 
     game.addModule<GameRenderingModule>(SCREEN_WIDTH * SCALE, SCREEN_HEIGHT * SCALE, "R-Type - Client");
+    game.addModule<GameProfilingModule>("assets/arial.ttf");
 
     const auto networkGameModule = game.addModule<NetworkGameModule>();
 

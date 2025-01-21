@@ -24,7 +24,7 @@ class DrawSpritesSystem final : public ARenderSystem
   public:
     explicit DrawSpritesSystem(ResourcesManager& resourceManager) : ARenderSystem("DrawSpritesSystem"), _textures(resourceManager.textures()) {}
 
-    void execute(sf::RenderWindow& window) override
+    void _execution(sf::RenderWindow& window) override
     {
         sf::Sprite sp{};
         auto vec = std::vector<std::tuple<ecs::Entity, Sprite, Transform>>{};
