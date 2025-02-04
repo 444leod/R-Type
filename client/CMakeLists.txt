@@ -4,17 +4,14 @@ set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/client/include)
 set(SHARED_DIR ${CMAKE_SOURCE_DIR}/shared)
 
-set(SRC_FILES
-    main.cpp
-    scenes/WaitingRoom/WaitingRoom.cpp
-    scenes/WaitingRoom/Modules/PacketHandlerSceneModule.cpp
-    scenes/Level1/Level1.cpp
-    scenes/Level1/Modules/PacketHandlerSceneModule.cpp
+add_executable(${PROJECT_NAME}
+        src/main.cpp
+        src/scenes/WaitingRoom/WaitingRoom.cpp
+        src/scenes/WaitingRoom/Modules/PacketHandlerSceneModule.cpp
+        src/scenes/Level1/Level1.cpp
+        src/scenes/Level1/Modules/PacketHandlerSceneModule.cpp
+        src/scenes/EndScreen/EndScreen.cpp
 )
-
-list(TRANSFORM SRC_FILES PREPEND "src/")
-
-add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE asio::asio sfml::sfml)
 target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR})
