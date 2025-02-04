@@ -10,6 +10,8 @@ set(SRC_FILES
     scenes/WaitingRoom/Modules/PacketHandlerSceneModule.cpp
     scenes/Level1/Level1.cpp
     scenes/Level1/Modules/PacketHandlerSceneModule.cpp
+    scenes/Win/Win.cpp
+    scenes/Lose/Lose.cpp
 )
 
 list(TRANSFORM SRC_FILES PREPEND "src/")

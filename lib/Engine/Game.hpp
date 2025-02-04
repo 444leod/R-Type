@@ -29,7 +29,7 @@ concept ConstructibleGameModule = std::constructible_from<T, Params...>;
 class Game final : public RestrictedGame
 {
   public:
-    Game() = default;
+    Game() : _sceneManager(this->_modules) {}
     ~Game() override = default;
 
     [[nodiscard]] const ecs::Registry& registry() const override { return this->_registry; }
@@ -58,21 +58,18 @@ class Game final : public RestrictedGame
     {
         this->_running = true;
         this->_sceneManager.load(scene);
-        this->_sceneManager.update();
         auto before = std::chrono::high_resolution_clock::now();
         double deltaTime = .0;
 
         for (const auto& module : this->_modules)
         {
             module->start(this->_sceneManager.current());
-            module->refresh(this->_sceneManager.current());
+            // module->refresh(this->_sceneManager.current());
         }
+        this->_sceneManager.update();
 
         while (_running)
         {
-            if (this->_sceneManager.update())
-                for (const auto& module : this->_modules)
-                    module->refresh(this->_sceneManager.current());
             for (const auto& module : this->_modules)
                 module->update();
             this->_sceneManager.current().update(deltaTime);
@@ -100,7 +97,7 @@ class Game final : public RestrictedGame
     ecs::Registry _registry;
     ecs::EventDispatcher _events;
 
-    std::vector<std::shared_ptr<AGameModule>> _modules;
+    std::vector<std::shared_ptr<AGameModule>> _modules = {};
     SceneManager _sceneManager;
 
     double _targetDeltaTime = 1000.0 / 60.0;

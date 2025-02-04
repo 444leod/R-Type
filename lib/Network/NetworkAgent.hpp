@@ -87,13 +87,13 @@ class NetworkAgent
         if (compressed.empty())
         {
             // Uncompressed packet
-            std::cout << "Sending uncompressed packet" << std::endl;
+            // std::cout << "Sending uncompressed packet" << std::endl;
             auto serialized = packet.serialize();
             this->_socket.async_send_to(asio::buffer(serialized), dest, std::bind(&NetworkAgent::_handleSend, this, asio::placeholders::error, asio::placeholders::bytes_transferred));
             return;
         }
 
-        std::cout << "Sending compressed packet" << std::endl;
+        // std::cout << "Sending compressed packet" << std::endl;
         // Add magic number (0xA0CD) and compressed size
         std::vector<std::byte> finalPacket;
         const uint32_t magicNumber = 0xA0CD;

@@ -27,10 +27,19 @@
 
 void Level1::initialize() {}
 
-void Level1::update(const double& deltaTime) { _executeUpdateSystems(deltaTime); }
+void Level1::update(const double& deltaTime)
+{
+    _executeUpdateSystems(deltaTime);
+    if (_networkModule == nullptr)
+        return;
+    // std::cout << "clients: " << _networkModule->clients().size() << std::endl;
+    if (_networkModule->clients().empty())
+        engine::RestrictedGame::instance().stop();
+}
 
 void Level1::onEnter()
 {
+    _networkModule = this->getModule<ANetworkSceneModule>();
     _registry.clear();
     const auto spaceship = _registry.create();
 
@@ -60,6 +69,8 @@ void Level1::onEnter()
     {
         const auto spaceship = _registry.create();
 
+        std::cout << "spaceship: " << spaceship << std::endl;
+
         _registry.addComponent(spaceship, spaceshipSprite);
         _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
         _registry.addComponent(spaceship, Hitbox{});
@@ -84,6 +95,7 @@ void Level1::onEnter()
 
 void Level1::onEnter(const AScene& lastScene)
 {
+    _networkModule = this->getModule<ANetworkSceneModule>();
     _registry.clear();
 
     const auto background = _registry.create();
@@ -103,6 +115,8 @@ void Level1::onEnter(const AScene& lastScene)
     {
         const auto spaceship = _registry.create();
 
+        std::cout << "spaceship: " << spaceship << std::endl;
+
         _registry.addComponent(spaceship, spaceshipSprite);
         _registry.addComponent(spaceship, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
         _registry.addComponent(spaceship, Hitbox{});
@@ -113,6 +127,7 @@ void Level1::onEnter(const AScene& lastScene)
         ntw::UDPPacket packet;
         packet << PACKET_TYPE::YOUR_SHIP << client.id << _registry.get<Transform>(spaceship) << _registry.get<Velocity>(spaceship);
         net->sendPacket(client.endpoint, packet);
+        std::cout << "sent ship packet of size " << packet.size() << std::endl;
 
         ntw::UDPPacket broadcast;
         broadcast << PACKET_TYPE::NEW_SHIP << client.id << _registry.get<Transform>(spaceship) << _registry.get<Velocity>(spaceship);

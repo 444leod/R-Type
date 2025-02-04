@@ -30,7 +30,7 @@ void handleConnect(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneM
 
     std::string name;
     packet >> name;
-    std::cout << "Client connected: " << name << std::endl;
+    std::cout << "Client connected: " << name << ", endpoint: " << src << std::endl;
 
     const ntw::ClientInformation clientInfo(src, name);
 
@@ -42,6 +42,8 @@ void handleConnect(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneM
 
     ntw::UDPPacket response;
     response << PACKET_TYPE::AUTHENTICATED;
+    std::cout << "sending packet of type: " << packetTypeToString.at(PACKET_TYPE::AUTHENTICATED) << " (" << static_cast<std::uint32_t>(PACKET_TYPE::AUTHENTICATED) << ")" << std::endl;
+    std::cout << "authenticated type: " << static_cast<std::uint32_t>(response.get<PACKET_TYPE>()) << std::endl;
     response << clientInfo.id << clientInfo.name;
 
     net->addClient(clientInfo);

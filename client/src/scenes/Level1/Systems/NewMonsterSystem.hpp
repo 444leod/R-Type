@@ -16,6 +16,7 @@
 #include "PremadeComponents/Projectile.hpp"
 #include "SharedComponents/Enemy.hpp"
 
+#include <PremadeComponents/Tags/Debug.hpp>
 #include <SharedComponents/Bug.hpp>
 #include <Sprites/Level1.hpp>
 
@@ -24,7 +25,7 @@ class NewMonsterSystem final : public engine::ASystem
   public:
     explicit NewMonsterSystem() : ASystem("NewMonsterSystem") {}
 
-    void execute(const std::uint32_t& id, const std::uint8_t& type, const Transform& transform, const Velocity& velocity) const
+    void execute(const std::uint32_t& id, const std::uint8_t& type, const Transform& transform, const Velocity& velocity)
     {
       const auto monster = _registry.create();
       _registry.addComponent(monster, bugSprite);
@@ -44,6 +45,9 @@ class NewMonsterSystem final : public engine::ASystem
         }
       });
     };
+
+private:
+  uint32_t _points = 0;
 };
 
 #endif /* !NEW_MONSTER_SYSTEM_HPP_ */

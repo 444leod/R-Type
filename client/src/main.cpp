@@ -19,6 +19,10 @@
 #include "scenes/WaitingRoom/Modules/PacketHandlerSceneModule.hpp"
 #include "scenes/WaitingRoom/WaitingRoom.hpp"
 
+#include "scenes/Win/Win.hpp"
+
+#include "scenes/Lose/Lose.hpp"
+
 #include "Config.hpp"
 
 int main()
@@ -46,6 +50,9 @@ int main()
         level1->addModule<ASceneRenderingModule>();
         level1->addModule<ASceneAudioModule>();
     }
+
+    game.registerScene<Win>("win");
+    game.registerScene<Lose>("lose");
 
     game.run();
     return 0;

@@ -21,6 +21,7 @@
 #include "Sprites/Level1.hpp"
 
 #include <chrono>
+#include <PremadeModules/Network/ANetworkSceneModule.hpp>
 
 class Level1 final : public engine::AScene
 {
@@ -53,6 +54,7 @@ class Level1 final : public engine::AScene
   public:
   private:
     std::uint32_t _enemyId = 0;
+    std::shared_ptr<ANetworkSceneModule> _networkModule;
 };
 
 #endif // GAME_HPP

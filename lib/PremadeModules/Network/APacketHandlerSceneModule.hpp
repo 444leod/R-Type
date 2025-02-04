@@ -38,7 +38,10 @@ class APacketHandlerSceneModule : public engine::ASceneModule
         packet >> type;
 
         if (!this->_packetHandlers.contains(static_cast<std::size_t>(type)))
+        {
+          std::cout << "not handled..." << std::endl;
             return;
+        }
         this->_packetHandlers.at(static_cast<std::size_t>(type))(_registry, _net, src, packet);
     }
 

@@ -11,7 +11,7 @@
 #include "ANetworkGameModule.hpp" // Include full definition of ANetworkGameModule
 #include "Engine/Modules/ASceneModule.hpp"
 
-class ANetworkSceneModule : public engine::ASceneModule
+class ANetworkSceneModule final : public engine::ASceneModule
 {
   public:
     explicit ANetworkSceneModule(engine::AScene& scene, ANetworkGameModule& networkGameModule) : ASceneModule(scene), _networkGameModule(networkGameModule) {}
@@ -19,7 +19,11 @@ class ANetworkSceneModule : public engine::ASceneModule
 
     void stop() const { this->_networkGameModule.stop(); }
 
-    void sendPacket(const asio::ip::udp::endpoint& dest, const ntw::UDPPacket& packet) const { this->_networkGameModule.sendPacket(dest, packet); }
+    void sendPacket(const asio::ip::udp::endpoint& dest, const ntw::UDPPacket& packet) const
+    {
+      std::cout << "sending packet to game module: " << dest << std::endl;
+      this->_networkGameModule.sendPacket(dest, packet);
+    }
 
     void sendPacket(const std::uint32_t& clientId, ntw::UDPPacket& packet) const { this->_networkGameModule.sendPacket(clientId, packet); }
 

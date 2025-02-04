@@ -10,6 +10,7 @@
 
 #include <Engine/AScene.hpp>
 #include <Engine/RestrictedSceneManager.hpp>
+#include <Engine/Modules/AGameModule.hpp>
 
 #include <chrono>
 #include <exception>
@@ -61,7 +62,7 @@ class SceneManager final : public RestrictedSceneManager
         std::string _message; ///< The exception message.
     };
 
-    SceneManager() = default;
+    explicit SceneManager(std::vector<std::shared_ptr<AGameModule>>& modules) : RestrictedSceneManager(modules) {}
     ~SceneManager() override = default;
 
     /**
@@ -102,7 +103,10 @@ class SceneManager final : public RestrictedSceneManager
         if (!this->_running)
             return;
         if (this->_scenes.contains(name))
-            this->_loadingName = name;
+        {
+          this->_loadingName = name;
+          this->update();
+        }
     }
 
     /**
@@ -117,13 +121,11 @@ class SceneManager final : public RestrictedSceneManager
 
     /**
      * @brief Updates the state of the current scene.
-     *
-     * @return true if the scene was updated, false otherwise.
      */
-    bool update()
+    void update()
     {
         if (this->_loadingName.empty() || !this->_scenes.contains(this->_loadingName))
-            return false;
+            return;
 
         /// Exit the current scene if there was on e
         const auto next = this->_scenes[this->_loadingName];
@@ -134,7 +136,8 @@ class SceneManager final : public RestrictedSceneManager
         this->_current = next;
         old != nullptr ? this->_current->onEnter(*old) : this->_current->onEnter();
         this->_loadingName = "";
-        return true;
+        for (const auto& module : this->_modules)
+          module->refresh(*this->_current);
     }
 
     /**

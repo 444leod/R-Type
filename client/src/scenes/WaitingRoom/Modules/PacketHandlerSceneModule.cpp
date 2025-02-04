@@ -69,6 +69,11 @@ void handleClientDisconnected(ecs::Registry& registry, const std::shared_ptr<ANe
     }
 }
 
+void handleCurrentPlayerShip(ecs::Registry& registry, const std::shared_ptr<ANetworkSceneModule>&, const asio::ip::udp::endpoint&, ntw::UDPPacket& packet)
+{
+    std::cout << "your ship handled not where it should.." << std::endl;
+}
+
 PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const std::shared_ptr<ANetworkSceneModule>& net) : APacketHandlerSceneModule(scene, net)
 {
     this->setHandler(PACKET_TYPE::DISCONNECT, handleDisconnect);
@@ -80,6 +85,8 @@ PacketHandlerSceneModule::PacketHandlerSceneModule(engine::AScene& scene, const 
     this->setHandler(PACKET_TYPE::START, handleGameStart);
 
     this->setHandler(PACKET_TYPE::CLIENT_DISCONNECTED, handleClientDisconnected);
+
+    this->setHandler(PACKET_TYPE::YOUR_SHIP, handleCurrentPlayerShip);
 }
 
 } // namespace waiting_room
