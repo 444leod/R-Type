@@ -55,6 +55,7 @@ void handleCurrentPlayerShip(ecs::Registry& registry, const std::shared_ptr<ANet
     Transform transform{};
     Velocity velocity{};
     packet >> id >> transform >> velocity;
+    std::cout << "player ship: " << id << std::endl;
 
     const auto spaceship = newShipSystem.execute(id, transform, velocity);
     registry.addComponent(spaceship, Self{});
@@ -65,6 +66,7 @@ void handleNewShip(ecs::Registry&, const std::shared_ptr<ANetworkSceneModule>&, 
     static NewShipSystem newShipSystem{};
 
     std::uint32_t id;
+    std::cout << "new ship: " << id << std::endl;
     Transform transform{};
     Velocity velocity{};
     packet >> id >> transform >> velocity;

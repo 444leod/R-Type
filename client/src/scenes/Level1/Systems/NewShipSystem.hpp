@@ -15,6 +15,7 @@
 #include "PremadeComponents/Velocity.hpp"
 
 #include "SharedComponents/Ship.hpp"
+#include "SharedComponents/Enemy.hpp"
 
 #include <PremadeComponents/Tags/Self.hpp>
 
@@ -29,7 +30,21 @@ class NewShipSystem final : public engine::ASystem
       _registry.addComponent(spaceship, Ship{.id = id});
       _registry.addComponent(spaceship, transform);
       _registry.addComponent(spaceship, velocity);
-      _registry.addComponent(spaceship, Hitbox{});
+      _registry.addComponent(spaceship, Debug{}),
+      _registry.addComponent(spaceship, Hitbox{
+        .shape = shape::Rectangle{
+            .width = 150,
+            .height = 80,
+            .fillColor = { 255, 0, 0, 150}
+        },
+        .onCollision = [this](const ecs::Entity& entity)
+        {
+          if (_registry.has_any_of<Enemy>(entity))
+          {
+            engine::RestrictedGame::instance().scenes().load("lose");
+          }
+        }
+      });
 
       _registry.addComponent(spaceship, spaceshipSprite);
 #if DEBUG

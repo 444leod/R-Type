@@ -27,7 +27,6 @@
 #include <Structures/UserInput.hpp>
 #include "PremadeComponents/Displayable/Text.hpp"
 
-
 void Level1::initialize() {}
 
 void Level1::update(const double& deltaTime)
@@ -173,6 +172,7 @@ void Level1::onEnter(const AScene& lastScene)
 
 void Level1::onExit()
 {
+    std::cout << "onExit" << std::endl;
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::DISCONNECT;
 

@@ -122,10 +122,10 @@ void WaitingRoom::_startGame(const std::vector<std::string>&)
     }
 
     std::cout << "Starting the game..." << std::endl;
-    engine::RestrictedGame::instance().scenes().load("game");
-
     ntw::UDPPacket packet;
     packet << PACKET_TYPE::START;
 
     net->sendPacket(packet);
+
+    engine::RestrictedGame::instance().scenes().load("game");
 }

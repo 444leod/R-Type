@@ -9,11 +9,14 @@
 #define RESTRICTED_SCENE_MANAGER_HPP
 
 #include <string>
+#include <vector>
+#include <memory>
 
 namespace engine
 {
 // Forward declaration
 class AScene;
+class AGameModule;
 
 /**
  * @class RestrictedSceneManager
@@ -22,7 +25,7 @@ class AScene;
 class RestrictedSceneManager
 {
   public:
-    RestrictedSceneManager() = default;
+    RestrictedSceneManager(std::vector<std::shared_ptr<AGameModule>>& modules) : _modules(modules) {}
     virtual ~RestrictedSceneManager() = default;
 
     /**
@@ -47,6 +50,9 @@ class RestrictedSceneManager
      * @brief Retrieves the currently running scene.
      */
     virtual AScene& current() = 0;
+
+protected:
+    std::vector<std::shared_ptr<AGameModule>>& _modules;
 };
 
 } // namespace engine

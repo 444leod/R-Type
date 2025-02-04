@@ -29,7 +29,7 @@ class NewProjectileSystem final : public engine::ASystem
   public:
     explicit NewProjectileSystem() : ASystem("NewProjectileSystem"), _lastShotTime(0.0) {}
 
-    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const std::uint32_t charge) const
+    void execute(const std::uint32_t& shipId, const std::uint32_t& projectileId, const Transform& transform, const std::uint32_t charge)
     {
         const auto currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()
@@ -75,8 +75,12 @@ class NewProjectileSystem final : public engine::ASystem
                 _registry.addComponent(projectile, Hitbox{
                     .shape = hitboxShape,
                     .onCollision = [this](const ecs::Entity entity) {
-                        if (_registry.has_any_of<Transform, Enemy>(entity)) {
+                        if (_registry.has_all_of<Transform, Enemy>(entity)) {
                             _registry.remove(entity);
+                            _points += 100;
+                            if (_points >= 1000) {
+                                engine::RestrictedGame::instance().scenes().load("win");
+                            }
                         }
                     }
                 });
@@ -90,6 +94,7 @@ class NewProjectileSystem final : public engine::ASystem
 
   private:
     mutable double _lastShotTime;
+    uint32_t _points = 0;
 };
 
 #endif /* !NEW_PROJECTILE_SYSTEM_HPP_ */

@@ -59,8 +59,9 @@ template <typename T> class SparseSet final : public ISparseSet
      */
     [[nodiscard]] T& at(const ecs::Entity& entity)
     {
+
         if (!this->contains(entity))
-            throw std::out_of_range("Entity " + std::to_string(entity) + " is not in the set");
+            throw std::out_of_range("Entity " + std::to_string(entity) + " is not in the set " + Family<T>::name());
         return this->_components[this->_sparse[entity]];
     }
 
@@ -69,19 +70,22 @@ template <typename T> class SparseSet final : public ISparseSet
      * @param entity The entity to set the component to
      * @param component The component
      */
-    void set(const ecs::Entity& entity, T component)
+    T& set(const ecs::Entity& entity, T component)
     {
         if (this->contains(entity))
         {
+          std::cout << "contains" << std::endl;
             this->_components[this->_sparse[entity]] = component;
         }
         else
         {
+          std::cout << "not contains" << std::endl;
             const std::size_t size = this->_dense.size();
             this->_dense.push_back(entity);
             this->_components.push_back(component);
             this->_add_in_sparse(entity, size);
         }
+        return this->_components[this->_sparse[entity]];
     }
 
     /**

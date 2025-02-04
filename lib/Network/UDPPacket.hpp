@@ -12,6 +12,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 
 /**
  * @brief Overload of the << operator for std::byte.
@@ -75,6 +76,17 @@ struct UDPPacket
     uint16_t payload_length = 0;         ///< Length of the payload.
     uint16_t checksum = 0;               ///< Checksum of the packet.
     std::vector<std::byte> payload = {}; ///< Payload of the packet.
+
+  [[nodiscard]] std::string toString() const
+  {
+    std::ostringstream oss;
+    oss << "Sequence: " << sequence_number
+        << ", Ack: " << ack_number
+        << ", Payload Length: " << payload_length
+        << ", Checksum: " << checksum
+        << ", Payload: " << print_bytes(payload.data(), payload.size());
+    return oss.str();
+  }
 
     /**
      * @brief Exception class for UDPPacket errors.
@@ -375,7 +387,7 @@ struct UDPPacket
         compressed.push_back(static_cast<std::byte>(count));
         compressed.push_back(static_cast<std::byte>(current));
 
-        std::cout << "Compressed size: " << compressed.size() << " Serialized size: " << serialized.size() << std::endl;
+        // std::cout << "Compressed size: " << compressed.size() << " Serialized size: " << serialized.size() << std::endl;
         // Only return compressed data if it's actually smaller
         return compressed.size() < serialized.size() ? compressed : std::vector<std::byte>{};
     }
@@ -522,6 +534,7 @@ struct UDPPacket
      */
     template <typename T> void get(T* data) const { this->get(data, sizeof(T)); }
 
+public:
     /**
      * @brief Get raw data from the payload without shifting the position.
      *
@@ -535,6 +548,8 @@ struct UDPPacket
         this->get(&var);
         return var;
     }
+
+private:
 
     /**
      * @brief Get raw data from the payload without shifting the position,

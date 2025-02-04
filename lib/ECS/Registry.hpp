@@ -51,6 +51,8 @@ class Registry
     {
         const auto entity = Registry::_get_new_entity_id();
 
+        std::cout << "Creating entity: " << entity << std::endl;
+
         _entities.emplace_back(entity);
         return entity;
     }
@@ -124,11 +126,13 @@ class Registry
      * @param entity The Entity to attach to
      * @param component The Component information to attach
      */
-    template <typename T> T& addComponent(Entity entity, const T& component)
+    template <typename T>
+    T& addComponent(Entity entity, const T& component)
     {
         const auto id = Family<T>::id();
         SparseSet<T>* set = nullptr;
 
+        std::cout << "Adding component " << Family<T>::name() << " to entity " << entity << std::endl;
         if (!this->_sparse_sets.contains(id))
         {
             set = new SparseSet<T>();
@@ -136,8 +140,7 @@ class Registry
         }
         else
             set = dynamic_cast<SparseSet<T>*>(this->_sparse_sets.at(id));
-        set->set(entity, component);
-        return set->at(entity);
+        return set->set(entity, component);
     }
 
     /**
