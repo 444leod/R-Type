@@ -26,11 +26,28 @@ void Win::onEnter()
 void Win::onEnter(const AScene& lastScene)
 {
     std::cout << "Win scene" << std::endl;
-    _registry.clear();
-    const auto text = _registry.create();
 
-    _registry.addComponent(text, Text{.font = "./assets/arial.ttf", .message = "You won!", .fontSize = 30u, .color = Color(31, 81, 255)});
-    _registry.addComponent(text, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
+    _registry.flush();
+    _registry.clear();
+
+    std::cout << "Registry state after clear:" << std::endl;
+    _registry.displaySparse();
+    const auto text = _registry.create();
+    std::cout << "Created text entity: " << text << std::endl;
+
+    try {
+        _registry.addComponent(text, Transform{.x = 100, .y = 100, .z = 1, .rotation = 0});
+        std::cout << "Added Transform component" << std::endl;
+        _registry.addComponent(text, Text{
+            .font = "./assets/arial.ttf",
+            .message = "You won!",
+            .fontSize = 30u,
+            .color = Color(31, 81, 255)
+        });
+        std::cout << "Added Text component" << std::endl;
+    } catch (const std::exception& e) {
+        std::cerr << "Error adding components: " << e.what() << std::endl;
+    }
 }
 
 void Win::onExit() {}

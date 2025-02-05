@@ -171,9 +171,18 @@ template <typename T> class SparseSet final : public ISparseSet
      */
     void clear() noexcept override
     {
-        this->_sparse.clear();
-        this->_dense.clear();
-        this->_components.clear();
+        std::cout << "Clearing SparseSet for " << Family<T>::name() << std::endl;
+        std::cout << "Before clear - sparse size: " << _sparse.size() 
+                  << ", dense size: " << _dense.size() 
+                  << ", components size: " << _components.size() << std::endl;
+
+        _sparse = std::vector<std::size_t>();
+        _dense = std::vector<Entity>();
+        _components = std::vector<T>();
+
+        std::cout << "After clear - sparse size: " << _sparse.size() 
+                  << ", dense size: " << _dense.size() 
+                  << ", components size: " << _components.size() << std::endl;
     }
 
     /**

@@ -86,6 +86,7 @@ class Registry
         for (auto const& [id, sparse] : _sparse_sets)
             sparse->clear();
         _entities.clear();
+        _reset_entity_counter();
     }
 
     /**
@@ -251,8 +252,19 @@ class Registry
      */
     static Entity _get_new_entity_id()
     {
+        return _get_entity_counter()++;
+    }
+
+    static void _reset_entity_counter()
+    {
+        static Entity& value = _get_entity_counter();
+        value = 0;
+    }
+
+    static Entity& _get_entity_counter()
+    {
         static Entity value = 0;
-        return value++;
+        return value;
     }
 
     std::vector<Entity> _queue_remove = {};
