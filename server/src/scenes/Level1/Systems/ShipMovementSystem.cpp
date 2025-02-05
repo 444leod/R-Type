@@ -18,10 +18,14 @@
 
 static std::optional<ecs::Entity> getEntityBySource(ecs::Registry& registry, const asio::ip::udp::endpoint& source)
 {
-    for (auto [entity, info] : registry.view<Client>())
-    {
-        if (info.info.endpoint == source)
-            return entity;
+    try {
+        for (auto [entity, info] : registry.view<Client>().each())
+        {
+            if (info.info.endpoint == source)
+                return entity;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error in getEntityBySource: " << e.what() << std::endl;
     }
     return std::nullopt;
 }
