@@ -257,8 +257,7 @@ class Registry
 
     static void _reset_entity_counter()
     {
-        static Entity& value = _get_entity_counter();
-        value = 0;
+        _get_entity_counter() = 0;
     }
 
     static Entity& _get_entity_counter()
