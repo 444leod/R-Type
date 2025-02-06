@@ -50,7 +50,31 @@ template <typename T> class SparseSet final : public ISparseSet
      * @param entity The entity to check for
      * @return `true` if the entity is in the set. `false` otherwise
      */
-    [[nodiscard]] bool contains(const ecs::Entity& entity) const noexcept override { return entity < this->_sparse.size() && this->_sparse[entity] < this->_dense.size() && entity == this->_dense[this->_sparse[entity]]; }
+    [[nodiscard]] bool contains(const ecs::Entity& entity) const noexcept override
+    {
+        if (entity >= this->_sparse.size()) {
+            return false;
+        }
+
+        const auto sparseIndex = this->_sparse[entity];
+        if (sparseIndex >= this->_dense.size()) {
+            return false;
+        }
+
+        const auto denseEntity = this->_dense[sparseIndex];
+        if (entity != denseEntity) {
+            if (entity == 6 || entity == 7) {
+                std::cout << "Entity " << entity << " mismatch in dense array:" << std::endl;
+                std::cout << "Sparse[" << entity << "] = " << sparseIndex << std::endl;
+                std::cout << "Dense[" << sparseIndex << "] = " << denseEntity << std::endl;
+                std::cout << "Dense size: " << this->_dense.size() << std::endl;
+                std::cout << "Components size: " << this->_components.size() << std::endl;
+            }
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * @brief Gets the component linked to an entity
@@ -59,10 +83,20 @@ template <typename T> class SparseSet final : public ISparseSet
      */
     [[nodiscard]] T& at(const ecs::Entity& entity)
     {
+        if (entity >= this->_sparse.size()) {
+            throw std::out_of_range("Entity " + std::to_string(entity) + " is out of range for set " + Family<T>::name());
+        }
 
-        if (!this->contains(entity))
+        if (!this->contains(entity)) {
             throw std::out_of_range("Entity " + std::to_string(entity) + " is not in the set " + Family<T>::name());
-        return this->_components[this->_sparse[entity]];
+        }
+
+        const auto index = this->_sparse[entity];
+        if (index >= this->_components.size()) {
+            throw std::out_of_range("Invalid component index for entity " + std::to_string(entity) + " in set " + Family<T>::name());
+        }
+
+        return this->_components[index];
     }
 
     /**
@@ -72,18 +106,27 @@ template <typename T> class SparseSet final : public ISparseSet
      */
     T& set(const ecs::Entity& entity, T component)
     {
+        std::cout << "Setting component for entity " << entity << " in set " << Family<T>::name() << std::endl;
+
+        if (entity >= this->_sparse.size()) {
+            const std::size_t newSize = this->_compute_resize(entity);
+            std::cout << "Resizing sparse array from " << this->_sparse.size() << " to " << newSize << std::endl;
+            this->_sparse.resize(newSize, this->_dense.size());
+        }
+
         if (this->contains(entity))
         {
-          std::cout << "contains" << std::endl;
+            std::cout << "Entity " << entity << " already exists in set, updating component" << std::endl;
             this->_components[this->_sparse[entity]] = component;
         }
         else
         {
-          std::cout << "not contains" << std::endl;
+            std::cout << "Adding new entity " << entity << " to set" << std::endl;
             const std::size_t size = this->_dense.size();
             this->_dense.push_back(entity);
             this->_components.push_back(component);
-            this->_add_in_sparse(entity, size);
+            this->_sparse[entity] = size;
+            std::cout << "Added entity " << entity << " at index " << size << std::endl;
         }
         return this->_components[this->_sparse[entity]];
     }
@@ -94,19 +137,33 @@ template <typename T> class SparseSet final : public ISparseSet
      */
     void remove(const ecs::Entity& entity) override
     {
-        if (!this->contains(entity))
+        std::cout << "Attempting to remove entity " << entity << " from set " << Family<T>::name() << std::endl;
+        if (!this->contains(entity)) {
+            std::cout << "Entity " << entity << " not found in set" << std::endl;
             return;
+        }
 
-        T& last_c = this->_components.back();
-        Entity last_e = this->_dense.back();
-        // Swap the Entity and Component to the end
-        this->_swap(this->_dense.back(), this->_dense[this->_sparse[entity]]);
-        this->_swap(this->_components.back(), this->_components[this->_sparse[entity]]);
-        // Swap their IDs in the sparse
-        this->_swap(this->_sparse[last_e], this->_sparse[entity]);
-        // Delete in dense lists
+        const auto currentIndex = this->_sparse[entity];
+        const auto lastIndex = this->_dense.size() - 1;
+
+        std::cout << "Removing entity " << entity << " from index " << currentIndex << std::endl;
+
+        if (currentIndex != lastIndex) {
+            Entity lastEntity = this->_dense[lastIndex];
+            std::cout << "Moving last entity " << lastEntity << " from index " << lastIndex << " to " << currentIndex << std::endl;
+
+            this->_dense[currentIndex] = lastEntity;
+            this->_components[currentIndex] = this->_components[lastIndex];
+            this->_sparse[lastEntity] = currentIndex;
+        }
+
         this->_dense.pop_back();
         this->_components.pop_back();
+
+        if (entity < this->_sparse.size()) {
+            this->_sparse[entity] = this->_dense.size() + 1;
+            std::cout << "Set invalid index " << this->_dense.size() + 1 << " for removed entity " << entity << std::endl;
+        }
     }
 
     /**
@@ -157,9 +214,20 @@ template <typename T> class SparseSet final : public ISparseSet
      */
     void _add_in_sparse(const ecs::Entity& entity, std::size_t value)
     {
+        std::cout << "Adding entity " << entity << " to sparse array with value " << value << std::endl;
         if (this->_sparse.capacity() <= entity)
         {
-            this->_sparse.resize(this->_compute_resize(entity));
+            std::size_t newSize = this->_compute_resize(entity);
+            std::cout << "Resizing sparse array from " << this->_sparse.capacity() << " to " << newSize << std::endl;
+
+            auto oldSize = this->_sparse.size();
+            auto oldValues = this->_sparse;
+
+            this->_sparse.resize(newSize, this->_dense.size() + 1);
+
+            for (size_t i = 0; i < oldSize; ++i) {
+                this->_sparse[i] = oldValues[i];
+            }
         }
         this->_sparse[entity] = value;
     }
