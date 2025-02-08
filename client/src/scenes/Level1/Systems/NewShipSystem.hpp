@@ -46,7 +46,8 @@ class NewShipSystem final : public engine::ASystem
         }
       });
 
-      _registry.addComponent(spaceship, spaceshipSprite);
+      auto &sprite = _registry.addComponent(spaceship, spaceshipSprite);
+      sprite.textureRect = IntRect(0, id * 16, 32, 16);
 #if DEBUG
       _registry.addComponent(spaceship, Debug{});
 #endif
