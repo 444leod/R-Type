@@ -12,13 +12,12 @@ class ResourcesManager;
 #include <SFML/Graphics.hpp>
 #include <cstdint>
 #include <utility>
-#include <vector>
 
 #include "ResourcesManager.hpp"
 
-#include "PremadeSystems/Abstracts/ARenderSystem.hpp"
 
 #include "PremadeSystems/Render/DebugDrawSystem.hpp"
+#include "PremadeSystems/Render/DrawInputsSystem.hpp"
 #include "PremadeSystems/Render/DrawButtonsSystem.hpp"
 #include "PremadeSystems/Render/DrawShapeSystem.hpp"
 #include "PremadeSystems/Render/DrawSpritesSystem.hpp"
@@ -40,7 +39,7 @@ class GameRenderingModule final : public engine::AGameModule
 {
   public:
     GameRenderingModule(const std::uint32_t& width, const std::uint32_t& height, std::string title)
-        : _title(std::move(title)), _mode(width, height), _spritesSystem(_resourcesManager), _textsSystem(_resourcesManager), _buttonSystem(_resourcesManager), _debugDrawSystem(), _buttonClickedSystem(), _shapeSystem()
+        : _title(std::move(title)), _mode(width, height), _spritesSystem(_resourcesManager), _textsSystem(_resourcesManager), _buttonSystem(_resourcesManager), _inputSystem(_resourcesManager), _debugDrawSystem(), _buttonClickedSystem(), _shapeSystem()
     {
     }
     ~GameRenderingModule() override = default;
@@ -78,6 +77,7 @@ class GameRenderingModule final : public engine::AGameModule
         this->_spritesSystem.execute(this->_window);
         this->_textsSystem.execute(this->_window);
         this->_buttonSystem.execute(this->_window);
+        this->_inputSystem.execute(this->_window);
         this->_debugDrawSystem.execute(this->_window);
         this->_shapeSystem.execute(this->_window);
         // Execute additional scene systems
@@ -98,6 +98,7 @@ class GameRenderingModule final : public engine::AGameModule
 
     DrawSpritesSystem _spritesSystem;
     DrawTextsSystem _textsSystem;
+    DrawInputsSystem _inputSystem;
     DebugDrawSystem _debugDrawSystem;
     DrawButtonsSystem _buttonSystem;
     DrawShapeSystem _shapeSystem;
