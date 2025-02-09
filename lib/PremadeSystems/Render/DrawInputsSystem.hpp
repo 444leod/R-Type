@@ -61,7 +61,11 @@ class DrawInputsSystem final : public ARenderSystem
                 label.setString(text.message);
                 label.setCharacterSize(text.fontSize);
                 label.setPosition(x + shapeWidth / 2 - label.getGlobalBounds().width / 2, y + shapeHeight / 2 / 2 - label.getGlobalBounds().height / 2);
-                label.setFillColor(sf::Color(text.color.r, text.color.g, text.color.b));
+
+                if (input.disabled)
+                    label.setFillColor(sf::Color(100, 100, 100));
+                else
+                    label.setFillColor(sf::Color(text.color.r, text.color.g, text.color.b));
 
                 if (label.getGlobalBounds().width > shapeWidth)
                 {

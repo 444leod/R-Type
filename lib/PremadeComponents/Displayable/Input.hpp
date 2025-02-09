@@ -17,6 +17,7 @@ struct Input {
     Color focused;
     Color notFocused;
     Text text;
+    bool disabled;
     bool active;
 };
 

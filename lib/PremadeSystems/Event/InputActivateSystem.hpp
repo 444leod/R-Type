@@ -23,6 +23,11 @@ public:
         _registry.view<Input, Transform>().each(
             [&](Input& input, const Transform& transform)
             {
+                if (input.disabled)
+                {
+                    input.active = false;
+                    return;
+                }
                 if (event.mouseButton.x < transform.x || event.mouseButton.x > transform.x + input.box.width || event.mouseButton.y < transform.y || event.mouseButton.y > transform.y + input.box.height)
                     input.active = false;
                 else

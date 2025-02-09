@@ -90,11 +90,11 @@ void WaitingRoom::onEnter()
             .box = shape::Rectangle{
                 .width = 250,
                 .height = 50,
-                .fillColor = Color(100, 100, 100),
+                .fillColor = Color(0, 111, 255),
                 .outlineColor = Color(0, 100, 100),
                 .outlineThickness = 5
             },
-            .maxLength = 69, //15
+            .maxLength = 69,
             .placeHolder = "000.000.000.000",
             .value = "",
             .focused = Color(255, 0, 0),
@@ -105,6 +105,7 @@ void WaitingRoom::onEnter()
                 .fontSize = 30u,
                 .color = Color(255, 255, 255)
             },
+            .disabled = false,
             .active = false,
         }
     );
