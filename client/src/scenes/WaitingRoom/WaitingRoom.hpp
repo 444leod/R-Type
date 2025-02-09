@@ -8,7 +8,6 @@
 #ifndef WAITING_ROOM_HPP
 #define WAITING_ROOM_HPP
 
-#include <chrono>
 #include <optional>
 
 #include <ECS/EventDispatcher.hpp>
@@ -16,6 +15,8 @@
 #include <Engine/AScene.hpp>
 
 #include "PremadeSystems/Update/CollisionSystem.hpp"
+#include "PremadeSystems/Event/InputActivateSystem.hpp"
+#include "PremadeSystems/Event/InputTypeSystem.hpp"
 
 class WaitingRoom final : public engine::AScene
 {
@@ -35,6 +36,9 @@ class WaitingRoom final : public engine::AScene
     void onExit(const engine::AScene& nextScene) override;
 
   private:
+    InputActivateSystem _inputActivateSystem;
+    InputTypeSystem _inputTypeSystem;
+  
     std::optional<std::uint32_t> _id = std::nullopt;
 
     ecs::EventDispatcher _eventDispatcher;

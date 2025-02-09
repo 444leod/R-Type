@@ -6,6 +6,9 @@
 */
 
 #include "WaitingRoom.hpp"
+
+#include "PremadeComponents/Displayable/Input.hpp"
+
 #include <ECS/Registry.hpp>
 
 #include "PremadeModules/Network/ANetworkSceneModule.hpp"
@@ -80,6 +83,59 @@ void WaitingRoom::onEnter()
                                                .label = Text{.font = "./assets/arial.ttf", .message = "Click me", .fontSize = 30u, .color = Color(255, 255, 255)}});
 
     _registry.addComponent(button, Transform{.x = 100, .y = 100, .rotation = 20});
+
+    const auto input = _registry.create();
+    _registry.addComponent<Input>(
+        input, Input{
+            .box = shape::Rectangle{
+                .width = 250,
+                .height = 50,
+                .fillColor = Color(0, 111, 255),
+                .outlineColor = Color(0, 100, 100),
+                .outlineThickness = 5
+            },
+            .maxLength = 69,
+            .placeHolder = "000.000.000.000",
+            .value = "",
+            .focused = Color(255, 0, 0),
+            .notFocused = Color(0, 100, 100),
+            .text = Text{
+                .font = "./assets/arial.ttf",
+                .message = "",
+                .fontSize = 30u,
+                .color = Color(255, 255, 255)
+            },
+            .disabled = false,
+            .active = false,
+        }
+    );
+
+    _registry.addComponent(input, Transform{.x = 100, .y = 150, .rotation = 20});
+
+    const auto sceneRenderingModule = this->getModule<ASceneRenderingModule>();
+    if (!sceneRenderingModule)
+    {
+        engine::RestrictedGame::instance().stop();
+        std::cerr << "No events module found, exiting..." << std::endl;
+    }
+
+    sceneRenderingModule->addHandler(
+        [this] (const sf::Event& e) {
+            return e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Left;
+        },
+        [this] (sf::Event& e) {
+            _inputActivateSystem.execute(e);
+        }
+    );
+
+    sceneRenderingModule->addHandler(
+        [this] (const sf::Event& e) {
+            return e.type == sf::Event::KeyPressed;
+        },
+        [this] (sf::Event& e) {
+            _inputTypeSystem.execute(e);
+        }
+    );
 }
 
 void WaitingRoom::onEnter(const AScene& lastScene) {}
