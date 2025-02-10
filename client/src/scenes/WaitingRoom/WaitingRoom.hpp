@@ -47,6 +47,9 @@ class WaitingRoom final : public engine::AScene
     std::uint8_t _connectionAttempts = 0;
     double _pointTimer = 0;
     std::uint8_t _pointNumber = 0;
+    std::uint32_t _statusTextId = 0;
+    bool _connecting = false;
+    bool _connected = false;
 };
 
 #endif // WAITING_ROOM_HPP
