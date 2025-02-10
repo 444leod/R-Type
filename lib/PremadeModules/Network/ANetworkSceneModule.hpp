@@ -43,6 +43,8 @@ class ANetworkSceneModule final : public engine::ASceneModule
 
     [[nodiscard]] std::vector<ntw::ClientInformation> clients() const { return this->_networkGameModule.clients(); }
 
+    void connect(const std::string& ip, const std::uint32_t& port, const std::string& userName) const { this->_networkGameModule.connect(ip, port, userName); }
+
   protected:
     ANetworkGameModule& _networkGameModule;
 };

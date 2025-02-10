@@ -157,6 +157,19 @@ class ANetworkGameModule : public engine::AGameModule, public ntw::NetworkAgent
 
     [[nodiscard]] std::vector<ntw::ClientInformation> clients() const { return this->_clients; }
 
+    void connect(const std::string& ip, const std::uint32_t& port, const std::string& userName)
+    {
+        const auto addr = asio::ip::address::from_string(ip);
+        const auto server = asio::ip::udp::endpoint(addr, port);
+                
+        ntw::UDPPacket packet;
+
+        packet << PACKET_TYPE::CONNECT;
+        packet << userName;
+        this->_clients.emplace_back(server, "Server");
+        this->sendPacket(server, packet);
+    }
+
   protected:
     void _onPacketReceived(const asio::ip::udp::endpoint& src, ntw::UDPPacket& packet) override
     {
