@@ -257,12 +257,12 @@ class Registry
 
     static void _reset_entity_counter()
     {
-        _get_entity_counter() = 0;
+        _get_entity_counter() = 1;
     }
 
     static Entity& _get_entity_counter()
     {
-        static Entity value = 0;
+        static Entity value = 1;
         return value;
     }
 
