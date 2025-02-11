@@ -30,7 +30,9 @@ class NewShipSystem final : public engine::ASystem
       _registry.addComponent(spaceship, Ship{.id = id});
       _registry.addComponent(spaceship, transform);
       _registry.addComponent(spaceship, velocity);
-      _registry.addComponent(spaceship, Debug{}),
+    #if DEBUG
+      _registry.addComponent(spaceship, Debug{});
+    #endif
       _registry.addComponent(spaceship, Hitbox{
         .shape = shape::Rectangle{
             .width = 150,
