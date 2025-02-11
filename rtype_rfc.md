@@ -47,6 +47,8 @@ The R-Type network protocol supports the following features:
 
 ## Packet Structure
 
+On average, a packet is 16-bytes long.
+
 ### Basic Packet Format
 Each packet starts with:
 ```
